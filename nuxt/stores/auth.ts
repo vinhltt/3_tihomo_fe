@@ -1,0 +1,361 @@
+import { logger } from '~/utils/logger'
+import { defineStore } from 'pinia'
+import type { LoginRequest, LoginResponse, User, ApiResponse } from '@/types/auth'
+
+type AuthState = {
+  user: User | null
+  token: string | null
+  refreshToken: string | null
+  isLoading: boolean
+  error: string | null
+  isAuthenticated: boolean
+}
+
+type LoginCredentials = {
+  email: string
+  password: string
+}
+
+/**
+ * Get secure cookie settings based on environment
+ * Lấy cài đặt cookie bảo mật dựa trên môi trường
+ */
+function getSecureCookieSettings() {
+  const isSecure = process.env.NODE_ENV === 'production' && process.env.HTTPS_ENABLED === 'true'
+  
+  if (process.dev) {
+    logger.dev('🍪 Cookie security settings:', {
+      isSecure,
+      nodeEnv: process.env.NODE_ENV,
+      httpsEnabled: process.env.HTTPS_ENABLED,
+      sameSite: isSecure ? 'strict' : 'lax'
+    })
+  }
+  
+  return {
+    httpOnly: false,
+    secure: isSecure,
+    sameSite: isSecure ? 'strict' : 'lax',
+  } as const
+}
+
+/**
+ * Authentication store for managing user login, logout, and session state (EN)
+ * Store xác thực để quản lý đăng nhập, đăng xuất và trạng thái phiên của người dùng (VI)
+ */
+export const useAuthStore = defineStore('auth', {
+  state: (): AuthState => ({
+    user: null,
+    token: null,
+    refreshToken: null,
+    isLoading: false,
+    error: null,
+    isAuthenticated: false
+  }),
+
+  actions: {
+    /**
+     * Initialize authentication - check for existing tokens
+     * Khởi tạo xác thực - kiểm tra token hiện có
+     */
+    async initAuth(): Promise<void> {
+      // Skip initialization on server-side to prevent hydration issues
+      // Bỏ qua khởi tạo trên server-side để tránh vấn đề hydration
+      if (process.server) {
+        return
+      }
+      
+      this.isLoading = true
+      this.error = null
+
+      try {
+        // Check for existing tokens in cookies
+        const tokenCookie = useCookie('auth-token')
+        const refreshCookie = useCookie('refresh-token')
+
+        if (tokenCookie.value) {
+          this.token = tokenCookie.value
+          this.refreshToken = refreshCookie.value || null
+          this.isAuthenticated = true
+          
+          // In a real implementation, validate token with server
+          // For now, assume token is valid if it exists
+        } else {
+          // No token found, ensure clean state
+          this.isAuthenticated = false
+          this.token = null
+          this.refreshToken = null
+          this.user = null
+        }
+      } catch (error: any) {
+        logger.error('Auth initialization error:', error)
+        this.error = 'Failed to initialize authentication'
+        // Set clean state on error
+        this.isAuthenticated = false
+        this.token = null
+        this.refreshToken = null
+        this.user = null
+      } finally {
+        this.isLoading = false
+      }
+    },    /**
+     * Login user with email and password
+     * Đăng nhập người dùng bằng email và mật khẩu
+     */
+    async login(credentials: LoginCredentials): Promise<boolean> {
+      this.isLoading = true
+      this.error = null
+
+      try {
+        const { data } = await $fetch<ApiResponse<LoginResponse>>('/api/auth/login', {
+          method: 'POST',
+          body: {
+            email: credentials.email,
+            password: credentials.password,
+          } as LoginRequest,
+        })
+
+        if (data) {
+          this.token = data.token
+          this.refreshToken = data.refreshToken
+          this.user = data.user
+          this.isAuthenticated = true
+
+          // Store tokens in cookies for SSR with environment-appropriate security settings
+          // Lưu tokens trong cookies cho SSR với cài đặt bảo mật phù hợp với môi trường
+          const cookieSettings = getSecureCookieSettings()
+          
+          const tokenCookie = useCookie('auth-token', {
+            ...cookieSettings,
+            maxAge: 60 * 60 * 24 * 7, // 7 days
+          })
+          const refreshCookie = useCookie('refresh-token', {
+            ...cookieSettings,
+            maxAge: 60 * 60 * 24 * 30, // 30 days
+          })
+
+          tokenCookie.value = data.token
+          refreshCookie.value = data.refreshToken
+
+          return true
+        }
+
+        this.error = 'Login failed'
+        return false
+      } catch (error: any) {
+        this.error = error.data?.message || 'Login failed. Please try again.'
+        return false
+      } finally {
+        this.isLoading = false
+      }
+    },
+
+    /**
+     * Logout user
+     * Đăng xuất người dùng
+     */
+    async logout(): Promise<void> {
+      this.isLoading = true
+
+      try {
+        // Traditional logout - call API to invalidate token
+        try {
+          await $fetch('/api/auth/logout', {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${this.token}`
+            }
+          })
+        } catch (error) {
+          // Continue with local logout even if server logout fails
+          logger.warn('Server logout failed:', error)
+        }
+      } catch (error: any) {
+        logger.error('Logout error:', error)
+      } finally {
+        // Clear local state regardless of server response
+        this.clearAuthState()
+        this.isLoading = false
+      }
+    },    /**
+     * Clear authentication state
+     * Xóa trạng thái xác thực
+     */
+    clearAuthState(): void {
+      this.user = null
+      this.token = null
+      this.refreshToken = null
+      this.isAuthenticated = false
+      this.error = null
+
+      // Clear cookies
+      const tokenCookie = useCookie('auth-token')
+      const refreshCookie = useCookie('refresh-token')
+
+      tokenCookie.value = null
+      refreshCookie.value = null
+    },
+
+    /**
+     * Refresh authentication token (EN)
+     * Làm mới token xác thực (VI)
+     */
+    async refreshAuthToken(): Promise<boolean> {
+      if (!this.refreshToken) {
+        await this.logout()
+        return false
+      }
+
+      try {
+        const { data } = await $fetch<ApiResponse<LoginResponse>>('/api/auth/refresh-token', {
+          method: 'POST',
+          body: { refreshToken: this.refreshToken },
+        })
+
+        if (data) {
+          this.token = data.token
+          this.refreshToken = data.refreshToken
+          this.user = data.user
+          this.isAuthenticated = true
+
+          // Update cookies
+          const tokenCookie = useCookie('auth-token')
+          const refreshCookie = useCookie('refresh-token')
+          tokenCookie.value = data.token
+          refreshCookie.value = data.refreshToken
+
+          return true
+        }
+
+        await this.logout()
+        return false
+      } catch (error) {
+        await this.logout()
+        return false
+      }
+    },
+
+    /**
+     * Clear error state (EN)
+     * Xóa trạng thái lỗi (VI)
+     */
+    clearError(): void {
+      this.error = null
+    },    /**
+     * Login user with social provider response (EN)
+     * Đăng nhập người dùng với phản hồi từ nhà cung cấp xã hội (VI)
+     */
+    async socialLogin(socialResponse: import('@/types/auth').SocialLoginResponse): Promise<boolean> {
+      this.isLoading = true
+      this.error = null
+
+      try {
+        // Validate response has required data
+        if (!socialResponse) {
+          throw new Error('Social login response is empty')
+        }
+
+        if (!socialResponse.accessToken) {
+          throw new Error('Access token is missing from social login response')
+        }
+
+        // Store tokens first
+        this.token = socialResponse.accessToken
+        this.refreshToken = socialResponse.refreshToken
+
+        // Convert UserInfo to User format for auth store
+        // Handle cases where user data might be incomplete
+        if (!socialResponse.user) {
+          // Create minimal user object when user data is missing
+          this.user = {
+            id: '',
+            email: '',
+            firstName: 'Social',
+            lastName: 'User',
+            isActive: true,
+            emailConfirmed: true,
+            roles: [],
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          }
+          logger.warn('⚠️ Social login response missing user data, using default user object')
+        } else {
+          const userName = socialResponse.user.name || socialResponse.user.email || 'User'
+          const nameParts = userName.split(' ')
+          this.user = {
+            id: socialResponse.user.id,
+            email: socialResponse.user.email || '',
+            firstName: nameParts[0] || '',
+            lastName: nameParts.slice(1).join(' ') || '',
+            isActive: socialResponse.user.isActive ?? true,
+            emailConfirmed: true,
+            roles: [],
+            createdAt: socialResponse.user.createdAt || new Date().toISOString(),
+            updatedAt: socialResponse.user.createdAt || new Date().toISOString(),
+            pictureUrl: socialResponse.user.pictureUrl
+          }
+        }
+        
+        this.isAuthenticated = true
+
+        // Store tokens in cookies for SSR with environment-appropriate security settings
+        // Lưu tokens trong cookies cho SSR với cài đặt bảo mật phù hợp với môi trường
+        const cookieSettings = getSecureCookieSettings()
+        
+        const tokenCookie = useCookie('auth-token', {
+          ...cookieSettings,
+          maxAge: 60 * 60 * 24 * 7, // 7 days
+        })
+        const refreshCookie = useCookie('refresh-token', {
+          ...cookieSettings,
+          maxAge: 60 * 60 * 24 * 30, // 30 days
+        })
+
+        tokenCookie.value = socialResponse.accessToken
+        refreshCookie.value = socialResponse.refreshToken
+
+        logger.dev('✅ Social login data stored in auth store:', {
+          hasUser: !!this.user,
+          hasToken: !!this.token,
+          userEmail: this.user?.email,
+          userName: this.user ? `${this.user.firstName} ${this.user.lastName}` : 'N/A',
+          isAuthenticated: this.isAuthenticated
+        })
+
+        return true
+      } catch (error: any) {
+        this.error = error.message || 'Social login failed'
+        logger.error('❌ Social login storage error:', error)
+        return false
+      } finally {
+        this.isLoading = false
+      }
+    },
+  },
+
+  getters: {
+    /**
+     * Get user's full name (EN)
+     * Lấy tên đầy đủ của người dùng (VI)
+     */
+    userFullName: (state): string => {
+      return state.user ? `${state.user.firstName} ${state.user.lastName}` : ''
+    },
+
+    /**
+     * Check if user has specific role (EN)
+     * Kiểm tra xem người dùng có vai trò cụ thể không (VI)
+     */
+    hasRole: (state) => (roleName: string): boolean => {
+      return state.user?.roles?.some(role => role.name === roleName) ?? false
+    },
+
+    /**
+     * Check if user is admin (EN)
+     * Kiểm tra xem người dùng có phải là admin không (VI)
+     */
+    isAdmin: (state): boolean => {
+      return state.user?.roles?.some(role => role.name === 'Admin') ?? false
+    },
+  },
+})

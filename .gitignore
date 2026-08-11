@@ -1,0 +1,32 @@
+# Environment & secrets
+.env*
+!.env.template
+!.env.example
+*.key
+*.pem
+
+# Dependencies
+node_modules/
+
+# Nuxt / build output
+.nuxt/
+.nitro/
+.cache/
+.output/
+dist/
+.data/
+
+# Logs
+*.log*
+logs/
+
+# IDE
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# Misc
+.DS_Store
+Thumbs.db
+coverage/
