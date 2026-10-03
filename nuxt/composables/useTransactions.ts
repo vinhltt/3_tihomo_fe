@@ -28,7 +28,7 @@ export const useTransactions = () => {
   const isLoading = ref(false)
   const error = ref<string | null>(null)
   const pagination = ref({
-    pageIndex: 0,
+    pageIndex: 1,
     pageSize: 20,
     totalRow: 0,
     pageCount: 0
@@ -41,7 +41,7 @@ export const useTransactions = () => {
   })
 
   // Get paginated transactions with filtering
-  const getTransactions = async (filter?: Partial<TransactionFilter>, page: number = 0, pageSize: number = 20) => {
+  const getTransactions = async (filter?: Partial<TransactionFilter>, page: number = 1, pageSize: number = 20) => {
     try {
       isLoading.value = true
       error.value = null

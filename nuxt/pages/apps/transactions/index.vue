@@ -249,17 +249,17 @@
           <!-- Pagination -->
           <div v-if="pagination.pageCount > 1" class="mt-5 flex items-center justify-between">
             <div class="text-sm text-gray-500">
-              Hiển thị {{ (pagination.pageIndex * pagination.pageSize) + 1 }}-{{ Math.min((pagination.pageIndex + 1) *
+              Hiển thị {{ ((pagination.pageIndex - 1) * pagination.pageSize) + 1 }}-{{ Math.min(pagination.pageIndex *
                 pagination.pageSize, pagination.totalRow) }}
               trong tổng số {{ pagination.totalRow }} giao dịch
             </div>
             <div class="flex gap-1">
-              <button @click="changePage(pagination.pageIndex - 1)" :disabled="pagination.pageIndex === 0"
+              <button @click="changePage(pagination.pageIndex - 1)" :disabled="pagination.pageIndex <= 1"
                 class="btn btn-sm btn-outline-primary">
                 Trước
               </button>
               <button @click="changePage(pagination.pageIndex + 1)"
-                :disabled="pagination.pageIndex >= pagination.pageCount - 1" class="btn btn-sm btn-outline-primary">
+                :disabled="pagination.pageIndex >= pagination.pageCount" class="btn btn-sm btn-outline-primary">
                 Sau
               </button>
             </div>
@@ -438,7 +438,7 @@ const confirmDelete = async (transaction: TransactionViewModel) => {
 }
 
 const changePage = async (page: number) => {
-  if (page >= 0 && page < pagination.value.pageCount) {
+  if (page >= 1 && page <= pagination.value.pageCount) {
     await getTransactions({}, page)
   }
 }

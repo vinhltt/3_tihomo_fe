@@ -213,6 +213,7 @@ import { useAppStore } from '@/stores/index'
 import { useAccounts } from '@/composables/useAccounts'
 import type { Account, AccountFilters, Pagination, FilterBodyRequest, ApiResponse, FilterRequest, FilterDetailsRequest } from '~/types'
 import { FilterLogicalOperator, FilterType } from '~/types'
+import { SortDirection } from '~/types/api'
 import Swal from 'sweetalert2'
 
 const store = useAppStore()
@@ -307,7 +308,10 @@ const fetchAccounts = async () => {
         logicalOperator: FilterLogicalOperator.And,
         details: filterDetails
       } : {},
-      orders: [],
+      orders: [
+        { field: 'Name', direction: SortDirection.Ascending },
+        { field: 'Id', direction: SortDirection.Ascending }
+      ],
       pagination: {
         pageIndex: pagination.value.pageIndex,
         pageSize: pagination.value.pageSize,

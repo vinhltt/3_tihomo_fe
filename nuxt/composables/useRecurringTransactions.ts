@@ -58,7 +58,7 @@ export const useRecurringTransactions = () => {
             },
             orders: [
                 {
-                    field: 'CreatedAt',
+                    field: 'CreateAt',
                     direction: 1 // Descending
                 }
             ],
@@ -78,7 +78,7 @@ export const useRecurringTransactions = () => {
             const request = buildFilterRequest(filters)
             
             const response = await $api.post<IBasePaging<RecurringTransactionTemplateViewModel>>(
-                '/api/RecurringTransactionTemplate/filter',
+                '/api/core-finance/RecurringTransactionTemplate/filter',
                 request
             )
             
