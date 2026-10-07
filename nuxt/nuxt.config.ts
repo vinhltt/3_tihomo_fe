@@ -122,7 +122,11 @@ export default defineNuxtConfig({
     compatibilityDate: '2024-09-21',
 
     devServer: {
-        port: process.env.FRONTEND_PORT ? parseInt(process.env.FRONTEND_PORT) : 3500, // Use FRONTEND_PORT env var or default to 3500
+        port: {
+            port: process.env.FRONTEND_PORT ? parseInt(process.env.FRONTEND_PORT) : 3500,
+            alternativePortRange: [],
+            random: false,
+        } as unknown as number,
     },
 
     runtimeConfig: {
