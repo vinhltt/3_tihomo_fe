@@ -1,9 +1,9 @@
 // Account types
-export type { AccountType, Account, AccountCreateRequest, AccountUpdateRequest, AccountFilters } from './account'
+export type { AccountType, Account, AccountSelection, AccountCreateRequest, AccountUpdateRequest, AccountFilters } from './account'
 
 // API types
 export type { Pagination, SortDescriptor, FilterDetailsRequest, FilterRequest, FilterBodyRequest, ApiResponse, ApiError } from './api' 
-export { FilterLogicalOperator, FilterType } from './api' 
+export { FilterLogicalOperator, FilterType, SortDirection } from './api'
 
 // Recurring Transaction types
 export type { 
@@ -16,6 +16,10 @@ export type {
     ExpectedTransactionUpdateRequest,
     ConfirmTransactionRequest,
     CancelTransactionRequest,
-    AdjustTransactionRequest
+    AdjustTransactionRequest,
+    ExpectedTransactionFilters,
+    RecordPaymentRequest,
+    RecordPaymentResult,
+    ExpectedCommandResult
 } from './recurring-transaction'
-export { RecurrenceFrequency, RecurringTransactionType, ExpectedTransactionStatus } from './recurring-transaction' 
+export { RecurrenceFrequency, RecurringTransactionType, ExpectedTransactionStatus, ExpectedTransactionDisplayStatus } from './recurring-transaction'

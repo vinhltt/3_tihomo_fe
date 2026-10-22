@@ -7,6 +7,7 @@ import type {
   TransactionDirectionType
 } from '~/types/transaction'
 import type { FilterBodyRequest, ApiResponse } from '~/types/api'
+import type { IBasePaging } from '~/types/recurring-transaction'
 import { FilterLogicalOperator, FilterType, SortDirection } from '~/types/api'
 import { 
   TransactionDirectionConst,
@@ -138,6 +139,26 @@ export const useTransactions = () => {
     } finally {
       isLoading.value = false
     }
+  }
+
+  // Stateless paged search: never touches this composable's shared list state, so any owner can call it.
+  const searchTransactions = (
+    searchValue: string,
+    pageIndex: number,
+    pageSize: number,
+    signal?: AbortSignal
+  ): Promise<IBasePaging<TransactionViewModel>> => {
+    const body: FilterBodyRequest = {
+      langId: '',
+      searchValue,
+      filter: {},
+      orders: [
+        { field: 'transactionDate', direction: SortDirection.Descending },
+        { field: 'id', direction: SortDirection.Descending }
+      ],
+      pagination: { pageIndex, pageSize, totalRow: 0, pageCount: 0 }
+    }
+    return post<IBasePaging<TransactionViewModel>>('/api/core-finance/transaction/filter', body, signal)
   }
 
   // Get transaction by ID
@@ -303,6 +324,7 @@ export const useTransactions = () => {
     
     // Actions
     getTransactions,
+    searchTransactions,
     getTransactionById,
     createTransaction,
     updateTransaction,

@@ -15,6 +15,12 @@
             </div>
 
             <form @submit.prevent="handleSubmit" class="p-6 space-y-6">
+                <div v-if="saveError" role="alert" class="rounded-lg border border-danger/20 bg-danger/10 p-3 text-danger">
+                    <p>{{ saveError }}</p>
+                    <ul v-if="validationErrors.length" class="mt-2 list-disc pl-5">
+                        <li v-for="(message, index) in validationErrors" :key="index">{{ message }}</li>
+                    </ul>
+                </div>
                 <!-- Basic Information -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -29,12 +35,18 @@
                     </div>
                     <div>
                         <label class="form-label">Tài khoản *</label>
-                        <select v-model="form.accountId" class="form-select" required>
+                        <select v-model="form.accountId" class="form-select" :disabled="accountLoading || !!accountError || loading" required>
                             <option value="">Chọn tài khoản</option>
                             <option v-for="account in accounts" :key="account.id" :value="account.id">
                                 {{ account.name }}
                             </option>
                         </select>
+                        <p v-if="accountLoading" class="mt-1 text-sm text-gray-500">Đang tải tài khoản...</p>
+                        <div v-else-if="accountError" role="alert" class="mt-1 text-sm text-danger">
+                            <p>Không thể tải tài khoản: {{ accountError }}</p>
+                            <button type="button" class="mt-2 btn btn-sm btn-outline-primary" @click="$emit('retry-accounts')">Thử lại</button>
+                        </div>
+                        <p v-else-if="accounts.length === 0" class="mt-1 text-sm text-warning">Chưa có tài khoản để tạo mẫu.</p>
                     </div>
                 </div>
 
@@ -89,17 +101,17 @@
                         <div>
                             <label class="form-label">Tần suất lặp lại *</label>
                             <select v-model="form.frequency" class="form-select" required @change="handleFrequencyChange">
-                                <option :value="0">Hàng ngày</option>
-                                <option :value="1">Hàng tuần</option>
-                                <option :value="2">Hai tuần một lần</option>
-                                <option :value="3">Hàng tháng</option>
-                                <option :value="4">Hàng quý</option>
-                                <option :value="5">Nửa năm</option>
-                                <option :value="6">Hàng năm</option>
-                                <option :value="7">Tùy chỉnh</option>
+                                <option :value="RecurrenceFrequency.Daily">Hàng ngày</option>
+                                <option :value="RecurrenceFrequency.Weekly">Hàng tuần</option>
+                                <option :value="RecurrenceFrequency.Biweekly">Hai tuần một lần</option>
+                                <option :value="RecurrenceFrequency.Monthly">Hàng tháng</option>
+                                <option :value="RecurrenceFrequency.Quarterly">Hàng quý</option>
+                                <option :value="RecurrenceFrequency.SemiAnnually">Nửa năm</option>
+                                <option :value="RecurrenceFrequency.Annually">Hàng năm</option>
+                                <option :value="RecurrenceFrequency.Custom">Tùy chỉnh</option>
                             </select>
                         </div>
-                        <div v-if="form.frequency === 7">
+                        <div v-if="form.frequency === RecurrenceFrequency.Custom">
                             <label class="form-label">Số ngày tùy chỉnh *</label>
                             <input 
                                 v-model.number="form.customIntervalDays" 
@@ -193,7 +205,7 @@
                     <button 
                         type="submit" 
                         class="btn btn-primary"
-                        :disabled="loading"
+                        :disabled="loading || accountLoading || !!accountError || !accounts.some(account => account.id === form.accountId)"
                     >
                         <div v-if="loading" class="inline-block animate-spin border-2 border-transparent border-l-white rounded-full w-4 h-4 mr-2"></div>
                         {{ isEditMode ? 'Cập nhật' : 'Tạo mẫu' }}
@@ -205,44 +217,53 @@
 </template>
 
 <script setup lang="ts">
-import { logger } from '~/utils/logger'
-
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRecurringTransactions } from '~/composables/useRecurringTransactions'
 import type { RecurringTransactionTemplateViewModel, RecurringTransactionTemplateCreateRequest, RecurringTransactionTemplateUpdateRequest } from '~/types'
+import { RecurrenceFrequency } from '~/types'
 import IconX from '~/components/icon/icon-x.vue'
-import type { Account } from '~/types/account'
+import type { AccountSelection } from '~/types/account'
+import type { ApiError } from '~/types/api'
+import { useAuthStore } from '~/stores/auth'
 
 // Props
 interface Props {
     template?: RecurringTransactionTemplateViewModel | null
-    accounts: Account[]
+    accounts: readonly AccountSelection[]
+    accountLoading?: boolean
+    accountError?: string | null
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    template: null
+    template: null,
+    accountLoading: false,
+    accountError: null
 })
 
 // Emits
 const emit = defineEmits<{
     close: []
     saved: []
+    'retry-accounts': []
 }>()
 
 // Composables
 const { createTemplate, updateTemplate } = useRecurringTransactions()
+const auth = useAuthStore()
+let disposed = false
 
 // Reactive data
 const loading = ref(false)
+const saveError = ref<string | null>(null)
+const validationErrors = ref<string[]>([])
 const form = ref({
-    userId: '00000000-0000-0000-0000-000000000000', // Temporary user ID
     accountId: '',
     name: '',
     description: '',
     amount: 0,
     transactionType: 1, // Default to Expense
     category: '',
-    frequency: 3, // Default to Monthly
+    frequency: RecurrenceFrequency.Monthly,
     customIntervalDays: null as number | null | undefined,
     startDate: '',
     endDate: '',
@@ -258,16 +279,17 @@ const isEditMode = computed(() => !!props.template)
 
 // Methods
 const handleFrequencyChange = () => {
-    if (form.value.frequency !== 7) { // Not Custom
+    if (form.value.frequency !== RecurrenceFrequency.Custom) {
         form.value.customIntervalDays = null
     }
 }
 
 const resetForm = () => {
+    saveError.value = null
+    validationErrors.value = []
     if (props.template) {
         // Edit mode - populate form with template data
         form.value = {
-            userId: props.template.userId,
             accountId: props.template.accountId,
             name: props.template.name,
             description: props.template.description || '',
@@ -288,14 +310,13 @@ const resetForm = () => {
         // Create mode - set default values
         const today = new Date().toISOString().split('T')[0]
         form.value = {
-            userId: '00000000-0000-0000-0000-000000000000',
             accountId: '',
             name: '',
             description: '',
             amount: 0,
             transactionType: 1,
             category: '',
-            frequency: 3,
+            frequency: RecurrenceFrequency.Monthly,
             customIntervalDays: null,
             startDate: today,
             endDate: '',
@@ -309,6 +330,10 @@ const resetForm = () => {
 }
 
 const handleSubmit = async () => {
+    if (!auth.isAuthenticated || !auth.token || loading.value || props.accountLoading || props.accountError || !props.accounts.some(account => account.id === form.value.accountId)) return
+    const token = auth.token
+    saveError.value = null
+    validationErrors.value = []
     try {
         loading.value = true
         
@@ -334,12 +359,14 @@ const handleSubmit = async () => {
             await createTemplate(createRequest)
         }
 
-        emit('saved')
+        if (!disposed && auth.isAuthenticated && auth.token === token) emit('saved')
     } catch (error) {
-        logger.error('Error saving template:', error)
-        // TODO: Show error message to user
+        if (disposed || !auth.isAuthenticated || auth.token !== token) return
+        const apiError = error as Partial<ApiError>
+        saveError.value = apiError.message || 'Không thể lưu mẫu giao dịch định kỳ. Vui lòng thử lại.'
+        validationErrors.value = Object.values(apiError.errors || {}).flat()
     } finally {
-        loading.value = false
+        if (!disposed && auth.token === token) loading.value = false
     }
 }
 
@@ -351,6 +378,10 @@ watch(() => props.template, () => {
 // Lifecycle
 onMounted(() => {
     resetForm()
+})
+
+onBeforeUnmount(() => {
+    disposed = true
 })
 </script>
 

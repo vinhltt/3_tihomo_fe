@@ -403,14 +403,14 @@
 
 <script setup lang="ts">
 import type { TransactionViewModel, TransactionCreateRequest, TransactionUpdateRequest, TransactionDirectionType } from '~/types/transaction'
-import type { AccountViewModel } from '~/types/account'
+import type { AccountSelection } from '~/types/account'
 import { CategoryTypeConst, TransactionDirectionConst } from '~/types/transaction'
 
 // Props
 interface Props {
   visible: boolean
   transaction?: TransactionViewModel | null
-  accounts: AccountViewModel[]
+  accounts: readonly AccountSelection[]
   mode: 'create' | 'edit' | 'view'
   defaultDirection?: TransactionDirectionType
   defaultAccountId?: string

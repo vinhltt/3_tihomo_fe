@@ -7,7 +7,7 @@ Frontend-only Nuxt 3 application for CoreFinance Personal Finance Management sys
 ## Architecture
 
 - **Frontend**: Nuxt 3 + Vue 3 + TypeScript
-- **Backend**: .NET Core API (localhost:7293)
+- **Backend**: .NET Core APIs through the Local gateway (`http://localhost:5000`)
 - **UI Framework**: VRISTO Admin Template + Tailwind CSS
 - **State Management**: Pinia
 - **Charts**: ApexCharts
@@ -22,7 +22,7 @@ Frontend-only Nuxt 3 application for CoreFinance Personal Finance Management sys
    ```
 
 2. **Environment Configuration**:
-   - Default API endpoint: `https://localhost:7293`
+   - Default API gateway: `http://localhost:5000`
    - To change, set environment variable: `API_BASE_URL=your_api_url`
 
 3. **Start development server**:
@@ -32,7 +32,7 @@ Frontend-only Nuxt 3 application for CoreFinance Personal Finance Management sys
 
 4. **Access application**:
    - Frontend: http://localhost:3500
-   - Backend API should be running on: https://localhost:7293
+   - Local gateway should be running on: http://localhost:5000
 
 ## Project Structure
 
@@ -77,6 +77,15 @@ src/FE/nuxt/
   - Dynamic fields based on account type
   - Currency selection with symbols
   - Card number formatting and masking
+
+### THM-3: khoản định kỳ và giao dịch dự kiến
+
+- `/apps/recurring-transactions`: tạo/sửa mẫu bằng form thật qua gateway, giữ Income0/false và không gửi owner. Tần suất: Custom0, Daily1, Weekly7, Biweekly14, Monthly30, Quarterly90, SemiAnnually180, Annually365; lịch tháng do backend neo StartDate, không cộng30 ngày trên browser.
+- `/apps/expected-transactions`: lọc display status/ngày/mẫu, phân trang, payment/link/cancel/adjust. Payment Income/Expense lấy amount/date của kỳ, bound account readonly hoặc fallback owned account khi FK null; không thay số dư tài khoản. Transfer chỉ link giao dịch có sẵn hoặc hủy.
+- Command commit lưu actual và Confirmed cùng nhau; UI giữ actualID/date/amount kể cả refresh lỗi. Conflict409 cần canonical read/manual retry, không tự gửi lại payment. Đóng modal đang gửi không hủy request hoặc chứng minh rollback.
+- Chuông Header là feed thật của mọi Pending overdue và today..today+7 theo UTC+7; fetch ngay/mở bell/mutation và mỗi60s. Có en/vi, loading/error/empty, không mock/dismiss/readreceipt hoặc render HTML động. Link query chọn owned kỳ cả khi không nằm trong trang/bộ lọc hiện tại.
+- Auth change/unmount clear dữ liệu owner cũ và abort READs; stale A200/A401 không đè/logout B. Native401 chỉ logout khi bearer request trùng current token. Calendar dates giữ ngày danh nghĩa; UTC timestamps được format UTC+7.
+- Local browser/gateway/PostgreSQL proof và limitations: `.specify/feature/thm-3/phases/phase-04-expected-transactions-screen.md`, `phase-05-live-reminder-bell.md`. Phase05 build PASS; global vue-tsc vẫn baseline77 diagnostics không thay đổi, không gọi là typecheck toàn-project PASS. Local Identity test-user JWT không chứng nhận production Auth.
 
 ### API Integration
 - **Centralized API Client** (`useApi`):
@@ -177,7 +186,7 @@ interface ApiResponse<T> {
 ### Common Issues
 
 1. **API Connection Failed**:
-   - Ensure .NET API is running on localhost:7293
+   - Ensure the Local API gateway is running on localhost:5000
    - Check CORS configuration in .NET API
    - Verify `API_BASE_URL` environment variable
 
