@@ -218,72 +218,64 @@
                                 <button
                                     type="button"
                                     class="relative block rounded-full bg-white-light/40 p-2 hover:bg-white-light/90 hover:text-primary dark:bg-dark/40 dark:hover:bg-dark/60"
+                                    :aria-label="$t('reminder_bell_label', { count: reminderCount })"
+                                    @click="refreshReminders()"
                                 >
                                     <icon-bell-bing />
 
-                                    <span class="absolute top-0 flex h-3 w-3 ltr:right-0 rtl:left-0">
-                                        <span
-                                            class="absolute -top-[3px] inline-flex h-full w-full animate-ping rounded-full bg-success/50 opacity-75 ltr:-left-[3px] rtl:-right-[3px]"
-                                        ></span>
-                                        <span class="relative inline-flex h-[6px] w-[6px] rounded-full bg-success"></span>
+                                    <span
+                                        v-if="reminderCount > 0"
+                                        class="absolute -top-1 min-w-[18px] rounded-full bg-danger px-1 text-center text-[10px] font-semibold leading-[18px] text-white ltr:-right-1 rtl:-left-1"
+                                        aria-hidden="true"
+                                    >
+                                        {{ reminderCount }}
                                     </span>
                                 </button>
                                 <template #content="{ close }">
                                     <ul class="w-[300px] divide-y !py-0 text-dark dark:divide-white/10 dark:text-white-dark sm:w-[350px]">
                                         <li>
                                             <div class="flex items-center justify-between px-4 py-2 font-semibold">
-                                                <h4 class="text-lg">Notification</h4>
-                                                <template v-if="notifications.length">
-                                                    <span class="badge bg-primary/80" v-text="notifications.length + 'New'"></span>
-                                                </template>
+                                                <h4 class="text-lg">{{ $t('reminder_title') }}</h4>
+                                                <span v-if="reminderCount > 0" class="badge bg-primary/80">{{ reminderCount }}</span>
                                             </div>
                                         </li>
-                                        <template v-for="notification in notifications" :key="notification.id">
-                                            <li class="dark:text-white-light/90">
-                                                <div class="group flex items-center px-4 py-2">
-                                                    <div class="grid place-content-center rounded">
-                                                        <div class="relative h-12 w-12">
-                                                            <img
-                                                                class="h-12 w-12 rounded-full object-cover"
-                                                                :src="`/assets/images/${notification.profile}`"
-                                                                alt=""
-                                                            />
-                                                            <span class="absolute bottom-0 right-[6px] block h-2 w-2 rounded-full bg-success"></span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="flex flex-auto ltr:pl-3 rtl:pr-3">
-                                                        <div class="ltr:pr-3 rtl:pl-3">
-                                                            <h6 v-html="notification.message"></h6>
-                                                            <span class="block text-xs font-normal dark:text-gray-500" v-text="notification.time"></span>
-                                                        </div>
-                                                        <button
-                                                            type="button"
-                                                            class="text-neutral-300 opacity-0 hover:text-danger group-hover:opacity-100 ltr:ml-auto rtl:mr-auto"
-                                                            @click="removeNotification(notification.id)"
-                                                        >
-                                                            <icon-x-circle />
-                                                        </button>
-                                                    </div>
+                                        <li v-if="remindersLoading && reminderCount === 0" class="px-4 py-4 text-sm" role="status">
+                                            {{ $t('reminder_loading') }}
+                                        </li>
+                                        <li v-if="remindersError" class="px-4 py-4 text-sm">
+                                            <p class="text-danger" role="alert">{{ $t('reminder_load_error') }}</p>
+                                            <p class="mt-1 break-words">{{ remindersError }}</p>
+                                            <button type="button" class="btn btn-outline-primary btn-sm mt-3" :disabled="remindersLoading" @click="refreshReminders()">
+                                                {{ $t('reminder_retry') }}
+                                            </button>
+                                        </li>
+                                        <li v-if="!remindersLoading && !remindersError && reminderCount === 0">
+                                            <div class="!grid min-h-[160px] place-content-center px-4 text-center text-sm hover:!bg-transparent" role="status">
+                                                <div class="mx-auto mb-4 rounded-full text-primary ring-4 ring-primary/30">
+                                                    <icon-info-circle :fill="true" class="h-10 w-10" />
                                                 </div>
-                                            </li>
-                                        </template>
-                                        <template v-if="notifications.length">
-                                            <li>
-                                                <div class="p-4">
-                                                    <button class="btn btn-primary btn-small block w-full" @click="close()">Read All Notifications</button>
+                                                {{ $t('reminder_empty') }}
+                                            </div>
+                                        </li>
+                                        <li v-for="item in reminders" :key="item.id" class="dark:text-white-light/90">
+                                            <NuxtLink
+                                                :to="{ path: '/apps/expected-transactions', query: { id: item.id } }"
+                                                class="!block px-4 py-3 hover:bg-white-light/40 dark:hover:bg-dark/60"
+                                                @click="close()"
+                                            >
+                                                <h6 class="break-words font-semibold">{{ item.templateName?.trim() || $t('reminder_unnamed_template') }}</h6>
+                                                <p v-if="item.description" class="mt-1 break-words text-sm">{{ item.description }}</p>
+                                                <div class="mt-2 flex flex-wrap items-center justify-between gap-2 text-sm">
+                                                    <span class="font-semibold">{{ formatReminderAmount(item.expectedAmount) }}</span>
+                                                    <span>{{ reminderTypeLabel(item.transactionType) }}</span>
                                                 </div>
-                                            </li>
-                                        </template>
-                                        <template v-if="!notifications.length">
-                                            <li>
-                                                <div class="!grid min-h-[200px] place-content-center text-lg hover:!bg-transparent">
-                                                    <div class="mx-auto mb-4 rounded-full text-primary ring-4 ring-primary/30">
-                                                        <icon-info-circle :fill="true" class="h-10 w-10" />
-                                                    </div>
-                                                    No data available.
+                                                <p class="mt-1 text-xs">{{ $t('reminder_due_date', { date: formatReminderDate(item.expectedDate) }) }}</p>
+                                                <div class="mt-2 flex flex-wrap items-center gap-2 text-xs">
+                                                    <span class="badge" :class="reminderStatusClass(item.displayStatus)">{{ reminderStatusLabel(item.displayStatus) }}</span>
+                                                    <span>{{ reminderDueLabel(item.daysUntilDue) }}</span>
                                                 </div>
-                                            </li>
-                                        </template>
+                                            </NuxtLink>
+                                        </li>
                                     </ul>
                                 </template>
                             </Popper>
@@ -881,18 +873,21 @@
     </header>
 </template>
 
-<script lang="ts" setup>    import { ref, onMounted, computed, reactive, watch } from 'vue';
+<script lang="ts" setup>    import { ref, onMounted, onBeforeUnmount, computed, reactive, watch } from 'vue';
 
     import appSetting from '@/app-setting';
 
     import { useRoute } from 'vue-router';
     import { useAppStore } from '@/stores/index';
+    import { ExpectedTransactionDisplayStatus, RecurringTransactionType } from '~/types/recurring-transaction';
+    import { useExpectedTransactionReminders } from '~/composables/useExpectedTransactionReminders';
+    import { useExpectedTransactions } from '~/composables/useExpectedTransactions';
     import { useAuthStore } from '@/stores/auth';    const store = useAppStore();
     const authStore = useAuthStore();
     const route = useRoute();
     const router = useRouter();
     const search = ref(false);
-    const { setLocale } = useI18n();    // multi language
+    const { setLocale, locale, t } = useI18n();    // multi language
     const changeLanguage = (item: any) => {
         appSetting.toggleLanguage(item, setLocale);
     };
@@ -918,26 +913,61 @@
         }
     };
 
-    const notifications = ref([
-        {
-            id: 1,
-            profile: 'user-profile.jpeg',
-            message: '<strong class="text-sm mr-1">John Doe</strong>invite you to <strong>Prototyping</strong>',
-            time: '45 min ago',
-        },
-        {
-            id: 2,
-            profile: 'profile-34.jpeg',
-            message: '<strong class="text-sm mr-1">Adam Nolan</strong>mentioned you to <strong>UX Basics</strong>',
-            time: '9h Ago',
-        },
-        {
-            id: 3,
-            profile: 'profile-16.jpeg',
-            message: '<strong class="text-sm mr-1">Anna Morgan</strong>Upload a file',
-            time: '9h Ago',
-        },
-    ]);
+    const {
+        reminders,
+        loading: remindersLoading,
+        error: remindersError,
+        count: reminderCount,
+        start: startReminders,
+        stop: stopReminders,
+        refresh: refreshReminders,
+    } = useExpectedTransactionReminders();
+    const { revision: expectedTransactionRevision } = useExpectedTransactions();
+    let reminderTimer: ReturnType<typeof setInterval> | undefined;
+    const reminderAmountFormatter = computed(() => new Intl.NumberFormat(locale.value === 'vi' ? 'vi-VN' : 'en-US', { style: 'currency', currency: 'VND' }));
+    const formatReminderAmount = (amount: number): string => reminderAmountFormatter.value.format(amount);
+    const formatReminderDate = (value: string): string => {
+        const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
+        if (!match) return value;
+        return locale.value === 'vi' ? `${match[3]}/${match[2]}/${match[1]}` : `${match[2]}/${match[3]}/${match[1]}`;
+    };
+    const reminderTypeLabel = (type: RecurringTransactionType): string => {
+        switch (type) {
+            case RecurringTransactionType.Income: return t('reminder_type_income');
+            case RecurringTransactionType.Expense: return t('reminder_type_expense');
+            case RecurringTransactionType.Transfer: return t('reminder_type_transfer');
+            default: return t('reminder_type_unknown');
+        }
+    };
+    const reminderStatusLabel = (status: ExpectedTransactionDisplayStatus): string => {
+        switch (status) {
+            case ExpectedTransactionDisplayStatus.Pending: return t('reminder_status_pending');
+            case ExpectedTransactionDisplayStatus.Overdue: return t('reminder_status_overdue');
+            case ExpectedTransactionDisplayStatus.Confirmed: return t('reminder_status_confirmed');
+            case ExpectedTransactionDisplayStatus.Cancelled: return t('reminder_status_cancelled');
+            case ExpectedTransactionDisplayStatus.Completed: return t('reminder_status_completed');
+            default: return t('reminder_status_unknown');
+        }
+    };
+    const reminderStatusClass = (status: ExpectedTransactionDisplayStatus): string => {
+        switch (status) {
+            case ExpectedTransactionDisplayStatus.Pending: return 'badge-outline-primary';
+            case ExpectedTransactionDisplayStatus.Overdue: return 'badge-outline-danger';
+            case ExpectedTransactionDisplayStatus.Confirmed: return 'badge-outline-success';
+            case ExpectedTransactionDisplayStatus.Cancelled: return 'badge-outline-secondary';
+            case ExpectedTransactionDisplayStatus.Completed: return 'badge-outline-info';
+            default: return 'badge-outline-secondary';
+        }
+    };
+    const reminderDueLabel = (days: number): string => {
+        if (days < 0) return t('reminder_days_overdue', { days: Math.abs(days) }, Math.abs(days));
+        if (days === 0) return t('reminder_due_today');
+        return t('reminder_days_remaining', { days }, days);
+    };
+
+    watch(expectedTransactionRevision, () => {
+        if (import.meta.client) void refreshReminders();
+    }, { flush: 'post' });
 
     const messages = ref([
         {
@@ -972,6 +1002,18 @@
 
     onMounted(() => {
         setActiveDropdown();
+        startReminders();
+        reminderTimer = setInterval(() => {
+            void refreshReminders();
+        }, 60000);
+    });
+
+    onBeforeUnmount(() => {
+        if (reminderTimer !== undefined) {
+            clearInterval(reminderTimer);
+            reminderTimer = undefined;
+        }
+        stopReminders();
     });
 
     watch(route, (to, from) => {
@@ -997,10 +1039,6 @@
                 }
             }
         }
-    };
-
-    const removeNotification = (value: number) => {
-        notifications.value = notifications.value.filter((d) => d.id !== value);
     };
 
     const removeMessage = (value: number) => {

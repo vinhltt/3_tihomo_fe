@@ -1,4 +1,6 @@
+import type { AccountType } from "./account"
 import type { Pagination } from "./api"
+import type { TransactionViewModel } from "./transaction"
 
 /**
  * Enum for recurrence frequency. (EN)
@@ -6,14 +8,14 @@ import type { Pagination } from "./api"
  * Enum cho tần suất lặp lại. (VI)
  */
 export enum RecurrenceFrequency {
-  Daily = 0,
-  Weekly = 1,
-  Biweekly = 2,
-  Monthly = 3,
-  Quarterly = 4,
-  SemiAnnually = 5,
-  Annually = 6,
-  Custom = 7
+  Daily = 1,
+  Weekly = 7,
+  Biweekly = 14,
+  Monthly = 30,
+  Quarterly = 90,
+  SemiAnnually = 180,
+  Annually = 365,
+  Custom = 0
 }
 
 /**
@@ -22,8 +24,11 @@ export enum RecurrenceFrequency {
  * Enum cho loại giao dịch định kỳ. (VI)
  */
 export enum RecurringTransactionType {
+  // Legacy alias of Income (same value; reverse lookup of 0 yields 'Income'). Remove once it has no callers.
   Revenue = 0,
-  Expense = 1
+  Income = 0,
+  Expense = 1,
+  Transfer = 2
 }
 
 /**
@@ -38,12 +43,20 @@ export enum ExpectedTransactionStatus {
   Completed = 3
 }
 
+export enum ExpectedTransactionDisplayStatus {
+  Pending = 0,
+  Confirmed = 1,
+  Cancelled = 2,
+  Completed = 3,
+  Overdue = 4
+}
+
 /**
  * Interface for base paging response. (EN)
  * 
  * Interface cho phản hồi phân trang cơ bản. (VI)
  */
-export type BasePaging<T> = {
+export type IBasePaging<T> = {
   /**
    * The collection of data for the current page. (EN)
    * 
@@ -188,12 +201,6 @@ export type RecurringTransactionTemplateViewModel = {
  */
 export type RecurringTransactionTemplateCreateRequest = {
   /**
-   * The ID of the user who owns the template. (EN)
-   * 
-   * ID của người dùng sở hữu mẫu. (VI)
-   */
-  userId: string
-  /**
    * The ID of the account associated with the template. (EN)
    * 
    * ID của tài khoản liên quan đến mẫu. (VI)
@@ -316,19 +323,19 @@ export interface ExpectedTransactionViewModel {
    * 
    * ID của mẫu giao dịch định kỳ. (VI)
    */
-  recurringTransactionTemplateId: string
+  recurringTransactionTemplateId?: string | null
   /**
    * The ID of the user. (EN)
    * 
    * ID của người dùng. (VI)
    */
-  userId: string
+  userId?: string | null
   /**
    * The ID of the account. (EN)
    * 
    * ID của tài khoản. (VI)
    */
-  accountId: string
+  accountId?: string | null
   /**
    * The expected date of the transaction. (EN)
    * 
@@ -371,6 +378,8 @@ export interface ExpectedTransactionViewModel {
    * Trạng thái của giao dịch dự kiến. (VI)
    */
   status: ExpectedTransactionStatus
+  displayStatus: ExpectedTransactionDisplayStatus
+  isAdjusted: boolean
   /**
    * The ID of the actual transaction (when confirmed). (EN)
    * 
@@ -383,6 +392,7 @@ export interface ExpectedTransactionViewModel {
    * Lý do điều chỉnh hoặc hủy bỏ. (VI)
    */
   adjustmentReason?: string | null
+  notes?: string | null
   /**
    * When the expected transaction was generated. (EN)
    * 
@@ -390,23 +400,16 @@ export interface ExpectedTransactionViewModel {
    */
   generatedAt: string
   /**
-   * When the expected transaction was confirmed. (EN)
-   * 
-   * Khi nào giao dịch dự kiến được xác nhận. (VI)
+   * When the expected transaction was processed.
    */
-  confirmedAt?: string | null
-  /**
-   * The creation date. (EN)
-   * 
-   * Ngày tạo. (VI)
-   */
-  createdAt: string
-  /**
-   * The last update date. (EN)
-   * 
-   * Ngày cập nhật cuối cùng. (VI)
-   */
-  updatedAt: string
+  processedAt?: string | null
+  templateName?: string | null
+  accountName?: string | null
+  accountType?: AccountType | null
+  hasActualTransaction: boolean
+  daysUntilDue: number
+  createAt?: string
+  updateAt?: string
 }
 
 /**
@@ -420,19 +423,13 @@ export type ExpectedTransactionCreateRequest = {
    * 
    * ID của mẫu giao dịch định kỳ. (VI)
    */
-  recurringTransactionTemplateId: string
-  /**
-   * The ID of the user. (EN)
-   * 
-   * ID của người dùng. (VI)
-   */
-  userId: string
+  recurringTransactionTemplateId?: string | null
   /**
    * The ID of the account. (EN)
    * 
    * ID của tài khoản. (VI)
    */
-  accountId: string
+  accountId?: string | null
   /**
    * The expected date of the transaction. (EN)
    * 
@@ -526,3 +523,48 @@ export interface AdjustTransactionRequest {
    */
   reason: string
 } 
+
+export type ExpectedTransactionFilters = {
+  displayStatus?: ExpectedTransactionDisplayStatus
+  dateFrom?: string
+  dateTo?: string
+  templateId?: string
+  search?: string
+}
+
+export type RecordPaymentRequest = {
+  accountId?: string
+}
+
+export type RecordPaymentResult = {
+  success: true
+  expectedTransactionId: string
+  actualTransactionId: string
+  actualTransaction: TransactionViewModel
+}
+
+export type ExpectedCommandResult = {
+  success: true
+  message: string
+}
+
+// Wire shape before enum normalisation: the backend may serialise Status/TransactionType as names or numbers.
+export type ExpectedTransactionWire = Omit<ExpectedTransactionViewModel, 'status' | 'transactionType'> & {
+  status: number | string
+  transactionType: number | string
+}
+
+export type ActionMode = 'payment' | 'link' | 'cancel' | 'adjust'
+
+export type CommittedPayload = {
+  mode: ActionMode
+  expectedTransactionId: string
+  payment?: RecordPaymentResult
+}
+
+export type ExpectedTransactionFilterForm = {
+  displayStatus: '' | ExpectedTransactionDisplayStatus
+  dateFrom: string
+  dateTo: string
+  templateId: string
+}

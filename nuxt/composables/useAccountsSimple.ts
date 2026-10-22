@@ -1,37 +1,75 @@
-import type { IBasePaging } from '~/types'
-import type { Account } from '~/types/account'
+import type { AccountSelection, ApiError } from '~/types'
 
 export const useAccountsSimple = () => {
   const { get } = useApi()
+  const authStore = useAuthStore()
   
   // Reactive state
-  const accounts = ref<Account[]>([])
+  const accounts = ref<AccountSelection[]>([])
   const isLoading = ref(false)
   const error = ref<string | null>(null)
+  let requestSequence = 0
+  let readController: AbortController | null = null
+
+  const clearAccounts = (): void => {
+    requestSequence += 1
+    readController?.abort()
+    readController = null
+    accounts.value = []
+    isLoading.value = false
+    error.value = null
+  }
+
+  watch(() => [authStore.token, authStore.isAuthenticated], clearAccounts, { flush: 'sync' })
+  onScopeDispose(clearAccounts)
 
   /**
-   * Fetch all accounts
+   * Fetch the raw, owner-scoped account selection list.
    */
-  const getAccounts = async () => {
+  const getAccounts = async (signal?: AbortSignal): Promise<void> => {
+    clearAccounts()
+    const requestToken = authStore.token
+    if (!authStore.isAuthenticated || !requestToken || signal?.aborted) return
+
+    const sequence = requestSequence
+    const controller = new AbortController()
+    readController = controller
+    const isCurrentRequest = () =>
+      sequence === requestSequence && authStore.token === requestToken && authStore.isAuthenticated
+    const abortRead = () => {
+      controller.abort()
+      if (isCurrentRequest()) clearAccounts()
+    }
+    signal?.addEventListener('abort', abortRead, { once: true })
+
+    isLoading.value = true
     try {
-      isLoading.value = true
-      error.value = null
-        // Use simple get request to get all accounts via Gateway
-      const response = await get<IBasePaging<Account>>('/api/core-finance/account/selections')
-      accounts.value = response.data || []
-      
+      const response = await get<AccountSelection[]>(
+        '/api/core-finance/account/selections',
+        undefined,
+        controller.signal
+      )
+      if (isCurrentRequest() && !controller.signal.aborted) {
+        accounts.value = response
+      }
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Lỗi khi tải danh sách tài khoản'
-      accounts.value = []
+      if (isCurrentRequest() && !controller.signal.aborted) {
+        error.value = (err as ApiError)?.message || 'Lỗi khi tải danh sách tài khoản'
+        accounts.value = []
+      }
     } finally {
-      isLoading.value = false
+      signal?.removeEventListener('abort', abortRead)
+      if (isCurrentRequest()) {
+        isLoading.value = false
+        readController = null
+      }
     }
   }
 
   /**
    * Get account by ID
    */
-  const getAccountById = (id: string): Account | undefined => {
+  const getAccountById = (id: string): AccountSelection | undefined => {
     return accounts.value.find(account => account.id === id)
   }
 
@@ -52,6 +90,7 @@ export const useAccountsSimple = () => {
     // Methods
     getAccounts,
     getAccountById,
-    getAccountName
+    getAccountName,
+    clearAccounts
   }
 } 

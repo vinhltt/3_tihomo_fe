@@ -5,21 +5,53 @@ import type {
     RecurringTransactionTemplateCreateRequest,
     RecurringTransactionTemplateUpdateRequest,
     FilterBodyRequest,
-    IBasePaging 
+    IBasePaging,
+    ApiError
 } from '~/types'
+import { RecurrenceFrequency, RecurringTransactionType } from '~/types'
+import { useAuthStore } from '~/stores/auth'
+
+type RecurringTemplateWireModel = Omit<RecurringTransactionTemplateViewModel, 'frequency' | 'transactionType'> & {
+    frequency: RecurrenceFrequency | keyof typeof RecurrenceFrequency
+    transactionType: RecurringTransactionType | keyof typeof RecurringTransactionType
+}
+
+const DEFAULT_PAGE_SIZE = 10
+
+// Resolve a wire enum name to its numeric value; an unknown name is a load error, not a row
+const resolveWireEnum = (enumObject: object, value: number | string, field: string): number => {
+    if (typeof value === 'number') return value
+    const resolved = (enumObject as Record<string, unknown>)[value]
+    if (typeof resolved !== 'number') {
+        const apiError: ApiError = { message: `Dữ liệu mẫu giao dịch định kỳ không hợp lệ (${field}: ${value})`, statusCode: 500 }
+        throw apiError
+    }
+    return resolved
+}
+
+// Map a wire row to a new view model without mutating the response
+const toTemplateViewModel = (template: RecurringTemplateWireModel): RecurringTransactionTemplateViewModel => ({
+    ...template,
+    frequency: resolveWireEnum(RecurrenceFrequency, template.frequency, 'frequency') as RecurrenceFrequency,
+    transactionType: resolveWireEnum(RecurringTransactionType, template.transactionType, 'transactionType') as RecurringTransactionType
+})
 
 export const useRecurringTransactions = () => {
   const $api = useApi();
-    
+    const authStore = useAuthStore()
+
     // Reactive state
     const templates = ref<RecurringTransactionTemplateViewModel[]>([])
     const loading = ref(false)
+    const error = ref<string | null>(null)
     const pagination = reactive({
         pageIndex: 1,
-        pageSize: 10,
+        pageSize: DEFAULT_PAGE_SIZE,
         totalRow: 0,
         pageCount: 0
     })
+    let requestSequence = 0
+    let readController: AbortController | null = null
 
     // Build filter request
     const buildFilterRequest = (filters: any = {}): FilterBodyRequest => {
@@ -58,8 +90,12 @@ export const useRecurringTransactions = () => {
             },
             orders: [
                 {
-                    field: 'CreateAt',
+                    field: 'CreatedAt',
                     direction: 1 // Descending
+                },
+                {
+                    field: 'id',
+                    direction: 1 // Descending tie-breaker for equal CreatedAt
                 }
             ],
             pagination: {
@@ -71,42 +107,79 @@ export const useRecurringTransactions = () => {
         }
     }
 
+    // Invalidate the in-flight list read so a late response, error or finally cannot touch state
+    const invalidateRead = () => {
+        requestSequence += 1
+        readController?.abort()
+        readController = null
+    }
+
+    // Drop the list owned by the previous session or owner
+    const clearTemplates = () => {
+        invalidateRead()
+        templates.value = []
+        error.value = null
+        loading.value = false
+        pagination.pageIndex = 1
+        pagination.pageSize = DEFAULT_PAGE_SIZE
+        pagination.totalRow = 0
+        pagination.pageCount = 0
+    }
+
     // Get templates with pagination and filtering
     const getTemplates = async (filters: any = {}) => {
-        try {
-            loading.value = true
-            const request = buildFilterRequest(filters)
-            
-            const response = await $api.post<IBasePaging<RecurringTransactionTemplateViewModel>>(
-                '/api/core-finance/RecurringTransactionTemplate/filter',
-                request
-            )
-            
-            if (response.data) {
-                templates.value = response.data || []
-                pagination.pageIndex = response.pagination.pageIndex
-                pagination.pageSize = response.pagination.pageSize
-                pagination.totalRow = response.pagination.totalRow
-                pagination.pageCount = response.pagination.pageCount
-            }
-        } catch (error) {
-            logger.error('Error fetching recurring transaction templates:', error)
-            templates.value = []
-        } finally {
+        const request = buildFilterRequest(filters)
+        invalidateRead()
+        const requestToken = authStore.token
+        if (!authStore.isAuthenticated || !requestToken) {
             loading.value = false
+            return
+        }
+
+        const sequence = requestSequence
+        const controller = new AbortController()
+        readController = controller
+        const isCurrentRequest = () =>
+            sequence === requestSequence && authStore.token === requestToken && authStore.isAuthenticated && !controller.signal.aborted
+
+        error.value = null
+        loading.value = true
+        try {
+            const response = await $api.post<IBasePaging<RecurringTemplateWireModel>>(
+                '/api/core-finance/RecurringTransactionTemplate/filter',
+                request,
+                controller.signal
+            )
+            if (!isCurrentRequest()) return
+
+            templates.value = (response.data ?? []).map(toTemplateViewModel)
+            pagination.pageIndex = response.pagination.pageIndex
+            pagination.pageSize = response.pagination.pageSize
+            pagination.totalRow = response.pagination.totalRow
+            pagination.pageCount = response.pagination.pageCount
+        } catch (err) {
+            if (!isCurrentRequest()) return
+            logger.error('Error fetching recurring transaction templates:', err)
+            error.value = (err as ApiError)?.message || 'Lỗi khi tải danh sách mẫu giao dịch định kỳ'
+            templates.value = []
+            pagination.totalRow = 0
+            pagination.pageCount = 0
+        } finally {
+            if (sequence === requestSequence) {
+                loading.value = false
+                readController = null
+            }
         }
     }
 
-    // Get active templates for a user
-    const getActiveTemplates = async (userId: string) => {
+    // Get the active templates of the signed-in owner; the backend resolves the owner from the token
+    const getActiveTemplates = async () => {
         try {
-            const response = await $api.get<IBasePaging<RecurringTransactionTemplateViewModel>>(
-                `/api/RecurringTransactionTemplate/active/${userId}`
-            )
-            return response.data || []
+            const response = await $api.get<RecurringTemplateWireModel[]>('/api/core-finance/RecurringTransactionTemplate/active')
+            return (response ?? []).map(toTemplateViewModel)
         } catch (error) {
             logger.error('Error fetching active templates:', error)
-            return []
+            throw error
         }
     }
 
@@ -126,42 +199,42 @@ export const useRecurringTransactions = () => {
     // Create template
     const createTemplate = async (request: RecurringTransactionTemplateCreateRequest) => {
         try {
-            const formData = new FormData()
-            Object.entries(request).forEach(([key, value]) => {
-                if (value !== null && value !== undefined) {
-                    formData.append(key, value.toString())
+            error.value = null
+            const formBody: Record<string, string> = {}
+            for (const [key, value] of Object.entries(request)) {
+                if (key !== 'userId' && value !== null && value !== undefined) {
+                    formBody[key] = String(value)
                 }
-            })
+            }
 
-            const response = await $api.postForm<RecurringTransactionTemplateViewModel>(
-                '/api/RecurringTransactionTemplate',
-                formData
+            return await $api.postForm<RecurringTransactionTemplateViewModel>(
+                '/api/core-finance/RecurringTransactionTemplate',
+                formBody
             )
-            return response
-        } catch (error) {
-            logger.error('Error creating recurring transaction template:', error)
-            throw error
+        } catch (err) {
+            error.value = (err as ApiError)?.message || 'Lỗi khi tạo mẫu giao dịch định kỳ'
+            throw err
         }
     }
 
     // Update template
     const updateTemplate = async (id: string, request: RecurringTransactionTemplateUpdateRequest) => {
         try {
-            const formData = new FormData()
-            Object.entries(request).forEach(([key, value]) => {
-                if (value !== null && value !== undefined) {
-                    formData.append(key, value.toString())
+            error.value = null
+            const formBody: Record<string, string> = {}
+            for (const [key, value] of Object.entries(request)) {
+                if (key !== 'userId' && value !== null && value !== undefined) {
+                    formBody[key] = String(value)
                 }
-            })
+            }
 
-            const response = await $api.putForm<RecurringTransactionTemplateViewModel>(
-                `/api/RecurringTransactionTemplate/${id}`,
-                formData
+            return await $api.putForm<RecurringTransactionTemplateViewModel>(
+                `/api/core-finance/RecurringTransactionTemplate/${id}`,
+                formBody
             )
-            return response
-        } catch (error) {
-            logger.error('Error updating recurring transaction template:', error)
-            throw error
+        } catch (err) {
+            error.value = (err as ApiError)?.message || 'Lỗi khi cập nhật mẫu giao dịch định kỳ'
+            throw err
         }
     }
 
@@ -233,10 +306,12 @@ export const useRecurringTransactions = () => {
         // State
         templates,
         loading,
+        error,
         pagination,
         
         // Methods
         getTemplates,
+        clearTemplates,
         getActiveTemplates,
         getTemplatesByAccount,
         createTemplate,

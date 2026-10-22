@@ -9,16 +9,23 @@
                 </button>
             </div>
 
+            <p v-if="savedNotice" role="status" class="mb-5 rounded-lg bg-success/10 p-3 text-success">{{ savedNotice }}</p>
+            <div v-if="accountError" role="alert" class="mb-5 rounded-lg border border-danger/20 bg-danger/10 p-3 text-danger">
+                <p>Không thể tải tài khoản: {{ accountError }}</p>
+                <button type="button" class="mt-2 btn btn-sm btn-outline-primary" @click="loadAccounts">Thử lại</button>
+            </div>
+
             <!-- Filters -->
             <div class="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <div>
                     <label class="form-label">Tài khoản</label>
-                    <select v-model="selectedAccountId" class="form-select" @change="handleAccountChange">
+                    <select v-model="selectedAccountId" class="form-select" :disabled="accountsLoading || !!accountError" @change="handleAccountChange">
                         <option value="">Tất cả tài khoản</option>
                         <option v-for="account in accounts" :key="account.id" :value="account.id">
                             {{ account.name }}
                         </option>
                     </select>
+                    <p v-if="accountsLoading" class="mt-1 text-sm text-gray-500">Đang tải tài khoản...</p>
                 </div>
                 <div>
                     <label class="form-label">Trạng thái</label>
@@ -32,14 +39,14 @@
                     <label class="form-label">Tần suất</label>
                     <select v-model="selectedFrequency" class="form-select" @change="handleFrequencyChange">
                         <option value="">Tất cả tần suất</option>
-                        <option value="0">Hàng ngày</option>
-                        <option value="1">Hàng tuần</option>
-                        <option value="2">Hai tuần một lần</option>
-                        <option value="3">Hàng tháng</option>
-                        <option value="4">Hàng quý</option>
-                        <option value="5">Nửa năm</option>
-                        <option value="6">Hàng năm</option>
-                        <option value="7">Tùy chỉnh</option>
+                        <option :value="String(RecurrenceFrequency.Daily)">Hàng ngày</option>
+                        <option :value="String(RecurrenceFrequency.Weekly)">Hàng tuần</option>
+                        <option :value="String(RecurrenceFrequency.Biweekly)">Hai tuần một lần</option>
+                        <option :value="String(RecurrenceFrequency.Monthly)">Hàng tháng</option>
+                        <option :value="String(RecurrenceFrequency.Quarterly)">Hàng quý</option>
+                        <option :value="String(RecurrenceFrequency.SemiAnnually)">Nửa năm</option>
+                        <option :value="String(RecurrenceFrequency.Annually)">Hàng năm</option>
+                        <option :value="String(RecurrenceFrequency.Custom)">Tùy chỉnh</option>
                     </select>
                 </div>
                 <div class="flex items-end">
@@ -68,6 +75,14 @@
                         <tr v-if="loading">
                             <td colspan="7" class="text-center py-4">
                                 <div class="inline-block animate-spin border-4 border-transparent border-l-primary rounded-full w-10 h-10"></div>
+                            </td>
+                        </tr>
+                        <tr v-else-if="templatesError">
+                            <td colspan="7" class="py-4">
+                                <div role="alert" class="rounded-lg border border-danger/20 bg-danger/10 p-3 text-center text-danger">
+                                    <p>Không thể tải mẫu giao dịch định kỳ: {{ templatesError }}</p>
+                                    <button type="button" class="mt-2 btn btn-sm btn-outline-primary" @click="getTemplates()">Thử lại</button>
+                                </div>
                             </td>
                         </tr>
                         <tr v-else-if="templates.length === 0">
@@ -172,19 +187,24 @@
         <RecurringTransactionModal
             v-if="showModal"
             :template="selectedTemplate"
-            :accounts="accounts.slice()"
+            :accounts="accounts"
+            :account-loading="accountsLoading"
+            :account-error="accountError"
             @close="closeModal"
             @saved="handleTemplateSaved"
+            @retry-accounts="loadAccounts"
         />
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRecurringTransactions } from '~/composables/useRecurringTransactions'
 import { useAccountsSimple } from '~/composables/useAccountsSimple'
 import type { RecurringTransactionTemplateViewModel } from '~/types'
+import { RecurrenceFrequency } from '~/types'
 import RecurringTransactionModal from '~/components/apps/recurring-transactions/RecurringTransactionModal.vue'
+import { useAuthStore } from '~/stores/auth'
 
 // Icons
 import IconPlus from '~/components/icon/icon-plus.vue'
@@ -198,13 +218,17 @@ import IconTrash from '~/components/icon/icon-trash.vue'
 // Composables
 const { 
     templates, 
-    loading, 
-    pagination, 
-    getTemplates, 
+    loading,
+    error: templatesError,
+    pagination,
+    getTemplates,
+    clearTemplates,
     toggleActiveStatus, 
     deleteTemplate: deleteTemplateApi 
 } = useRecurringTransactions()
-const { accounts, getAccountName } = useAccountsSimple()
+const { accounts, isLoading: accountsLoading, error: accountError, getAccounts, getAccountName } = useAccountsSimple()
+const auth = useAuthStore()
+let accountController: AbortController | null = null
 
 // Reactive data
 const selectedAccountId = ref('')
@@ -212,8 +236,15 @@ const selectedStatus = ref('')
 const selectedFrequency = ref('')
 const showModal = ref(false)
 const selectedTemplate = ref<RecurringTransactionTemplateViewModel | null>(null)
+const savedNotice = ref<string | null>(null)
 
 // Methods
+const loadAccounts = async () => {
+    accountController?.abort()
+    accountController = new AbortController()
+    await getAccounts(accountController.signal)
+}
+
 const handleAccountChange = () => {
     getTemplates({ accountId: selectedAccountId.value })
 }
@@ -241,16 +272,19 @@ const changePage = (page: number) => {
 }
 
 const openCreateModal = () => {
+    savedNotice.value = null
     selectedTemplate.value = null
     showModal.value = true
 }
 
 const viewTemplate = (template: RecurringTransactionTemplateViewModel) => {
+    savedNotice.value = null
     selectedTemplate.value = template
     showModal.value = true
 }
 
 const editTemplate = (template: RecurringTransactionTemplateViewModel) => {
+    savedNotice.value = null
     selectedTemplate.value = template
     showModal.value = true
 }
@@ -277,9 +311,24 @@ const closeModal = () => {
 }
 
 const handleTemplateSaved = () => {
+    savedNotice.value = 'Đã lưu mẫu giao dịch định kỳ.'
     closeModal()
     getTemplates()
 }
+
+watch(() => [auth.token, auth.isAuthenticated] as const, () => {
+    clearTemplates()
+    accountController?.abort()
+    closeModal()
+    savedNotice.value = null
+    selectedAccountId.value = ''
+    selectedStatus.value = ''
+    selectedFrequency.value = ''
+    if (auth.token && auth.isAuthenticated) {
+        void loadAccounts()
+        void getTemplates()
+    }
+}, { flush: 'sync' })
 
 // Utility functions
 const formatCurrency = (amount: number) => {
@@ -297,23 +346,27 @@ const formatDate = (date: string) => {
     })
 }
 
-const getFrequencyText = (frequency: number) => {
-    const frequencies = [
-        'Hàng ngày',
-        'Hàng tuần', 
-        'Hai tuần một lần',
-        'Hàng tháng',
-        'Hàng quý',
-        'Nửa năm',
-        'Hàng năm',
-        'Tùy chỉnh'
-    ]
-    return frequencies[frequency] || 'Không xác định'
+const frequencyLabels: Record<RecurrenceFrequency, string> = {
+    [RecurrenceFrequency.Daily]: 'Hàng ngày',
+    [RecurrenceFrequency.Weekly]: 'Hàng tuần',
+    [RecurrenceFrequency.Biweekly]: 'Hai tuần một lần',
+    [RecurrenceFrequency.Monthly]: 'Hàng tháng',
+    [RecurrenceFrequency.Quarterly]: 'Hàng quý',
+    [RecurrenceFrequency.SemiAnnually]: 'Nửa năm',
+    [RecurrenceFrequency.Annually]: 'Hàng năm',
+    [RecurrenceFrequency.Custom]: 'Tùy chỉnh'
 }
+const getFrequencyText = (frequency: RecurrenceFrequency) => frequencyLabels[frequency] || 'Không xác định'
 
 // Lifecycle
 onMounted(async () => {
+    void loadAccounts()
     await getTemplates()
+})
+
+onBeforeUnmount(() => {
+    accountController?.abort()
+    clearTemplates()
 })
 </script>
 

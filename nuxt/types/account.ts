@@ -15,6 +15,8 @@ export type Account = {
   createBy?: string
   updateBy?: string
 }
+
+export type AccountSelection = Pick<Account, 'id' | 'name'>
 export type AccountSelectOption = {
   id: string
   name: string

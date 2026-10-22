@@ -16,16 +16,18 @@ export const useApi = () => {
       body?: any
       query?: Record<string, any>
       isFormData?: boolean
+      signal?: AbortSignal
     } = {}
   ): Promise<T> => {
+    const requestToken = authStore.token
     try {
       const headers: Record<string, string> = {
         'Accept': 'application/json'
       }
 
       // Add authentication headers if user is authenticated
-      if (authStore.isAuthenticated && authStore.token) {
-        headers['Authorization'] = `Bearer ${authStore.token}`
+      if (authStore.isAuthenticated && requestToken) {
+        headers['Authorization'] = `Bearer ${requestToken}`
       }
 
       let body = options.body
@@ -33,18 +35,12 @@ export const useApi = () => {
       // Convert to FormData if needed
       if (options.isFormData && body && typeof body === 'object') {
         const formData = ConvertObjectToFormData(body, new FormData());
-        // Debug: Log all FormData entries
-        logger.dev('FormData entries:')
-        for (const [key, value] of formData.entries()) {
-          logger.dev(`  ${key}: ${value}`)
-        }
 
         body = formData
         // Don't set Content-Type for FormData, let browser set it with boundary
       } else {
         headers['Content-Type'] = 'application/json'
       }
-      logger.dev('apiCall', endpoint, options, body, headers)
 
       // Use native fetch for FormData to avoid issues with $fetch
       if (options.isFormData) {
@@ -57,26 +53,15 @@ export const useApi = () => {
         const response = await fetch(url.toString(), {
           method: options.method || 'GET',
           body,
-          headers: {
-            'Accept': 'application/json',
-            // Add authentication headers for FormData requests too
-            ...(authStore.isAuthenticated && authStore.token ? {
-              'Authorization': `Bearer ${authStore.token}`
-            } : {})
-            // Don't set Content-Type for FormData
-          }
+          headers,
+          signal: options.signal
         })
 
         if (!response.ok) {
           // Check for 401 Unauthorized - token expired
-          if (response.status === 401) {
-            logger.dev('🔐 401 Unauthorized detected (FormData) - clearing auth and redirecting to login')
-
-            // Clear authentication state
-            const authStore = useAuthStore()
-            await authStore.clearAuthState()
-
-            // Redirect to login page
+          if (response.status === 401 && authStore.token === requestToken) {
+            logger.dev('401 Unauthorized (FormData) - clearing current authentication')
+            authStore.clearAuthState()
             await navigateTo('/auth/login')
           }
 
@@ -94,23 +79,30 @@ export const useApi = () => {
           method: options.method || 'GET',
           body,
           query: options.query,
-          headers
+          headers,
+          signal: options.signal
         })
         return response
       }
     } catch (error: any) {
+      if (options.signal?.aborted || error?.name === 'AbortError' || error?.cause?.name === 'AbortError') {
+        throw error
+      }
+
+      // Keep native-fetch ApiError responses intact, including validation/conflict statuses.
+      if (!error.response && typeof error?.statusCode === 'number' && typeof error?.message === 'string') {
+        throw error
+      }
+
       // Handle different types of errors
       if (error.response) {
         // Check for 401 Unauthorized - token expired
         if (error.response.status === 401) {
-          logger.dev('🔐 401 Unauthorized detected - clearing auth and redirecting to login')
-
-          // Clear authentication state
-          const authStore = useAuthStore()
-          await authStore.clearAuthState()
-
-          // Redirect to login page
-          await navigateTo('/auth/login')
+          if (authStore.token === requestToken) {
+            logger.dev('401 Unauthorized - clearing current authentication')
+            authStore.clearAuthState()
+            await navigateTo('/auth/login')
+          }
 
           // Still throw the error for the calling component to handle if needed
           const apiError: ApiError = {
@@ -147,15 +139,15 @@ export const useApi = () => {
   /**
    * GET request
    */
-  const get = <T>(endpoint: string, query?: Record<string, any>): Promise<T> => {
-    return apiCall<T>(endpoint, { method: 'GET', query })
+  const get = <T>(endpoint: string, query?: Record<string, any>, signal?: AbortSignal): Promise<T> => {
+    return apiCall<T>(endpoint, { method: 'GET', query, signal })
   }
 
   /**
    * POST request
    */
-  const post = <T>(endpoint: string, body?: any): Promise<T> => {
-    return apiCall<T>(endpoint, { method: 'POST', body })
+  const post = <T>(endpoint: string, body?: any, signal?: AbortSignal): Promise<T> => {
+    return apiCall<T>(endpoint, { method: 'POST', body, signal })
   }
 
   /**
