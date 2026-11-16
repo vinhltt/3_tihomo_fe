@@ -7,7 +7,7 @@
                         <img class="inline w-8 ltr:-ml-1 rtl:-mr-1" src="/assets/images/logo.svg" alt="" />
                         <span
                             class="hidden align-middle text-2xl font-semibold transition-all duration-300 ltr:ml-1.5 rtl:mr-1.5 dark:text-white-light md:inline"
-                            >Home</span
+                            >{{ $t('shell.header.home') }}</span
                         >
                     </NuxtLink>
 
@@ -60,7 +60,7 @@
                                 <input
                                     type="text"
                                     class="peer form-input bg-gray-100 placeholder:tracking-widest ltr:pl-9 ltr:pr-9 rtl:pl-9 rtl:pr-9 sm:bg-transparent ltr:sm:pr-4 rtl:sm:pl-4"
-                                    placeholder="Search..."
+                                    :placeholder="$t('shell.search.placeholder')"
                                 />
                                 <button type="button" class="absolute inset-0 h-9 w-9 appearance-none peer-focus:text-primary ltr:right-auto rtl:left-auto">
                                     <icon-search class="mx-auto" />
@@ -117,7 +117,7 @@
                                     type="button"
                                     class="block rounded-full bg-white-light/40 p-2 hover:bg-white-light/90 hover:text-primary dark:bg-dark/40 dark:hover:bg-dark/60"
                                 >
-                                    <img :src="currentFlag" alt="flag" class="h-5 w-5 rounded-full object-cover" />
+                                    <img :src="currentFlag" :alt="$t('shell.language.switcher')" class="h-5 w-5 rounded-full object-cover" />
                                 </button>
                                 <template #content="{ close }">
                                     <ul
@@ -134,7 +134,7 @@
                                                 >
                                                     <img
                                                         class="h-5 w-5 rounded-full object-cover"
-                                                        :src="`/assets/images/flags/${item.code.toUpperCase()}.svg`"
+                                                        :src="`/assets/images/flags/${item.flag}.svg`"
                                                         alt=""
                                                     />
                                                     <span class="ltr:ml-3 rtl:mr-3">{{ item.name }}</span>
@@ -244,7 +244,9 @@
                                         </li>
                                         <li v-if="remindersError" class="px-4 py-4 text-sm">
                                             <p class="text-danger" role="alert">{{ $t('reminder_load_error') }}</p>
-                                            <p class="mt-1 break-words">{{ remindersError }}</p>
+                                            <p class="mt-1 break-words">
+                                                {{ remindersError.messageKey ? $t(remindersError.messageKey, remindersError.messageParams ?? {}) : remindersError.message }}
+                                            </p>
                                             <button type="button" class="btn btn-outline-primary btn-sm mt-3" :disabled="remindersLoading" @click="refreshReminders()">
                                                 {{ $t('reminder_retry') }}
                                             </button>
@@ -266,7 +268,7 @@
                                                 <h6 class="break-words font-semibold">{{ item.templateName?.trim() || $t('reminder_unnamed_template') }}</h6>
                                                 <p v-if="item.description" class="mt-1 break-words text-sm">{{ item.description }}</p>
                                                 <div class="mt-2 flex flex-wrap items-center justify-between gap-2 text-sm">
-                                                    <span class="font-semibold">{{ formatReminderAmount(item.expectedAmount) }}</span>
+                                                    <span class="font-semibold">{{ formatMoney(item.expectedAmount) }}</span>
                                                     <span>{{ reminderTypeLabel(item.transactionType) }}</span>
                                                 </div>
                                                 <p class="mt-1 text-xs">{{ $t('reminder_due_date', { date: formatReminderDate(item.expectedDate) }) }}</p>
@@ -300,7 +302,7 @@
                                                     <img class="h-10 w-10 rounded-md object-cover" src="/assets/images/user-profile.jpeg" alt="" />
                                                 </div>                                                <div class="truncate ltr:pl-4 rtl:pr-4">
                                                     <h4 class="text-base">
-                                                        {{ (authStore.user?.firstName && authStore.user?.lastName) ? `${authStore.user.firstName} ${authStore.user.lastName}` : authStore.user?.email || 'User' }}<span class="rounded bg-success-light px-1 text-xs text-success ltr:ml-2 rtl:ml-2">Pro</span>
+                                                        {{ (authStore.user?.firstName && authStore.user?.lastName) ? `${authStore.user.firstName} ${authStore.user.lastName}` : authStore.user?.email || $t('shell.userMenu.defaultName') }}<span class="rounded bg-success-light px-1 text-xs text-success ltr:ml-2 rtl:ml-2">{{ $t('shell.userMenu.proBadge') }}</span>
                                                     </h4>
                                                     <a
                                                         class="text-black/60 hover:text-primary dark:text-dark-light/60 dark:hover:text-white"
@@ -314,21 +316,21 @@
                                             <NuxtLink to="/users/profile" class="dark:hover:text-white" @click="close()">
                                                 <icon-user class="h-4.5 w-4.5 shrink-0 ltr:mr-2 rtl:ml-2" />
 
-                                                Profile
+                                                {{ $t('shell.userMenu.profile') }}
                                             </NuxtLink>
                                         </li>
                                         <li>
                                             <NuxtLink to="/apps/mailbox" class="dark:hover:text-white" @click="close()">
                                                 <icon-mail class="h-4.5 w-4.5 shrink-0 ltr:mr-2 rtl:ml-2" />
 
-                                                Inbox
+                                                {{ $t('shell.userMenu.inbox') }}
                                             </NuxtLink>
                                         </li>
                                         <li>
                                             <NuxtLink to="/auth/boxed-lockscreen" class="dark:hover:text-white" @click="close()">
                                                 <icon-lock-dots class="h-4.5 w-4.5 shrink-0 ltr:mr-2 rtl:ml-2" />
 
-                                                Lock Screen
+                                                {{ $t('shell.userMenu.lockScreen') }}
                                             </NuxtLink>
                                         </li>                                        <li class="border-t border-white-light dark:border-white-light/10">
                                             <button 
@@ -337,13 +339,13 @@
                                                 :disabled="authStore.isLoading"
                                             >
                                                 <icon-logout class="h-4.5 w-4.5 shrink-0 rotate-90 ltr:mr-2 rtl:ml-2" />
-                                                <span v-if="!authStore.isLoading">Sign Out</span>
+                                                <span v-if="!authStore.isLoading">{{ $t('shell.userMenu.signOut') }}</span>
                                                 <span v-else class="flex items-center">
                                                     <svg class="animate-spin h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                                     </svg>
-                                                    Signing out...
+                                                    {{ $t('shell.userMenu.signingOut') }}
                                                 </span>
                                             </button>
                                         </li>
@@ -882,17 +884,19 @@
     import { ExpectedTransactionDisplayStatus, RecurringTransactionType } from '~/types/recurring-transaction';
     import { useExpectedTransactionReminders } from '~/composables/useExpectedTransactionReminders';
     import { useExpectedTransactions } from '~/composables/useExpectedTransactions';
+    import { formatDate, formatMoney } from '~/utils/display-format';
     import { useAuthStore } from '@/stores/auth';    const store = useAppStore();
     const authStore = useAuthStore();
     const route = useRoute();
     const router = useRouter();
     const search = ref(false);
-    const { setLocale, locale, t } = useI18n();    // multi language
+    const { setLocale, t } = useI18n();    // multi language
     const changeLanguage = (item: any) => {
         appSetting.toggleLanguage(item, setLocale);
     };
     const currentFlag = computed(() => {
-        return `/assets/images/flags/${store.locale?.toUpperCase()}.svg`;
+        const current = store.languageList.find((item) => item.code === store.locale);
+        return `/assets/images/flags/${current?.flag}.svg`;
     });
 
     /**
@@ -924,19 +928,14 @@
     } = useExpectedTransactionReminders();
     const { revision: expectedTransactionRevision } = useExpectedTransactions();
     let reminderTimer: ReturnType<typeof setInterval> | undefined;
-    const reminderAmountFormatter = computed(() => new Intl.NumberFormat(locale.value === 'vi' ? 'vi-VN' : 'en-US', { style: 'currency', currency: 'VND' }));
-    const formatReminderAmount = (amount: number): string => reminderAmountFormatter.value.format(amount);
-    const formatReminderDate = (value: string): string => {
-        const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
-        if (!match) return value;
-        return locale.value === 'vi' ? `${match[3]}/${match[2]}/${match[1]}` : `${match[2]}/${match[3]}/${match[1]}`;
-    };
+    // ExpectedDate is a calendar date sent as a DateTime: only its date digits are formatted, so no timezone can shift the day.
+    const formatReminderDate = (value: string): string => formatDate(value?.slice(0, 10));
     const reminderTypeLabel = (type: RecurringTransactionType): string => {
         switch (type) {
             case RecurringTransactionType.Income: return t('reminder_type_income');
             case RecurringTransactionType.Expense: return t('reminder_type_expense');
             case RecurringTransactionType.Transfer: return t('reminder_type_transfer');
-            default: return t('reminder_type_unknown');
+            default: return String(type ?? '');
         }
     };
     const reminderStatusLabel = (status: ExpectedTransactionDisplayStatus): string => {
@@ -946,7 +945,7 @@
             case ExpectedTransactionDisplayStatus.Confirmed: return t('reminder_status_confirmed');
             case ExpectedTransactionDisplayStatus.Cancelled: return t('reminder_status_cancelled');
             case ExpectedTransactionDisplayStatus.Completed: return t('reminder_status_completed');
-            default: return t('reminder_status_unknown');
+            default: return String(status ?? '');
         }
     };
     const reminderStatusClass = (status: ExpectedTransactionDisplayStatus): string => {

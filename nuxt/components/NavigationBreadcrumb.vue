@@ -1,5 +1,5 @@
 <template>
-  <nav class="breadcrumb" aria-label="Breadcrumb navigation">
+  <nav class="breadcrumb" :aria-label="t('shell.breadcrumb.ariaLabel')">
     <ol class="flex items-center space-x-2 text-sm">
       <li 
         v-for="(item, index) in breadcrumbItems" 
@@ -13,7 +13,7 @@
           :class="getBreadcrumbItemClass(item, index)"
           @click="handleBreadcrumbClick(item, index)"
         >
-          {{ item.name }}
+          {{ item.labelKey ? t(item.labelKey) : item.name }}
         </component>
         
         <!-- Separator -->
@@ -33,6 +33,8 @@
 // Types cho NavigationBreadcrumb component
 type BreadcrumbItem = {
   name: string
+  // Translation key for a built-in label; when set it is rendered instead of name. Caller labels stay in name.
+  labelKey?: string
   path?: string
   params?: Record<string, string>
   query?: Record<string, string>
@@ -63,6 +65,7 @@ const emit = defineEmits<NavigationBreadcrumbEmits>()
 
 // Router composable
 const router = useRouter()
+const { t } = useI18n()
 
 // Computed properties
 const breadcrumbItems = computed(() => {
@@ -158,22 +161,22 @@ function generateAccountTransactionBreadcrumb(
   accountName: string
 ): BreadcrumbItem[] {
   return [
-    { name: 'Dashboard', path: '/' },
-    { name: 'Accounts', path: '/accounts' },
+    { name: '', labelKey: 'shell.breadcrumb.dashboard', path: '/' },
+    { name: '', labelKey: 'shell.nav.accounts', path: '/accounts' },
     { 
       name: accountName, 
       path: '/accounts', 
       query: { highlight: accountId }
     },
-    { name: 'Transactions' } // Current page - no path
+    { name: '', labelKey: 'shell.nav.transactions' } // Current page - no path
   ]
 }
 
 // Generate breadcrumb cho Direct menu navigation
 function generateDirectNavigationBreadcrumb(): BreadcrumbItem[] {
   return [
-    { name: 'Dashboard', path: '/' },
-    { name: 'Transactions' } // Current page - no path
+    { name: '', labelKey: 'shell.breadcrumb.dashboard', path: '/' },
+    { name: '', labelKey: 'shell.nav.transactions' } // Current page - no path
   ]
 }
 

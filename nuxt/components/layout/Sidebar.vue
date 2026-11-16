@@ -31,7 +31,7 @@
                                         <icon-credit-card class="shrink-0 group-hover:!text-primary" />
 
                                         <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">
-                                            Accounts
+                                            {{ $t('shell.nav.accounts') }}
                                         </span>
                                     </div>
                                 </NuxtLink>
@@ -43,7 +43,7 @@
                                         <icon-dollar-sign class="shrink-0 group-hover:!text-primary" />
 
                                         <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">
-                                            Transactions
+                                            {{ $t('shell.nav.transactions') }}
                                         </span>
                                     </div>
                                 </NuxtLink>
@@ -55,7 +55,7 @@
                                         <icon-refresh class="shrink-0 group-hover:!text-primary" />
 
                                         <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">
-                                            Recurring Transactions
+                                            {{ $t('shell.nav.recurringTransactions') }}
                                         </span>
                                     </div>
                                 </NuxtLink>

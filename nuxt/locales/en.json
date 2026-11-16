@@ -231,5 +231,37 @@
             "revoked": "Revoked",
             "expired": "Expired"
         }
+    },
+    "shell": {
+        "nav": {
+            "accounts": "Accounts",
+            "transactions": "Transactions",
+            "recurringTransactions": "Recurring Transactions"
+        },
+        "header": {
+            "home": "Home"
+        },
+        "search": {
+            "placeholder": "Search..."
+        },
+        "language": {
+            "switcher": "Change language"
+        },
+        "userMenu": {
+            "defaultName": "User",
+            "proBadge": "Pro",
+            "profile": "Profile",
+            "inbox": "Inbox",
+            "lockScreen": "Lock Screen",
+            "signOut": "Sign Out",
+            "signingOut": "Signing out..."
+        },
+        "footer": {
+            "copyright": "© {year}. Vristo All rights reserved."
+        },
+        "breadcrumb": {
+            "ariaLabel": "Breadcrumb navigation",
+            "dashboard": "Dashboard"
+        }
     }
 }

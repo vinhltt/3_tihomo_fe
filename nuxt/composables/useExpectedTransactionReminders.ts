@@ -12,7 +12,7 @@ export const useExpectedTransactionReminders = () => {
   const authStore = useAuthStore()
   const reminders = useState<ExpectedTransactionViewModel[]>('expected-transaction-reminders', () => [])
   const loading = useState<boolean>('expected-transaction-reminders-loading', () => false)
-  const error = useState<string | null>('expected-transaction-reminders-error', () => null)
+  const error = useState<Pick<ApiError, 'messageKey' | 'messageParams' | 'message'> | null>('expected-transaction-reminders-error', () => null)
   const count = computed(() => reminders.value.length)
 
   // Header is the sole lifecycle owner; execution state stays private to its consumer.
@@ -74,7 +74,12 @@ export const useExpectedTransactionReminders = () => {
             if (!isCurrentRequest()) return
             // A failed refresh never keeps stale items or a stale badge next to the error.
             reminders.value = []
-            error.value = (err as ApiError)?.message || 'Không thể tải danh sách nhắc hạn.'
+            const apiError = err as Partial<ApiError> | null | undefined
+            // The component translates messageKey; a backend message is shown verbatim.
+            error.value =
+              apiError?.messageKey || apiError?.message
+                ? { messageKey: apiError?.messageKey, messageParams: apiError?.messageParams, message: apiError?.message ?? '' }
+                : { messageKey: 'common.errors.loadFailed', message: 'Unable to load reminders.' }
           }
 
           // Success and failure both drain one coalesced canonical read, never a retry.

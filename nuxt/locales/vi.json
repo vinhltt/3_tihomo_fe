@@ -231,5 +231,37 @@
             "revoked": "Đã thu hồi",
             "expired": "Hết hạn"
         }
+    },
+    "shell": {
+        "nav": {
+            "accounts": "Tài khoản",
+            "transactions": "Giao dịch",
+            "recurringTransactions": "Giao dịch định kỳ"
+        },
+        "header": {
+            "home": "Trang chủ"
+        },
+        "search": {
+            "placeholder": "Tìm kiếm..."
+        },
+        "language": {
+            "switcher": "Đổi ngôn ngữ"
+        },
+        "userMenu": {
+            "defaultName": "Người dùng",
+            "proBadge": "Pro",
+            "profile": "Hồ sơ",
+            "inbox": "Hộp thư",
+            "lockScreen": "Khóa màn hình",
+            "signOut": "Đăng xuất",
+            "signingOut": "Đang đăng xuất..."
+        },
+        "footer": {
+            "copyright": "© {year}. Vristo. Bảo lưu mọi quyền."
+        },
+        "breadcrumb": {
+            "ariaLabel": "Đường dẫn điều hướng",
+            "dashboard": "Bảng điều khiển"
+        }
     }
 } 
