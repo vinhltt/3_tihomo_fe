@@ -3,9 +3,9 @@
     <!-- Page Header (Tiêu đề trang) -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
       <div>
-        <h5 class="font-semibold text-lg dark:text-white-light">API Keys</h5>
+        <h5 class="font-semibold text-lg dark:text-white-light">{{ t('api_keys') }}</h5>
         <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          Create and manage API keys to access TiHoMo services
+          {{ t('apiKey.page.description') }}
         </p>
       </div>
 
@@ -18,11 +18,11 @@
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div class="flex items-center space-x-3">
           <h6 class="font-medium text-gray-900 dark:text-white">
-            Your API Keys ({{ filteredApiKeys.length }})
+            {{ t('apiKey.page.yourKeys', { count: filteredApiKeys.length }) }}
           </h6>
           <div v-if="loading" class="flex items-center space-x-2">
             <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-            <span class="text-sm text-gray-500">Loading...</span>
+            <span class="text-sm text-gray-500">{{ t('common.loading') }}</span>
           </div>
         </div>
         
@@ -32,7 +32,7 @@
           class="btn btn-primary"
         >
           <icon-plus class="h-4 w-4 mr-2" />
-          Create API Key
+          {{ t('apiKey.actions.create') }}
         </button>
       </div>
     </div>
@@ -45,7 +45,7 @@
             <icon-lock class="h-8 w-8 text-primary" />
           </div>
           <div>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Total API Keys</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">{{ t('apiKey.page.totalKeys') }}</p>
             <p class="text-xl font-semibold text-gray-900 dark:text-white">
               {{ apiKeys.length }}
             </p>
@@ -59,7 +59,7 @@
             <icon-circle-check class="h-8 w-8 text-success" />
           </div>
           <div>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Active Keys</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">{{ t('apiKey.page.activeKeys') }}</p>
             <p class="text-xl font-semibold text-success">
               {{ activeKeysCount }}
             </p>
@@ -86,7 +86,7 @@
       <!-- Loading State -->
       <div v-else-if="loading" class="text-center py-20">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-        <p class="text-gray-500">Loading API keys...</p>
+        <p class="text-gray-500">{{ t('apiKey.page.loadingKeys') }}</p>
       </div>
     </div>
 
@@ -142,6 +142,7 @@
 </template>
 
 <script setup lang="ts">
+import Swal from 'sweetalert2'
 import { logger } from '~/utils/logger'
 
 import type { ApiKey } from '~/types/api-key'
@@ -151,11 +152,13 @@ import { useApiKeys } from '~/composables/useApiKeys'
 import SimpleApiKeyForm from '~/components/api-key/SimpleApiKeyForm.vue'
 import ApiKeySuccessModal from '~/components/api-key/ApiKeySuccessModal.vue'
 
+const { t } = useI18n()
+
 // Meta tags and page info
 useHead({
-  title: 'API Key Management - TiHoMo',
+  title: computed(() => t('apiKey.page.metaTitle')),
   meta: [
-    { name: 'description', content: 'Manage your API keys for third-party integrations with TiHoMo services' }
+    { name: 'description', content: computed(() => t('apiKey.page.metaDescription')) }
   ]
 })
 
@@ -183,8 +186,8 @@ const createdApiKeyData = ref<any>(null)
 
 // Breadcrumb navigation
 const breadcrumbs = ref([
-  { name: 'Apps', href: '/apps' },
-  { name: 'API Keys', href: '/apps/api-keys' }
+  { name: '', labelKey: 'apps', href: '/apps' },
+  { name: '', labelKey: 'api_keys', href: '/apps/api-keys' }
 ])
 
 /**
@@ -217,7 +220,7 @@ const handleCopyKeyPrefix = async (apiKey: ApiKey): Promise<void> => {
     await navigator.clipboard.writeText(textToCopy)
     
     // Show success message
-    showSuccessToast(`API Key prefix "${textToCopy}" copied to clipboard!`)
+    showSuccessToast(t('apiKey.messages.prefixCopied', { prefix: textToCopy }))
     
     logger.dev('Copied API key prefix:', textToCopy)
   } catch (error) {
@@ -236,7 +239,7 @@ const handleCopyKeyPrefix = async (apiKey: ApiKey): Promise<void> => {
       document.execCommand('copy')
       document.body.removeChild(textArea)
       
-      showSuccessToast(`API Key prefix "${apiKey.keyPrefix}" copied to clipboard!`)
+      showSuccessToast(t('apiKey.messages.prefixCopied', { prefix: apiKey.keyPrefix }))
     } catch (fallbackError) {
       logger.error('Fallback copy failed:', fallbackError)
       // Could show an error toast here
@@ -246,12 +249,12 @@ const handleCopyKeyPrefix = async (apiKey: ApiKey): Promise<void> => {
 
 const handleRevokeKey = async (keyId: string): Promise<void> => {
   // Show confirmation dialog
-  const confirmed = confirm('Are you sure you want to revoke this API key? This action cannot be undone.')
+  const confirmed = await confirmAction(t('apiKey.confirm.revoke'), t('apiKey.actions.revoke'))
   if (!confirmed) return
   
   try {
     await revokeApiKey(keyId)
-    showSuccessToast('API key revoked successfully')
+    showSuccessToast(t('apiKey.messages.revoked'))
     await refreshApiKeys()
   } catch (error) {
     logger.error('Failed to revoke API key:', error)
@@ -261,12 +264,12 @@ const handleRevokeKey = async (keyId: string): Promise<void> => {
 
 const handleRegenerateKey = async (keyId: string): Promise<void> => {
   // Show confirmation dialog
-  const confirmed = confirm('Are you sure you want to regenerate this API key? The old key will stop working immediately.')
+  const confirmed = await confirmAction(t('apiKey.confirm.regenerate'), t('apiKey.actions.regenerate'))
   if (!confirmed) return
   
   try {
     await rotateApiKey(keyId)
-    showSuccessToast('API key regenerated successfully')
+    showSuccessToast(t('apiKey.messages.regenerated'))
     await refreshApiKeys()
   } catch (error) {
     logger.error('Failed to regenerate API key:', error)
@@ -311,6 +314,21 @@ const handleViewAnalytics = (keyId: string): void => {
 
 const refreshApiKeys = async (): Promise<void> => {
   await fetchApiKeys()
+}
+
+// Texts are translated when the dialog opens, so they follow the active locale.
+const confirmAction = async (text: string, confirmButtonText: string): Promise<boolean> => {
+  const result = await Swal.fire({
+    title: t('common.confirmation.title'),
+    text,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText,
+    cancelButtonText: t('common.cancel')
+  })
+  return result.isConfirmed
 }
 
 const showSuccessToast = (message: string): void => {

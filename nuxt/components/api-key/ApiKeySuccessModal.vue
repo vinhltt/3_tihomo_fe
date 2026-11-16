@@ -20,10 +20,10 @@
               </div>
               <div>
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-                  API Key Created Successfully!
+                  {{ t('apiKey.successModal.title') }}
                 </h3>
                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  Your API key has been generated and is ready to use.
+                  {{ t('apiKey.successModal.subtitle') }}
                 </p>
               </div>
             </div>
@@ -40,7 +40,7 @@
             <!-- Key Name -->
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                API Key Name
+                {{ t('apiKey.form.name') }}
               </label>
               <div class="px-3 py-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
                 <span class="text-gray-900 dark:text-white font-medium">{{ apiKeyData?.name }}</span>
@@ -50,7 +50,7 @@
             <!-- API Key -->
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                API Key <span class="text-red-500 text-xs">(Copy now - shown only once!)</span>
+                {{ t('apiKey.card.apiKey') }} <span class="text-red-500 text-xs">{{ t('apiKey.successModal.copyNowNotice') }}</span>
               </label>
               <div class="relative">
                 <div class="px-3 py-2 bg-gray-50 dark:bg-gray-700 rounded-lg border-2 border-dashed border-yellow-300 dark:border-yellow-600">
@@ -61,7 +61,7 @@
                 <button
                   @click="copyToClipboard"
                   class="absolute right-2 top-2 p-1 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-                  :title="copied ? 'Copied!' : 'Copy to clipboard'"
+                  :title="copied ? t('common.copied') : t('common.copy')"
                 >
                   <icon-clipboard-text v-if="!copied" class="w-4 h-4" />
                   <icon-checks v-else class="w-4 h-4 text-green-600" />
@@ -73,7 +73,7 @@
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Key Prefix
+                  {{ t('apiKey.table.keyPrefix') }}
                 </label>
                 <div class="text-sm text-gray-600 dark:text-gray-400">
                   {{ apiKeyData?.keyPrefix }}
@@ -81,7 +81,7 @@
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Created At
+                  {{ t('apiKey.card.created') }}
                 </label>
                 <div class="text-sm text-gray-600 dark:text-gray-400">
                   {{ formattedCreatedAt }}
@@ -95,12 +95,12 @@
             <div class="flex items-start">
               <icon-info-triangle class="h-5 w-5 text-yellow-600 dark:text-yellow-400 mt-0.5 mr-3 flex-shrink-0" />
               <div class="text-sm">
-                <h6 class="font-medium text-yellow-900 dark:text-yellow-200 mb-1">Important Security Notice</h6>
+                <h6 class="font-medium text-yellow-900 dark:text-yellow-200 mb-1">{{ t('apiKey.successModal.noticeTitle') }}</h6>
                 <ul class="text-yellow-700 dark:text-yellow-300 space-y-1 text-xs">
-                  <li>• <strong>Copy this API key now</strong> - it will not be shown again for security reasons</li>
-                  <li>• Store it securely in your application or password manager</li>
-                  <li>• Never share your API key or commit it to version control</li>
-                  <li>• If you lose it, you'll need to generate a new one</li>
+                  <li>• <strong>{{ t('apiKey.successModal.noticeCopyNow') }}</strong> {{ t('apiKey.successModal.noticeCopyNowReason') }}</li>
+                  <li>• {{ t('apiKey.successModal.noticeStoreSecurely') }}</li>
+                  <li>• {{ t('apiKey.successModal.noticeNeverShare') }}</li>
+                  <li>• {{ t('apiKey.successModal.noticeIfLost') }}</li>
                 </ul>
               </div>
             </div>
@@ -109,7 +109,7 @@
           <!-- Actions -->
           <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
             <div class="text-sm text-gray-500 dark:text-gray-400">
-              You can manage this API key in your dashboard
+              {{ t('apiKey.successModal.manageHint') }}
             </div>
             <div class="flex items-center space-x-3">
               <button
@@ -117,13 +117,13 @@
                 class="btn btn-outline-primary btn-sm"
               >
                 <icon-clipboard-text class="w-4 h-4 mr-1" />
-                {{ copied ? 'Copied!' : 'Copy Key' }}
+                {{ copied ? t('common.copied') : t('apiKey.actions.copyKey') }}
               </button>
               <button
                 @click="handleClose"
                 class="btn btn-primary btn-sm"
               >
-                Done
+                {{ t('common.done') }}
               </button>
             </div>
           </div>
@@ -135,6 +135,7 @@
 
 <script setup lang="ts">
 import { logger } from '~/utils/logger'
+import { formatDateTime } from '~/utils/display-format'
 
 import type { CreateApiKeyResponse } from '~/types/api-key'
 
@@ -151,21 +152,13 @@ interface Emits {
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
+const { t } = useI18n()
 
 // State
 const copied = ref(false)
 
 // Computed
-const formattedCreatedAt = computed(() => {
-  if (!props.apiKeyData?.createdAt) return ''
-  return new Date(props.apiKeyData.createdAt).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-})
+const formattedCreatedAt = computed(() => formatDateTime(props.apiKeyData?.createdAt))
 
 // Methods
 const copyToClipboard = async () => {

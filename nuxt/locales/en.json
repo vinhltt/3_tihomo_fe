@@ -157,29 +157,38 @@
         "clearFilters": "Clear filters",
         "close": "Close",
         "confirm": "Confirm",
+        "copied": "Copied!",
         "copy": "Copy",
         "create": "Create",
         "delete": "Delete",
         "disabled": "Disabled",
+        "done": "Done",
         "edit": "Edit",
         "enabled": "Enabled",
         "error": "Error",
+        "export": "Export",
         "hide": "Hide",
         "inactive": "Inactive",
         "loading": "Loading...",
         "next": "Next",
         "noData": "No data",
+        "of": "of",
         "previous": "Previous",
         "refresh": "Refresh",
         "reset": "Reset",
         "retry": "Retry",
         "save": "Save",
+        "saveChanges": "Save changes",
+        "saving": "Saving...",
         "search": "Search",
         "show": "Show",
+        "showDetails": "Show details",
+        "showing": "Showing",
         "showLess": "Show less",
         "showMore": "Show more",
         "status": "Status",
         "success": "Success",
+        "to": "to",
         "update": "Update",
         "confirmation": {
             "title": "Are you sure?",
@@ -262,6 +271,310 @@
         "breadcrumb": {
             "ariaLabel": "Breadcrumb navigation",
             "dashboard": "Dashboard"
+        }
+    },
+    "apiKey": {
+        "page": {
+            "metaTitle": "API Key Management - TiHoMo",
+            "metaDescription": "Manage your API keys for third-party integrations with TiHoMo services",
+            "description": "Create and manage API keys to access TiHoMo services",
+            "yourKeys": "Your API Keys ({count})",
+            "totalKeys": "Total API Keys",
+            "activeKeys": "Active Keys",
+            "loadingKeys": "Loading API keys..."
+        },
+        "actions": {
+            "analytics": "Analytics",
+            "copyKey": "Copy Key",
+            "copyPrefix": "Copy API Key Prefix",
+            "create": "Create API Key",
+            "regenerate": "Regenerate API Key",
+            "revoke": "Revoke API Key",
+            "viewUsage": "View Usage"
+        },
+        "messages": {
+            "prefixCopied": "API key prefix \"{prefix}\" copied to clipboard!",
+            "revoked": "API key revoked successfully",
+            "regenerated": "API key regenerated successfully"
+        },
+        "confirm": {
+            "revoke": "Are you sure you want to revoke this API key? This action cannot be undone.",
+            "regenerate": "Are you sure you want to regenerate this API key? The old key will stop working immediately."
+        },
+        "errors": {
+            "fetchFailed": "Failed to load API keys.",
+            "fetchOneFailed": "Failed to load the API key.",
+            "createFailed": "Failed to create the API key.",
+            "updateFailed": "Failed to update the API key.",
+            "revokeFailed": "Failed to revoke the API key.",
+            "rotateFailed": "Failed to regenerate the API key.",
+            "verifyFailed": "Failed to verify the API key.",
+            "usageFailed": "Failed to load API key usage.",
+            "validationFailed": "Please correct the invalid fields."
+        },
+        "card": {
+            "apiKey": "API Key",
+            "created": "Created",
+            "expires": "Expires",
+            "keyId": "Key ID",
+            "keyNotAvailable": "Full key not available",
+            "keyNotAvailableDescription": "The full API key is shown only once, right after it is created.",
+            "lastUsed": "Last used",
+            "perMinute": "req/min",
+            "permissions": "Permissions",
+            "rateLimit": "Rate limit",
+            "requests": "requests",
+            "scopes": "scopes",
+            "security": "Security",
+            "todayUsage": "Today's usage",
+            "totalUsage": "Total usage"
+        },
+        "empty": {
+            "createFirst": "Create your first API key to get started.",
+            "noKeys": "No API keys yet",
+            "noResults": "No API keys match your filters",
+            "tryDifferentFilter": "Try a different search or filter."
+        },
+        "form": {
+            "advancedSecurity": "Advanced security",
+            "advancedSecurityDescription": "Restrict where and how this API key can be used.",
+            "basicDescription": "Give the API key a name, a description and an optional expiration date.",
+            "basicInformation": "Basic information",
+            "creating": "Creating...",
+            "customScopes": "Custom scopes",
+            "dailyQuotaHint": "Maximum number of requests per day, at least 100.",
+            "dailyUsageQuota": "Daily usage quota",
+            "description": "Description",
+            "descriptionPlaceholder": "What is this API key used for?",
+            "enableIpValidation": "Enable IP validation",
+            "enableIpValidationDescription": "Accept requests only from IP addresses in the whitelist.",
+            "enableRateLimiting": "Enable rate limiting",
+            "enableRateLimitingDescription": "Limit the number of requests per minute and per day.",
+            "enableUsageAnalytics": "Enable usage analytics",
+            "enableUsageAnalyticsDescription": "Record usage so you can monitor this API key.",
+            "expiresAt": "Expiration date",
+            "expiresAtHint": "Leave empty for a key that never expires.",
+            "ipWhitelist": "IP whitelist",
+            "ipWhitelistHint": "One IP address or CIDR range per line.",
+            "ipWhitelistPlaceholder": "e.g., 192.168.1.100 or 10.0.0.0/24",
+            "name": "API Key Name",
+            "nameHint": "Choose a name that helps you identify what this API key is used for.",
+            "namePlaceholder": "Enter a descriptive name for your API key",
+            "perDay": "req/day",
+            "permissions": "Permissions",
+            "permissionsDescription": "Choose what this API key is allowed to access.",
+            "rateLimitHint": "Between 1 and 1.000 requests per minute.",
+            "rateLimitPerMinute": "Rate limit per minute",
+            "rateLimitSuggestion": "Recommended rate limit",
+            "rateLimitSuggestionText": "Based on your selected scopes, we recommend {count} requests per minute",
+            "rateLimiting": "Rate limiting",
+            "rateLimitingDescription": "Control how many requests this API key can make.",
+            "requireHttps": "Require HTTPS",
+            "requireHttpsDescription": "Reject requests that are not sent over HTTPS.",
+            "scopeTemplates": "Scope templates",
+            "securityOptions": "Security options",
+            "securityScore": "Security score",
+            "securityScoreDescription": "How well this API key is protected with the current settings.",
+            "selectedScopes": "Selected scopes",
+            "updating": "Updating..."
+        },
+        "templates": {
+            "readOnly": {
+                "name": "Read Only",
+                "description": "View data only, no modifications"
+            },
+            "fullAccess": {
+                "name": "Full Access",
+                "description": "Complete access to all resources"
+            },
+            "transactionsOnly": {
+                "name": "Transactions Only",
+                "description": "Access to transaction data only"
+            },
+            "accountsOnly": {
+                "name": "Accounts Only",
+                "description": "Access to account data only"
+            }
+        },
+        "validation": {
+            "nameRequired": "API key name is required",
+            "nameMinLength": "API key name must be at least 3 characters",
+            "nameMaxLength": "API key name must not exceed 100 characters",
+            "descriptionMaxLength": "Description must be less than 500 characters",
+            "scopesRequired": "At least one scope must be selected",
+            "rateLimitRange": "Rate limit must be between 1 and 1.000 requests per minute",
+            "dailyQuotaMin": "Daily quota must be at least 100 requests",
+            "invalidIps": "Invalid IP addresses: {ips}",
+            "expiryInFuture": "Expiration date must be in the future"
+        },
+        "management": {
+            "keys": "keys"
+        },
+        "table": {
+            "actions": "Actions",
+            "created": "Created",
+            "expires": "Expires",
+            "keyPrefix": "Key Prefix",
+            "name": "Name",
+            "scopes": "Scopes",
+            "status": "Status",
+            "usage": "Usage"
+        },
+        "scope": {
+            "read": "Read",
+            "write": "Write",
+            "delete": "Delete",
+            "admin": "Admin",
+            "transactionsRead": "Txn Read",
+            "transactionsWrite": "Txn Write",
+            "accountsRead": "Acc Read",
+            "accountsWrite": "Acc Write"
+        },
+        "scopeDescription": {
+            "read": "View data only",
+            "write": "Create and modify data",
+            "delete": "Delete data",
+            "admin": "Full administrative access",
+            "transactionsRead": "View transaction data",
+            "transactionsWrite": "Create and modify transactions",
+            "accountsRead": "View account data",
+            "accountsWrite": "Create and modify accounts",
+            "custom": "Custom scope"
+        },
+        "statusDescription": {
+            "active": "API key is active and working",
+            "revoked": "API key has been revoked and cannot be used",
+            "expired": "API key has expired and needs renewal",
+            "unknown": "Unknown status",
+            "expiresSoon": "expires soon: {date}"
+        },
+        "security": {
+            "breakdown": "Score breakdown",
+            "expirationSet": "Expiration set",
+            "httpsRequired": "HTTPS required",
+            "improvements": "Suggested improvements",
+            "ipValidation": "IP validation",
+            "limitedScopes": "Limited scopes",
+            "rateLimiting": "Rate limiting",
+            "securityScore": "Security score",
+            "securityWarnings": "Security warnings",
+            "usageAnalytics": "Usage analytics",
+            "levels": {
+                "excellent": "Excellent",
+                "veryGood": "Very good",
+                "good": "Good",
+                "fair": "Fair",
+                "poor": "Poor",
+                "veryPoor": "Very poor"
+            },
+            "suggestions": {
+                "enableHttps": "Enable HTTPS requirement for better security",
+                "addIpWhitelist": "Add IP whitelist to restrict access",
+                "enableRateLimiting": "Enable rate limiting to prevent abuse",
+                "setExpiration": "Set an expiration date for the API key",
+                "enableUsageAnalytics": "Enable usage analytics to monitor key activity",
+                "reviewAdminScope": "Review if admin scope is really necessary"
+            },
+            "warnings": {
+                "httpsNotRequired": "HTTPS not required - consider enabling for better security",
+                "noIpRestrictions": "No IP restrictions - consider adding IP whitelist",
+                "rateLimitingDisabled": "Rate limiting disabled - this could allow abuse",
+                "noExpiration": "No expiration date - consider setting an expiry for better security",
+                "adminScope": "Admin scope granted - ensure this is necessary",
+                "usageAnalyticsDisabled": "Usage analytics disabled - you won't be able to monitor key usage"
+            }
+        },
+        "successModal": {
+            "title": "API Key Created Successfully!",
+            "subtitle": "Your API key has been generated and is ready to use.",
+            "copyNowNotice": "(Copy now - shown only once!)",
+            "noticeTitle": "Important Security Notice",
+            "noticeCopyNow": "Copy this API key now",
+            "noticeCopyNowReason": "- it will not be shown again for security reasons",
+            "noticeStoreSecurely": "Store it securely in your application or password manager",
+            "noticeNeverShare": "Never share your API key or commit it to version control",
+            "noticeIfLost": "If you lose it, you'll need to generate a new one",
+            "manageHint": "You can manage this API key in your dashboard"
+        },
+        "simpleForm": {
+            "description": "Create an API key to access TiHoMo services programmatically.",
+            "advancedLater": "Advanced settings can be configured later if needed.",
+            "defaults": {
+                "title": "Default Settings",
+                "intro": "Your API key will be created with these default settings:",
+                "accessLabel": "Access:",
+                "access": "Full read and write permissions",
+                "rateLimitLabel": "Rate Limit:",
+                "rateLimit": "50 requests per minute",
+                "dailyQuotaLabel": "Daily Quota:",
+                "dailyQuota": "500 requests per day",
+                "securityLabel": "Security:",
+                "security": "HTTPS required, usage analytics enabled",
+                "expirationLabel": "Expiration:",
+                "expiration": "Never expires"
+            }
+        },
+        "usage": {
+            "apiUsage": "API Usage",
+            "currentPeriod": "Current period",
+            "currentUsage": "Current Usage",
+            "limit": "Limit",
+            "percentUsed": "{percent}% used",
+            "rateLimitPerMinute": "Rate limit: {value} requests/minute",
+            "rateLimitShort": "Rate limit: {value}/min",
+            "statistics": "Usage Statistics",
+            "used": "Used",
+            "level": {
+                "over": "Over Limit",
+                "warning": "Near Limit",
+                "moderate": "Moderate",
+                "low": "Low Usage",
+                "normal": "Normal"
+            }
+        },
+        "ipManagement": {
+            "title": "IP Whitelist Management",
+            "description": "Manage allowed IP addresses and CIDR ranges for enhanced security",
+            "validationOn": "IP Validation ON",
+            "validationOff": "IP Validation OFF",
+            "enableDescription": "Restrict API key usage to specific IP addresses or ranges",
+            "addTitle": "Add IP Address or CIDR Range",
+            "addressLabel": "IP Address or CIDR Range",
+            "addressHint": "Supports IPv4, IPv6, and CIDR notation (e.g., 192.168.1.0/24)",
+            "descriptionLabel": "Description (Optional)",
+            "descriptionPlaceholder": "e.g., Office network",
+            "addAddress": "Add IP Address",
+            "detecting": "Detecting...",
+            "addCurrentIp": "Add Current IP",
+            "commonRanges": "Common Ranges",
+            "commonRangesTitle": "Common IP Ranges",
+            "invalidAddress": "Please enter a valid IP address or CIDR range",
+            "currentWhitelist": "Current Whitelist ({count})",
+            "deleteSelected": "Delete Selected ({count})",
+            "bulkDeleteConfirm": "Are you sure you want to delete {count} IP addresses?",
+            "singleIp": "Single IP",
+            "cidrRange": "CIDR Range",
+            "currentIp": "Current IP",
+            "currentIpDescription": "Current IP (auto-detected)",
+            "added": "Added {date}",
+            "lastUsed": "Last used {date}",
+            "emptyTitle": "No IP addresses in whitelist",
+            "emptyDescription": "Add IP addresses to restrict access",
+            "disabledTitle": "IP Validation is disabled",
+            "disabledDescription": "Enable IP validation to restrict access to specific addresses",
+            "recentActivity": "Recent IP Activity",
+            "noRecentActivity": "No recent IP activity",
+            "activityStatus": {
+                "allowed": "Allowed",
+                "blocked": "Blocked"
+            },
+            "ranges": {
+                "classA": "Private network (Class A)",
+                "classB": "Private network (Class B)",
+                "classC": "Private network (Class C)",
+                "loopback": "Loopback addresses",
+                "allIpv4": "All IPv4 addresses (not recommended)"
+            }
         }
     }
 }

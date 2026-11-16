@@ -29,7 +29,7 @@
               required
             />
             <div v-if="errors.name" class="form-error">
-              {{ errors.name }}
+              {{ $t(errors.name) }}
             </div>
             <div class="form-hint">
               {{ $t('apiKey.form.nameHint') }}
@@ -50,7 +50,7 @@
               :min="minExpiryDate"
             />
             <div v-if="errors.expiresAt" class="form-error">
-              {{ errors.expiresAt }}
+              {{ $t(errors.expiresAt) }}
             </div>
             <div class="form-hint">
               {{ $t('apiKey.form.expiresAtHint') }}
@@ -72,7 +72,7 @@
             :class="{ 'error': errors.description }"
           />
           <div v-if="errors.description" class="form-error">
-            {{ errors.description }}
+            {{ $t(errors.description) }}
           </div>
         </div>
       </div>
@@ -112,11 +112,11 @@
               <div class="flex items-center space-x-2 mb-2">
                 <component :is="template.icon" class="h-5 w-5 text-primary" />
                 <span class="font-medium text-gray-900 dark:text-white">
-                  {{ template.name }}
+                  {{ templateLabels[template.id] ? $t(templateLabels[template.id].name) : template.name }}
                 </span>
               </div>
               <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                {{ template.description }}
+                {{ templateLabels[template.id] ? $t(templateLabels[template.id].description) : template.description }}
               </p>
               <div class="flex flex-wrap gap-1">
                 <ScopeBadge
@@ -154,14 +154,14 @@
                 <div class="flex-1">
                   <ScopeBadge :scope="scope" size="sm" />
                   <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {{ getScopeDescription(scope) }}
+                    {{ $t(getScopeDescriptionKey(scope)) }}
                   </p>
                 </div>
               </label>
             </div>
             
             <div v-if="errors.scopes" class="form-error">
-              {{ errors.scopes }}
+              {{ $t(errors.scopes) }}
             </div>
           </div>
         </div>
@@ -213,11 +213,11 @@
                 :class="{ 'error': errors.rateLimitPerMinute }"
               />
               <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500">
-                req/min
+                {{ $t('apiKey.card.perMinute') }}
               </span>
             </div>
             <div v-if="errors.rateLimitPerMinute" class="form-error">
-              {{ errors.rateLimitPerMinute }}
+              {{ $t(errors.rateLimitPerMinute) }}
             </div>
             <div class="form-hint">
               {{ $t('apiKey.form.rateLimitHint') }}
@@ -240,11 +240,11 @@
                 :class="{ 'error': errors.dailyUsageQuota }"
               />
               <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500">
-                req/day
+                {{ $t('apiKey.form.perDay') }}
               </span>
             </div>
             <div v-if="errors.dailyUsageQuota" class="form-error">
-              {{ errors.dailyUsageQuota }}
+              {{ $t(errors.dailyUsageQuota) }}
             </div>
             <div class="form-hint">
               {{ $t('apiKey.form.dailyQuotaHint') }}
@@ -261,7 +261,7 @@
                 {{ $t('apiKey.form.rateLimitSuggestion') }}
               </h4>
               <p class="text-sm text-blue-700 dark:text-blue-300 mt-1">
-                {{ getRateLimitSuggestionText() }}
+                {{ $t('apiKey.form.rateLimitSuggestionText', { count: formatNumber(calculateRateLimitSuggestion(form.scopes)) }) }}
               </p>
               <button
                 type="button"
@@ -317,7 +317,7 @@
             :class="{ 'error': errors.ipWhitelist }"
           />
           <div v-if="errors.ipWhitelist" class="form-error">
-            {{ errors.ipWhitelist }}
+            {{ $t(errors.ipWhitelist, { ips: invalidIps.join(', ') }) }}
           </div>
           <div class="form-hint">
             {{ $t('apiKey.form.ipWhitelistHint') }}
@@ -449,7 +449,7 @@
       <div class="flex items-center space-x-4">
         <div v-if="loading" class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
           <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-          <span>{{ isEditMode ? $t('apiKey.form.updating') : $t('apiKey.form.creating') }}...</span>
+          <span>{{ isEditMode ? $t('apiKey.form.updating') : $t('apiKey.form.creating') }}</span>
         </div>
         
         <button
@@ -478,6 +478,7 @@ import {
   SCOPE_TEMPLATES,
   ApiKeyScope 
 } from '~/types/api-key'
+import { formatNumber } from '~/utils/display-format'
 
 interface Props {
   apiKey?: ApiKey
@@ -495,6 +496,16 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
+const { t } = useI18n()
+
+// Scope template id → translation keys; an unknown template shows the name and description it carries.
+const templateLabels: Record<string, { name: string; description: string }> = {
+  'read-only': { name: 'apiKey.templates.readOnly.name', description: 'apiKey.templates.readOnly.description' },
+  'full-access': { name: 'apiKey.templates.fullAccess.name', description: 'apiKey.templates.fullAccess.description' },
+  'transactions-only': { name: 'apiKey.templates.transactionsOnly.name', description: 'apiKey.templates.transactionsOnly.description' },
+  'accounts-only': { name: 'apiKey.templates.accountsOnly.name', description: 'apiKey.templates.accountsOnly.description' }
+}
+
 /**
  * Form state và validation (Trạng thái form và xác thực)
  */
@@ -509,7 +520,9 @@ const {
 } = useApiKeyManager()
 
 const form = ref({ ...DEFAULT_API_KEY_REQUEST })
+// Field → translation key of its validation message.
 const errors = ref<Record<string, string>>({})
+const invalidIps = ref<string[]>([])
 const showAdvancedSecurity = ref(false)
 const selectedTemplate = ref<ScopeTemplate | null>(null)
 
@@ -546,27 +559,27 @@ const securityWarnings = computed(() => {
   const warnings: string[] = []
   
   if (!form.value.securitySettings.requireHttps) {
-    warnings.push('HTTPS not required - consider enabling for better security')
+    warnings.push(t('apiKey.security.warnings.httpsNotRequired'))
   }
   
   if (!form.value.securitySettings.enableIpValidation || form.value.ipWhitelist.length === 0) {
-    warnings.push('No IP restrictions - consider adding IP whitelist')
+    warnings.push(t('apiKey.security.warnings.noIpRestrictions'))
   }
   
   if (!form.value.securitySettings.enableRateLimiting) {
-    warnings.push('Rate limiting disabled - this could allow abuse')
+    warnings.push(t('apiKey.security.warnings.rateLimitingDisabled'))
   }
   
   if (!form.value.expiresAt) {
-    warnings.push('No expiration date - consider setting an expiry for better security')
+    warnings.push(t('apiKey.security.warnings.noExpiration'))
   }
   
   if (form.value.scopes.includes(ApiKeyScope.Admin)) {
-    warnings.push('Admin scope granted - ensure this is necessary')
+    warnings.push(t('apiKey.security.warnings.adminScope'))
   }
   
   if (!form.value.securitySettings.enableUsageAnalytics) {
-    warnings.push('Usage analytics disabled - you won\'t be able to monitor key usage')
+    warnings.push(t('apiKey.security.warnings.usageAnalyticsDisabled'))
   }
   
   return warnings
@@ -613,28 +626,19 @@ const applyScopeTemplate = (template: ScopeTemplate): void => {
 }
 
 /**
- * Get scope description (Lấy mô tả scope)
+ * Get scope description translation key (Lấy key bản dịch mô tả scope)
  */
-const getScopeDescription = (scope: string): string => {
-  // This would typically come from i18n translations
+const getScopeDescriptionKey = (scope: string): string => {
   const descriptions: Record<string, string> = {
-    [ApiKeyScope.Read]: 'Read access to resources',
-    [ApiKeyScope.Write]: 'Write access to resources',
-    [ApiKeyScope.AccountsRead]: 'Read access to accounts',
-    [ApiKeyScope.AccountsWrite]: 'Write access to accounts',
-    [ApiKeyScope.TransactionsRead]: 'Read access to transactions',
-    [ApiKeyScope.TransactionsWrite]: 'Write access to transactions',
-    [ApiKeyScope.Admin]: 'Full administrative access'
+    [ApiKeyScope.Read]: 'apiKey.scopeDescription.read',
+    [ApiKeyScope.Write]: 'apiKey.scopeDescription.write',
+    [ApiKeyScope.AccountsRead]: 'apiKey.scopeDescription.accountsRead',
+    [ApiKeyScope.AccountsWrite]: 'apiKey.scopeDescription.accountsWrite',
+    [ApiKeyScope.TransactionsRead]: 'apiKey.scopeDescription.transactionsRead',
+    [ApiKeyScope.TransactionsWrite]: 'apiKey.scopeDescription.transactionsWrite',
+    [ApiKeyScope.Admin]: 'apiKey.scopeDescription.admin'
   }
-  return descriptions[scope] || 'Custom scope'
-}
-
-/**
- * Get rate limit suggestion text (Lấy văn bản gợi ý giới hạn tốc độ)
- */
-const getRateLimitSuggestionText = (): string => {
-  const suggestion = calculateRateLimitSuggestion(form.value.scopes)
-  return `Based on your selected scopes, we recommend ${suggestion} requests per minute`
+  return descriptions[scope] || 'apiKey.scopeDescription.custom'
 }
 
 /**
@@ -654,37 +658,38 @@ const validateFormData = (): boolean => {
   
   // Name validation
   if (!form.value.name.trim()) {
-    newErrors.name = 'API key name is required'
+    newErrors.name = 'apiKey.validation.nameRequired'
   } else if (form.value.name.length < 3) {
-    newErrors.name = 'Name must be at least 3 characters'
+    newErrors.name = 'apiKey.validation.nameMinLength'
   } else if (form.value.name.length > 100) {
-    newErrors.name = 'Name must be less than 100 characters'
+    newErrors.name = 'apiKey.validation.nameMaxLength'
   }
   
   // Description validation
   if (form.value.description && form.value.description.length > 500) {
-    newErrors.description = 'Description must be less than 500 characters'
+    newErrors.description = 'apiKey.validation.descriptionMaxLength'
   }
   
   // Scopes validation
   if (form.value.scopes.length === 0) {
-    newErrors.scopes = 'At least one scope must be selected'
+    newErrors.scopes = 'apiKey.validation.scopesRequired'
   }
   
   // Rate limiting validation
   if (form.value.rateLimitPerMinute < 1 || form.value.rateLimitPerMinute > 1000) {
-    newErrors.rateLimitPerMinute = 'Rate limit must be between 1 and 1000 requests per minute'
+    newErrors.rateLimitPerMinute = 'apiKey.validation.rateLimitRange'
   }
   
   if (form.value.dailyUsageQuota < 100) {
-    newErrors.dailyUsageQuota = 'Daily quota must be at least 100 requests'
+    newErrors.dailyUsageQuota = 'apiKey.validation.dailyQuotaMin'
   }
   
   // IP whitelist validation
+  invalidIps.value = []
   if (form.value.securitySettings.enableIpValidation && form.value.ipWhitelist.length > 0) {
-    const invalidIps = form.value.ipWhitelist.filter(ip => !validateIpAddress(ip))
-    if (invalidIps.length > 0) {
-      newErrors.ipWhitelist = `Invalid IP addresses: ${invalidIps.join(', ')}`
+    invalidIps.value = form.value.ipWhitelist.filter(ip => !validateIpAddress(ip))
+    if (invalidIps.value.length > 0) {
+      newErrors.ipWhitelist = 'apiKey.validation.invalidIps'
     }
   }
   
@@ -693,7 +698,7 @@ const validateFormData = (): boolean => {
     const expiryDate = new Date(form.value.expiresAt)
     const now = new Date()
     if (expiryDate <= now) {
-      newErrors.expiresAt = 'Expiration date must be in the future'
+      newErrors.expiresAt = 'apiKey.validation.expiryInFuture'
     }
   }
   

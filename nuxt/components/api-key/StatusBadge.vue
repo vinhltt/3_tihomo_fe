@@ -23,6 +23,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { ApiKeyStatus } from '~/types/api-key'
+import { formatDateTime } from '~/utils/display-format'
 
 // Props
 interface Props {
@@ -42,35 +43,42 @@ const props = withDefaults(defineProps<Props>(), {
   variant: 'solid'
 })
 
-// Status configuration
+const { t } = useI18n()
+
+// Status configuration; label and description are translation keys
 const statusConfig = {
   [ApiKeyStatus.Active]: {
-    label: 'Active',
+    labelKey: 'enums.apiKeyStatus.active',
     color: 'green',
     icon: '✅',
-    description: 'API key is active and working'
+    descriptionKey: 'apiKey.statusDescription.active'
   },
   [ApiKeyStatus.Revoked]: {
-    label: 'Revoked',
+    labelKey: 'enums.apiKeyStatus.revoked',
     color: 'red',
     icon: '🚫',
-    description: 'API key has been revoked and cannot be used'
+    descriptionKey: 'apiKey.statusDescription.revoked'
   },
   [ApiKeyStatus.Expired]: {
-    label: 'Expired',
+    labelKey: 'enums.apiKeyStatus.expired',
     color: 'orange',
     icon: '⏰',
-    description: 'API key has expired and needs renewal'
+    descriptionKey: 'apiKey.statusDescription.expired'
   }
 }
 
 // Computed properties
 const statusInfo = computed(() => {
-  return statusConfig[props.status as ApiKeyStatus] || {
-    label: props.customText || props.status,
+  const config = statusConfig[props.status as ApiKeyStatus]
+  if (config) {
+    return { label: t(config.labelKey), color: config.color, icon: config.icon, description: t(config.descriptionKey) }
+  }
+  // A status missing from the map is shown verbatim, as the backend sent it.
+  return {
+    label: props.customText || String(props.status ?? ''),
     color: 'gray',
     icon: '❓',
-    description: 'Unknown status'
+    description: t('apiKey.statusDescription.unknown')
   }
 })
 
@@ -80,7 +88,7 @@ const displayText = computed(() => {
 
 const statusDescription = computed(() => {
   if (props.status === ApiKeyStatus.Active && isExpiringSoon.value) {
-    return `${statusInfo.value.description} (expires soon: ${formatExpiryDate.value})`
+    return `${statusInfo.value.description} (${t('apiKey.statusDescription.expiresSoon', { date: formatDateTime(props.expiresAt) })})`
   }
   return statusInfo.value.description
 })
@@ -99,20 +107,6 @@ const isExpiringSoon = computed(() => {
   const daysUntilExpiry = Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
   
   return daysUntilExpiry <= 7 && daysUntilExpiry > 0
-})
-
-const formatExpiryDate = computed(() => {
-  if (!props.expiresAt) return ''
-  
-  const expiryDate = new Date(props.expiresAt)
-  const now = new Date()
-  const daysUntilExpiry = Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-  
-  if (daysUntilExpiry === 0) return 'today'
-  if (daysUntilExpiry === 1) return 'tomorrow'
-  if (daysUntilExpiry <= 7) return `in ${daysUntilExpiry} days`
-  
-  return expiryDate.toLocaleDateString()
 })
 
 const showExpiryWarning = computed(() => {

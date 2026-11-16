@@ -113,7 +113,7 @@
       <div class="space-y-2">
         <div 
           v-for="factor in securityFactors" 
-          :key="factor.name"
+          :key="factor.labelKey"
           class="flex items-center justify-between"
         >
           <div class="flex items-center space-x-2">
@@ -128,7 +128,7 @@
               'text-sm',
               factor.achieved ? 'text-gray-700 dark:text-gray-300' : 'text-gray-500'
             ]">
-              {{ factor.name }}
+              {{ $t(factor.labelKey) }}
             </span>
           </div>
           <div class="flex items-center space-x-2">
@@ -157,7 +157,7 @@
 import type { ApiKeySecuritySettings } from '~/types/api-key'
 
 interface SecurityFactor {
-  name: string
+  labelKey: string
   points: number
   achieved: boolean
   icon: string
@@ -195,6 +195,8 @@ const props = withDefaults(defineProps<Props>(), {
   animated: false,
   class: ''
 })
+
+const { t } = useI18n()
 
 /**
  * Computed properties for styling (Thuộc tính computed cho styling)
@@ -257,12 +259,12 @@ const progressColorClasses = computed(() => {
  * Security level text (Văn bản mức độ bảo mật)
  */
 const securityLevel = computed(() => {
-  if (props.score >= 90) return 'Excellent'
-  if (props.score >= 80) return 'Very Good'
-  if (props.score >= 60) return 'Good'
-  if (props.score >= 40) return 'Fair'
-  if (props.score >= 20) return 'Poor'
-  return 'Very Poor'
+  if (props.score >= 90) return t('apiKey.security.levels.excellent')
+  if (props.score >= 80) return t('apiKey.security.levels.veryGood')
+  if (props.score >= 60) return t('apiKey.security.levels.good')
+  if (props.score >= 40) return t('apiKey.security.levels.fair')
+  if (props.score >= 20) return t('apiKey.security.levels.poor')
+  return t('apiKey.security.levels.veryPoor')
 })
 
 /**
@@ -272,27 +274,27 @@ const securitySuggestions = computed(() => {
   const suggestions: string[] = []
   
   if (!props.securitySettings?.requireHttps) {
-    suggestions.push('Enable HTTPS requirement for better security')
+    suggestions.push(t('apiKey.security.suggestions.enableHttps'))
   }
   
   if (!props.securitySettings?.enableIpValidation) {
-    suggestions.push('Add IP whitelist to restrict access')
+    suggestions.push(t('apiKey.security.suggestions.addIpWhitelist'))
   }
   
   if (!props.securitySettings?.enableRateLimiting) {
-    suggestions.push('Enable rate limiting to prevent abuse')
+    suggestions.push(t('apiKey.security.suggestions.enableRateLimiting'))
   }
   
   if (!props.hasExpiration) {
-    suggestions.push('Set an expiration date for the API key')
+    suggestions.push(t('apiKey.security.suggestions.setExpiration'))
   }
   
   if (!props.securitySettings?.enableUsageAnalytics) {
-    suggestions.push('Enable usage analytics to monitor key activity')
+    suggestions.push(t('apiKey.security.suggestions.enableUsageAnalytics'))
   }
   
   if (props.scopes?.includes('admin')) {
-    suggestions.push('Review if admin scope is really necessary')
+    suggestions.push(t('apiKey.security.suggestions.reviewAdminScope'))
   }
   
   return suggestions
@@ -303,37 +305,37 @@ const securitySuggestions = computed(() => {
  */
 const securityFactors = computed((): SecurityFactor[] => [
   {
-    name: 'HTTPS Required',
+    labelKey: 'apiKey.security.httpsRequired',
     points: 20,
     achieved: !!props.securitySettings?.requireHttps,
     icon: 'icon-shield-check'
   },
   {
-    name: 'IP Validation',
+    labelKey: 'apiKey.security.ipValidation',
     points: 25,
     achieved: !!props.securitySettings?.enableIpValidation,
     icon: 'icon-globe-alt'
   },
   {
-    name: 'Rate Limiting',
+    labelKey: 'apiKey.security.rateLimiting',
     points: 15,
     achieved: !!props.securitySettings?.enableRateLimiting,
     icon: 'icon-clock'
   },
   {
-    name: 'Expiration Set',
+    labelKey: 'apiKey.security.expirationSet',
     points: 15,
     achieved: !!props.hasExpiration,
     icon: 'icon-calendar'
   },
   {
-    name: 'Limited Scopes',
+    labelKey: 'apiKey.security.limitedScopes',
     points: props.scopes?.includes('admin') ? 5 : 10,
     achieved: !!props.scopes && props.scopes.length > 0,
     icon: 'icon-key'
   },
   {
-    name: 'Usage Analytics',
+    labelKey: 'apiKey.security.usageAnalytics',
     points: 10,
     achieved: !!props.securitySettings?.enableUsageAnalytics,
     icon: 'icon-chart-bar'

@@ -15,6 +15,7 @@ import {
   ApiKeyScope,
   ApiKeyStatus 
 } from '~/types/api-key'
+import type { ApiError } from '~/types/api'
 
 /**
  * Composable for managing API Key UI state and business logic (EN)
@@ -378,9 +379,9 @@ export const useApiKeyManager = () => {
    * Create API key with validation (EN)
    * Tạo API key với xác thực (VI)
    */
-  const createApiKey = async (): Promise<{ success: boolean; data?: any; error?: string }> => {
+  const createApiKey = async (): Promise<{ success: boolean; data?: any; error?: Pick<ApiError, 'messageKey' | 'messageParams' | 'message'> }> => {
     if (!validateForm()) {
-      return { success: false, error: 'Form validation failed' }
+      return { success: false, error: { messageKey: 'apiKey.errors.validationFailed', message: 'Form validation failed' } }
     }
 
     try {
@@ -393,7 +394,7 @@ export const useApiKeyManager = () => {
       return { success: true, data: response }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to create API key'
-      return { success: false, error: errorMessage }
+      return { success: false, error: { messageKey: 'apiKey.errors.createFailed', message: errorMessage } }
     } finally {
       formState.value.loading = false
     }
@@ -403,9 +404,9 @@ export const useApiKeyManager = () => {
    * Update API key with validation (EN)
    * Cập nhật API key với xác thực (VI)
    */
-  const updateApiKey = async (id: string): Promise<{ success: boolean; error?: string }> => {
+  const updateApiKey = async (id: string): Promise<{ success: boolean; error?: Pick<ApiError, 'messageKey' | 'messageParams' | 'message'> }> => {
     if (!validateForm()) {
-      return { success: false, error: 'Form validation failed' }
+      return { success: false, error: { messageKey: 'apiKey.errors.validationFailed', message: 'Form validation failed' } }
     }
 
     try {
@@ -430,7 +431,7 @@ export const useApiKeyManager = () => {
       return { success: true }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to update API key'
-      return { success: false, error: errorMessage }
+      return { success: false, error: { messageKey: 'apiKey.errors.updateFailed', message: errorMessage } }
     } finally {
       formState.value.loading = false
     }

@@ -7,7 +7,7 @@
         <div class="absolute inset-0 bg-white dark:bg-gray-900 bg-opacity-50 flex items-center justify-center z-10">
           <div class="flex items-center space-x-3">
             <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-            <span class="text-gray-600 dark:text-gray-400">{{ $t('common.loading') }}...</span>
+            <span class="text-gray-600 dark:text-gray-400">{{ $t('common.loading') }}</span>
           </div>
         </div>
       </div>
@@ -84,7 +84,7 @@
                   <button
                     @click.stop="$emit('copy-key-prefix', apiKey)"
                     class="p-1.5 text-gray-400 hover:text-info transition-colors"
-                    title="Copy API Key Prefix"
+                    :title="$t('apiKey.actions.copyPrefix')"
                   >
                     <icon-copy class="h-4 w-4" />
                   </button>
@@ -92,7 +92,7 @@
                   <button
                     @click.stop="$emit('regenerate-key', apiKey.id)"
                     class="p-1.5 text-gray-400 hover:text-warning transition-colors"
-                    title="Regenerate API Key"
+                    :title="$t('apiKey.actions.regenerate')"
                   >
                     <icon-refresh class="h-4 w-4" />
                   </button>
@@ -100,7 +100,7 @@
                   <button
                     @click.stop="$emit('revoke-key', apiKey.id)"
                     class="p-1.5 text-gray-400 hover:text-danger transition-colors"
-                    title="Revoke API Key"
+                    :title="$t('apiKey.actions.revoke')"
                     :disabled="apiKey.status === 'revoked'"
                   >
                     <icon-trash class="h-4 w-4" />
@@ -179,7 +179,7 @@
             <!-- Actions -->
             <div class="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-700">
               <div class="text-xs text-gray-500 dark:text-gray-400">
-                {{ formatRelativeTime(apiKey.createdAt) }}
+                {{ formatDateTime(apiKey.createdAt) }}
               </div>
               <div class="flex items-center space-x-1">
                 <button
@@ -270,6 +270,7 @@
 
 <script setup lang="ts">
 import { logger } from '~/utils/logger'
+import { formatDateTime } from '~/utils/display-format'
 
 import type { ApiKey } from '~/types/api-key'
 import { ApiKeyScope } from '~/types/api-key'
@@ -435,22 +436,6 @@ const copyToClipboard = async (text: string): Promise<void> => {
   } catch (error) {
     logger.error('Failed to copy to clipboard:', error)
   }
-}
-
-/**
- * Format date for display (Định dạng ngày để hiển thị)
- */
-const formatRelativeTime = (date: string): string => {
-  const now = new Date()
-  const target = new Date(date)
-  const diffInSeconds = Math.floor((now.getTime() - target.getTime()) / 1000)
-  
-  if (diffInSeconds < 60) return 'Just now'
-  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`
-  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`
-  if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)}d ago`
-  
-  return target.toLocaleDateString()
 }
 
 /**

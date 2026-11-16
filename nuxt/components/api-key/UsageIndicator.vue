@@ -4,7 +4,7 @@
     <div v-if="variant === 'compact'" class="flex items-center space-x-2">
       <!-- Usage fraction -->
       <span class="text-sm font-medium" :class="usageTextColor">
-        {{ current }}/{{ limit }}
+        {{ formatNumber(current) }}/{{ formatNumber(limit) }}
       </span>
       
       <!-- Mini progress bar -->
@@ -27,7 +27,7 @@
       <!-- Header -->
       <div class="flex items-center justify-between">
         <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100">
-          {{ title || 'Usage Statistics' }}
+          {{ title || t('apiKey.usage.statistics') }}
         </h4>
         <span 
           class="px-2 py-1 text-xs font-medium rounded-full"
@@ -40,7 +40,7 @@
       <!-- Progress bar with labels -->
       <div class="space-y-2">
         <div class="flex items-center justify-between text-sm">
-          <span class="text-gray-600 dark:text-gray-400">Current Usage</span>
+          <span class="text-gray-600 dark:text-gray-400">{{ t('apiKey.usage.currentUsage') }}</span>
           <span class="font-medium" :class="usageTextColor">
             {{ formatNumber(current) }} / {{ formatNumber(limit) }}
           </span>
@@ -73,7 +73,7 @@
           <!-- Percentage label -->
           <div class="mt-1 text-right">
             <span class="text-xs font-medium" :class="usageTextColor">
-              {{ Math.round(progressPercentage) }}% used
+              {{ t('apiKey.usage.percentUsed', { percent: Math.round(progressPercentage) }) }}
             </span>
           </div>
         </div>
@@ -81,7 +81,7 @@
 
       <!-- Rate limiting info -->
       <div v-if="rateLimit" class="text-xs text-gray-500 dark:text-gray-400">
-        Rate limit: {{ formatNumber(rateLimit) }} requests/minute
+        {{ t('apiKey.usage.rateLimitPerMinute', { value: formatNumber(rateLimit) }) }}
       </div>
     </div>
 
@@ -94,10 +94,10 @@
         </div>
         <div>
           <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
-            {{ title || 'API Usage' }}
+            {{ title || t('apiKey.usage.apiUsage') }}
           </h3>
           <p class="text-sm text-gray-500 dark:text-gray-400">
-            {{ period || 'Current period' }}
+            {{ period || t('apiKey.usage.currentPeriod') }}
           </p>
         </div>
       </div>
@@ -108,20 +108,20 @@
           <div class="text-2xl font-bold" :class="usageTextColor">
             {{ formatNumber(current) }}
           </div>
-          <div class="text-xs text-gray-500 dark:text-gray-400">Used</div>
+          <div class="text-xs text-gray-500 dark:text-gray-400">{{ t('apiKey.usage.used') }}</div>
         </div>
         <div class="text-center">
           <div class="text-2xl font-bold text-gray-600 dark:text-gray-300">
             {{ formatNumber(limit) }}
           </div>
-          <div class="text-xs text-gray-500 dark:text-gray-400">Limit</div>
+          <div class="text-xs text-gray-500 dark:text-gray-400">{{ t('apiKey.usage.limit') }}</div>
         </div>
       </div>
 
       <!-- Progress visualization -->
       <div class="space-y-2">
         <div class="flex items-center justify-between text-sm">
-          <span class="text-gray-600 dark:text-gray-400">Usage</span>
+          <span class="text-gray-600 dark:text-gray-400">{{ t('apiKey.table.usage') }}</span>
           <span class="font-medium" :class="usageTextColor">
             {{ Math.round(progressPercentage) }}%
           </span>
@@ -144,7 +144,7 @@
 
       <!-- Additional info -->
       <div v-if="rateLimit || additionalInfo" class="text-xs text-gray-500 dark:text-gray-400 space-y-1">
-        <div v-if="rateLimit">Rate limit: {{ formatNumber(rateLimit) }}/min</div>
+        <div v-if="rateLimit">{{ t('apiKey.usage.rateLimitShort', { value: formatNumber(rateLimit) }) }}</div>
         <div v-if="additionalInfo">{{ additionalInfo }}</div>
       </div>
     </div>
@@ -153,6 +153,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { formatNumber } from '~/utils/display-format'
 
 // Props
 interface Props {
@@ -172,6 +173,8 @@ const props = withDefaults(defineProps<Props>(), {
   warningThreshold: 80,
   showWarningLine: false
 })
+
+const { t } = useI18n()
 
 // Computed properties
 const progressPercentage = computed(() => {
@@ -198,11 +201,11 @@ const usageLevel = computed(() => {
 const usageStatusText = computed(() => {
   const level = usageLevel.value
   switch (level) {
-    case 'over': return 'Over Limit'
-    case 'warning': return 'Near Limit'
-    case 'moderate': return 'Moderate'
-    case 'low': return 'Low Usage'
-    default: return 'Normal'
+    case 'over': return t('apiKey.usage.level.over')
+    case 'warning': return t('apiKey.usage.level.warning')
+    case 'moderate': return t('apiKey.usage.level.moderate')
+    case 'low': return t('apiKey.usage.level.low')
+    default: return t('apiKey.usage.level.normal')
   }
 })
 
@@ -295,17 +298,6 @@ const iconBgColor = computed(() => {
       return ['bg-gray-100', 'dark:bg-gray-900/30']
   }
 })
-
-// Utility functions
-const formatNumber = (num: number): string => {
-  if (num >= 1000000) {
-    return (num / 1000000).toFixed(1) + 'M'
-  }
-  if (num >= 1000) {
-    return (num / 1000).toFixed(1) + 'K'
-  }
-  return num.toString()
-}
 </script>
 
 <style scoped>

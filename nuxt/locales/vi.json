@@ -157,29 +157,38 @@
         "clearFilters": "Xóa bộ lọc",
         "close": "Đóng",
         "confirm": "Xác nhận",
+        "copied": "Đã sao chép!",
         "copy": "Sao chép",
         "create": "Tạo mới",
         "delete": "Xóa",
         "disabled": "Đã tắt",
+        "done": "Xong",
         "edit": "Sửa",
         "enabled": "Đã bật",
         "error": "Lỗi",
+        "export": "Xuất",
         "hide": "Ẩn",
         "inactive": "Không hoạt động",
         "loading": "Đang tải...",
         "next": "Tiếp",
         "noData": "Không có dữ liệu",
+        "of": "trên",
         "previous": "Trước",
         "refresh": "Làm mới",
         "reset": "Đặt lại",
         "retry": "Thử lại",
         "save": "Lưu",
+        "saveChanges": "Lưu thay đổi",
+        "saving": "Đang lưu...",
         "search": "Tìm kiếm",
         "show": "Hiện",
+        "showDetails": "Xem chi tiết",
+        "showing": "Hiển thị",
         "showLess": "Thu gọn",
         "showMore": "Xem thêm",
         "status": "Trạng thái",
         "success": "Thành công",
+        "to": "đến",
         "update": "Cập nhật",
         "confirmation": {
             "title": "Bạn có chắc chắn?",
@@ -262,6 +271,310 @@
         "breadcrumb": {
             "ariaLabel": "Đường dẫn điều hướng",
             "dashboard": "Bảng điều khiển"
+        }
+    },
+    "apiKey": {
+        "page": {
+            "metaTitle": "Quản lý khóa API - TiHoMo",
+            "metaDescription": "Quản lý khóa API dùng cho tích hợp bên thứ ba với các dịch vụ TiHoMo",
+            "description": "Tạo và quản lý khóa API để truy cập các dịch vụ TiHoMo",
+            "yourKeys": "Khóa API của bạn ({count})",
+            "totalKeys": "Tổng số khóa API",
+            "activeKeys": "Khóa đang hoạt động",
+            "loadingKeys": "Đang tải khóa API..."
+        },
+        "actions": {
+            "analytics": "Phân tích",
+            "copyKey": "Sao chép khóa",
+            "copyPrefix": "Sao chép tiền tố khóa API",
+            "create": "Tạo khóa API",
+            "regenerate": "Tạo lại khóa API",
+            "revoke": "Thu hồi khóa API",
+            "viewUsage": "Xem mức sử dụng"
+        },
+        "messages": {
+            "prefixCopied": "Đã sao chép tiền tố khóa API \"{prefix}\" vào bộ nhớ tạm!",
+            "revoked": "Đã thu hồi khóa API",
+            "regenerated": "Đã tạo lại khóa API"
+        },
+        "confirm": {
+            "revoke": "Bạn có chắc muốn thu hồi khóa API này? Thao tác này không thể hoàn tác.",
+            "regenerate": "Bạn có chắc muốn tạo lại khóa API này? Khóa cũ sẽ ngừng hoạt động ngay lập tức."
+        },
+        "errors": {
+            "fetchFailed": "Không thể tải danh sách khóa API.",
+            "fetchOneFailed": "Không thể tải khóa API.",
+            "createFailed": "Không thể tạo khóa API.",
+            "updateFailed": "Không thể cập nhật khóa API.",
+            "revokeFailed": "Không thể thu hồi khóa API.",
+            "rotateFailed": "Không thể tạo lại khóa API.",
+            "verifyFailed": "Không thể xác minh khóa API.",
+            "usageFailed": "Không thể tải mức sử dụng của khóa API.",
+            "validationFailed": "Vui lòng sửa các trường không hợp lệ."
+        },
+        "card": {
+            "apiKey": "Khóa API",
+            "created": "Ngày tạo",
+            "expires": "Ngày hết hạn",
+            "keyId": "Mã khóa",
+            "keyNotAvailable": "Không có khóa đầy đủ",
+            "keyNotAvailableDescription": "Khóa API đầy đủ chỉ hiển thị một lần, ngay sau khi được tạo.",
+            "lastUsed": "Dùng gần nhất",
+            "perMinute": "yêu cầu/phút",
+            "permissions": "Quyền",
+            "rateLimit": "Giới hạn tốc độ",
+            "requests": "yêu cầu",
+            "scopes": "phạm vi",
+            "security": "Bảo mật",
+            "todayUsage": "Sử dụng hôm nay",
+            "totalUsage": "Tổng lượt sử dụng"
+        },
+        "empty": {
+            "createFirst": "Tạo khóa API đầu tiên để bắt đầu.",
+            "noKeys": "Chưa có khóa API",
+            "noResults": "Không có khóa API phù hợp với bộ lọc",
+            "tryDifferentFilter": "Hãy thử từ khóa tìm kiếm hoặc bộ lọc khác."
+        },
+        "form": {
+            "advancedSecurity": "Bảo mật nâng cao",
+            "advancedSecurityDescription": "Giới hạn nơi và cách khóa API này được sử dụng.",
+            "basicDescription": "Đặt tên, mô tả và ngày hết hạn (không bắt buộc) cho khóa API.",
+            "basicInformation": "Thông tin cơ bản",
+            "creating": "Đang tạo...",
+            "customScopes": "Phạm vi tùy chỉnh",
+            "dailyQuotaHint": "Số yêu cầu tối đa mỗi ngày, ít nhất 100.",
+            "dailyUsageQuota": "Hạn mức sử dụng hằng ngày",
+            "description": "Mô tả",
+            "descriptionPlaceholder": "Khóa API này dùng để làm gì?",
+            "enableIpValidation": "Bật kiểm tra IP",
+            "enableIpValidationDescription": "Chỉ chấp nhận yêu cầu từ các địa chỉ IP trong danh sách cho phép.",
+            "enableRateLimiting": "Bật giới hạn tốc độ",
+            "enableRateLimitingDescription": "Giới hạn số yêu cầu mỗi phút và mỗi ngày.",
+            "enableUsageAnalytics": "Bật phân tích sử dụng",
+            "enableUsageAnalyticsDescription": "Ghi nhận lượt sử dụng để bạn theo dõi khóa API này.",
+            "expiresAt": "Ngày hết hạn",
+            "expiresAtHint": "Để trống nếu khóa không bao giờ hết hạn.",
+            "ipWhitelist": "Danh sách IP cho phép",
+            "ipWhitelistHint": "Mỗi dòng một địa chỉ IP hoặc dải CIDR.",
+            "ipWhitelistPlaceholder": "Ví dụ: 192.168.1.100 hoặc 10.0.0.0/24",
+            "name": "Tên khóa API",
+            "nameHint": "Chọn tên giúp bạn nhận biết khóa API này dùng để làm gì.",
+            "namePlaceholder": "Nhập tên mô tả cho khóa API",
+            "perDay": "yêu cầu/ngày",
+            "permissions": "Quyền",
+            "permissionsDescription": "Chọn những gì khóa API này được phép truy cập.",
+            "rateLimitHint": "Từ 1 đến 1.000 yêu cầu mỗi phút.",
+            "rateLimitPerMinute": "Giới hạn tốc độ mỗi phút",
+            "rateLimitSuggestion": "Giới hạn tốc độ đề xuất",
+            "rateLimitSuggestionText": "Dựa trên các phạm vi đã chọn, chúng tôi đề xuất {count} yêu cầu mỗi phút",
+            "rateLimiting": "Giới hạn tốc độ",
+            "rateLimitingDescription": "Kiểm soát số yêu cầu mà khóa API này được phép gửi.",
+            "requireHttps": "Bắt buộc HTTPS",
+            "requireHttpsDescription": "Từ chối các yêu cầu không gửi qua HTTPS.",
+            "scopeTemplates": "Mẫu phạm vi",
+            "securityOptions": "Tùy chọn bảo mật",
+            "securityScore": "Điểm bảo mật",
+            "securityScoreDescription": "Mức độ bảo vệ của khóa API này với cài đặt hiện tại.",
+            "selectedScopes": "Phạm vi đã chọn",
+            "updating": "Đang cập nhật..."
+        },
+        "templates": {
+            "readOnly": {
+                "name": "Chỉ đọc",
+                "description": "Chỉ xem dữ liệu, không chỉnh sửa"
+            },
+            "fullAccess": {
+                "name": "Toàn quyền",
+                "description": "Truy cập đầy đủ mọi tài nguyên"
+            },
+            "transactionsOnly": {
+                "name": "Chỉ giao dịch",
+                "description": "Chỉ truy cập dữ liệu giao dịch"
+            },
+            "accountsOnly": {
+                "name": "Chỉ tài khoản",
+                "description": "Chỉ truy cập dữ liệu tài khoản"
+            }
+        },
+        "validation": {
+            "nameRequired": "Vui lòng nhập tên khóa API",
+            "nameMinLength": "Tên khóa API phải có ít nhất 3 ký tự",
+            "nameMaxLength": "Tên khóa API không được vượt quá 100 ký tự",
+            "descriptionMaxLength": "Mô tả phải ít hơn 500 ký tự",
+            "scopesRequired": "Phải chọn ít nhất một phạm vi",
+            "rateLimitRange": "Giới hạn tốc độ phải từ 1 đến 1.000 yêu cầu mỗi phút",
+            "dailyQuotaMin": "Hạn mức hằng ngày phải ít nhất 100 yêu cầu",
+            "invalidIps": "Địa chỉ IP không hợp lệ: {ips}",
+            "expiryInFuture": "Ngày hết hạn phải ở tương lai"
+        },
+        "management": {
+            "keys": "khóa"
+        },
+        "table": {
+            "actions": "Thao tác",
+            "created": "Ngày tạo",
+            "expires": "Ngày hết hạn",
+            "keyPrefix": "Tiền tố khóa",
+            "name": "Tên",
+            "scopes": "Phạm vi",
+            "status": "Trạng thái",
+            "usage": "Mức sử dụng"
+        },
+        "scope": {
+            "read": "Đọc",
+            "write": "Ghi",
+            "delete": "Xóa",
+            "admin": "Quản trị",
+            "transactionsRead": "Đọc giao dịch",
+            "transactionsWrite": "Ghi giao dịch",
+            "accountsRead": "Đọc tài khoản",
+            "accountsWrite": "Ghi tài khoản"
+        },
+        "scopeDescription": {
+            "read": "Chỉ xem dữ liệu",
+            "write": "Tạo và sửa dữ liệu",
+            "delete": "Xóa dữ liệu",
+            "admin": "Toàn quyền quản trị",
+            "transactionsRead": "Xem dữ liệu giao dịch",
+            "transactionsWrite": "Tạo và sửa giao dịch",
+            "accountsRead": "Xem dữ liệu tài khoản",
+            "accountsWrite": "Tạo và sửa tài khoản",
+            "custom": "Phạm vi tùy chỉnh"
+        },
+        "statusDescription": {
+            "active": "Khóa API đang hoạt động bình thường",
+            "revoked": "Khóa API đã bị thu hồi và không thể sử dụng",
+            "expired": "Khóa API đã hết hạn và cần gia hạn",
+            "unknown": "Trạng thái không xác định",
+            "expiresSoon": "sắp hết hạn: {date}"
+        },
+        "security": {
+            "breakdown": "Chi tiết điểm",
+            "expirationSet": "Có ngày hết hạn",
+            "httpsRequired": "Bắt buộc HTTPS",
+            "improvements": "Đề xuất cải thiện",
+            "ipValidation": "Kiểm tra IP",
+            "limitedScopes": "Giới hạn phạm vi",
+            "rateLimiting": "Giới hạn tốc độ",
+            "securityScore": "Điểm bảo mật",
+            "securityWarnings": "Cảnh báo bảo mật",
+            "usageAnalytics": "Phân tích sử dụng",
+            "levels": {
+                "excellent": "Xuất sắc",
+                "veryGood": "Rất tốt",
+                "good": "Tốt",
+                "fair": "Trung bình",
+                "poor": "Kém",
+                "veryPoor": "Rất kém"
+            },
+            "suggestions": {
+                "enableHttps": "Bật yêu cầu HTTPS để tăng bảo mật",
+                "addIpWhitelist": "Thêm danh sách IP cho phép để giới hạn truy cập",
+                "enableRateLimiting": "Bật giới hạn tốc độ để chống lạm dụng",
+                "setExpiration": "Đặt ngày hết hạn cho khóa API",
+                "enableUsageAnalytics": "Bật phân tích sử dụng để theo dõi hoạt động của khóa",
+                "reviewAdminScope": "Xem lại phạm vi quản trị có thật sự cần thiết không"
+            },
+            "warnings": {
+                "httpsNotRequired": "Chưa bắt buộc HTTPS - nên bật để tăng bảo mật",
+                "noIpRestrictions": "Chưa giới hạn IP - nên thêm danh sách IP cho phép",
+                "rateLimitingDisabled": "Đã tắt giới hạn tốc độ - khóa có thể bị lạm dụng",
+                "noExpiration": "Chưa có ngày hết hạn - nên đặt ngày hết hạn để tăng bảo mật",
+                "adminScope": "Đã cấp phạm vi quản trị - hãy chắc chắn điều này là cần thiết",
+                "usageAnalyticsDisabled": "Đã tắt phân tích sử dụng - bạn sẽ không theo dõi được mức sử dụng của khóa"
+            }
+        },
+        "successModal": {
+            "title": "Đã tạo khóa API thành công!",
+            "subtitle": "Khóa API của bạn đã được tạo và sẵn sàng sử dụng.",
+            "copyNowNotice": "(Sao chép ngay - chỉ hiển thị một lần!)",
+            "noticeTitle": "Lưu ý bảo mật quan trọng",
+            "noticeCopyNow": "Sao chép khóa API này ngay",
+            "noticeCopyNowReason": "- khóa sẽ không được hiển thị lại vì lý do bảo mật",
+            "noticeStoreSecurely": "Lưu trữ an toàn trong ứng dụng hoặc trình quản lý mật khẩu",
+            "noticeNeverShare": "Không bao giờ chia sẻ khóa API hoặc đưa nó vào hệ thống quản lý phiên bản",
+            "noticeIfLost": "Nếu làm mất, bạn sẽ cần tạo khóa mới",
+            "manageHint": "Bạn có thể quản lý khóa API này trên trang quản lý"
+        },
+        "simpleForm": {
+            "description": "Tạo khóa API để truy cập các dịch vụ TiHoMo bằng chương trình.",
+            "advancedLater": "Bạn có thể cấu hình cài đặt nâng cao sau nếu cần.",
+            "defaults": {
+                "title": "Cài đặt mặc định",
+                "intro": "Khóa API sẽ được tạo với các cài đặt mặc định sau:",
+                "accessLabel": "Quyền truy cập:",
+                "access": "Toàn quyền đọc và ghi",
+                "rateLimitLabel": "Giới hạn tốc độ:",
+                "rateLimit": "50 yêu cầu mỗi phút",
+                "dailyQuotaLabel": "Hạn mức hằng ngày:",
+                "dailyQuota": "500 yêu cầu mỗi ngày",
+                "securityLabel": "Bảo mật:",
+                "security": "Bắt buộc HTTPS, bật phân tích sử dụng",
+                "expirationLabel": "Hết hạn:",
+                "expiration": "Không bao giờ hết hạn"
+            }
+        },
+        "usage": {
+            "apiUsage": "Mức sử dụng API",
+            "currentPeriod": "Kỳ hiện tại",
+            "currentUsage": "Mức sử dụng hiện tại",
+            "limit": "Giới hạn",
+            "percentUsed": "Đã dùng {percent}%",
+            "rateLimitPerMinute": "Giới hạn tốc độ: {value} yêu cầu/phút",
+            "rateLimitShort": "Giới hạn tốc độ: {value}/phút",
+            "statistics": "Thống kê sử dụng",
+            "used": "Đã dùng",
+            "level": {
+                "over": "Vượt giới hạn",
+                "warning": "Gần giới hạn",
+                "moderate": "Trung bình",
+                "low": "Sử dụng thấp",
+                "normal": "Bình thường"
+            }
+        },
+        "ipManagement": {
+            "title": "Quản lý danh sách IP cho phép",
+            "description": "Quản lý các địa chỉ IP và dải CIDR được phép để tăng cường bảo mật",
+            "validationOn": "Kiểm tra IP: BẬT",
+            "validationOff": "Kiểm tra IP: TẮT",
+            "enableDescription": "Chỉ cho phép dùng khóa API từ các địa chỉ IP hoặc dải IP cụ thể",
+            "addTitle": "Thêm địa chỉ IP hoặc dải CIDR",
+            "addressLabel": "Địa chỉ IP hoặc dải CIDR",
+            "addressHint": "Hỗ trợ IPv4, IPv6 và ký hiệu CIDR (ví dụ: 192.168.1.0/24)",
+            "descriptionLabel": "Mô tả (không bắt buộc)",
+            "descriptionPlaceholder": "Ví dụ: Mạng văn phòng",
+            "addAddress": "Thêm địa chỉ IP",
+            "detecting": "Đang phát hiện...",
+            "addCurrentIp": "Thêm IP hiện tại",
+            "commonRanges": "Dải IP phổ biến",
+            "commonRangesTitle": "Các dải IP phổ biến",
+            "invalidAddress": "Vui lòng nhập địa chỉ IP hoặc dải CIDR hợp lệ",
+            "currentWhitelist": "Danh sách cho phép hiện tại ({count})",
+            "deleteSelected": "Xóa mục đã chọn ({count})",
+            "bulkDeleteConfirm": "Bạn có chắc muốn xóa {count} địa chỉ IP?",
+            "singleIp": "IP đơn",
+            "cidrRange": "Dải CIDR",
+            "currentIp": "IP hiện tại",
+            "currentIpDescription": "IP hiện tại (tự động phát hiện)",
+            "added": "Thêm lúc {date}",
+            "lastUsed": "Dùng gần nhất {date}",
+            "emptyTitle": "Danh sách cho phép chưa có địa chỉ IP",
+            "emptyDescription": "Thêm địa chỉ IP để giới hạn truy cập",
+            "disabledTitle": "Kiểm tra IP đang tắt",
+            "disabledDescription": "Bật kiểm tra IP để chỉ cho phép truy cập từ các địa chỉ cụ thể",
+            "recentActivity": "Hoạt động IP gần đây",
+            "noRecentActivity": "Không có hoạt động IP gần đây",
+            "activityStatus": {
+                "allowed": "Cho phép",
+                "blocked": "Đã chặn"
+            },
+            "ranges": {
+                "classA": "Mạng riêng (lớp A)",
+                "classB": "Mạng riêng (lớp B)",
+                "classC": "Mạng riêng (lớp C)",
+                "loopback": "Địa chỉ loopback",
+                "allIpv4": "Mọi địa chỉ IPv4 (không khuyến nghị)"
+            }
         }
     }
 } 
