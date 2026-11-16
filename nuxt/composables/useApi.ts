@@ -55,6 +55,16 @@ export const useApi = () => {
           body,
           headers,
           signal: options.signal
+        }).catch((error: any) => {
+          // fetch rejects only when no response arrived: an abort, or a network failure.
+          if (options.signal?.aborted || error?.name === 'AbortError') {
+            throw error
+          }
+          throw {
+            message: 'Network error. Please check your connection.',
+            messageKey: 'common.errors.network',
+            statusCode: 0
+          } as ApiError
         })
 
         if (!response.ok) {
@@ -68,6 +78,7 @@ export const useApi = () => {
           const errorData = await response.json().catch(() => ({}))
           throw {
             message: response.status === 401 ? 'Your session has expired. Please login again.' : (errorData.message || 'An error occurred'),
+            messageKey: response.status === 401 ? 'common.errors.sessionExpired' : (errorData.message ? undefined : 'common.errors.unknown'),
             statusCode: response.status,
             errors: errorData.errors
           } as ApiError
@@ -107,6 +118,7 @@ export const useApi = () => {
           // Still throw the error for the calling component to handle if needed
           const apiError: ApiError = {
             message: 'Your session has expired. Please login again.',
+            messageKey: 'common.errors.sessionExpired',
             statusCode: 401,
             errors: error.response._data?.errors
           }
@@ -116,6 +128,7 @@ export const useApi = () => {
         // Server responded with other error status
         const apiError: ApiError = {
           message: error.response._data?.message || 'An error occurred',
+          messageKey: error.response._data?.message ? undefined : 'common.errors.unknown',
           statusCode: error.response.status,
           errors: error.response._data?.errors
         }
@@ -124,12 +137,14 @@ export const useApi = () => {
         // Network error
         throw {
           message: 'Network error. Please check your connection.',
+          messageKey: 'common.errors.network',
           statusCode: 0
         } as ApiError
       } else {
         // Other error
         throw {
           message: error.message || 'An unexpected error occurred',
+          messageKey: 'common.errors.unknown',
           statusCode: 500
         } as ApiError
       }

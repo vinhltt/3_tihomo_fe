@@ -1,46 +1,77 @@
 import { $themeConfig } from './theme.config';
 import { useAppStore } from '@/stores/index';
 
+// Set after the one-time reset to the default locale has run in this browser.
+const LOCALE_RESET_MARKER = 'i18n_locale_reset_v1';
+
+/**
+ * Reads a value from localStorage; returns null when storage is blocked or unavailable. (EN)
+ *
+ * Đọc giá trị từ localStorage; trả null khi storage bị chặn hoặc không dùng được. (VI)
+ */
+export const readStorage = (key: string): string | null => {
+    try {
+        return localStorage.getItem(key);
+    } catch {
+        return null;
+    }
+};
+
+/**
+ * Writes a value to localStorage; does nothing when storage is blocked or unavailable. (EN)
+ *
+ * Ghi giá trị vào localStorage; bỏ qua khi storage bị chặn hoặc không dùng được. (VI)
+ */
+export const writeStorage = (key: string, value: string): void => {
+    try {
+        localStorage.setItem(key, value);
+    } catch {
+        // Storage blocked: the setting lives in memory for this page only.
+    }
+};
+
 export default {
     init(setLocale: any) {
         const store = useAppStore();
 
         // set default styles
-        let val: any = localStorage.getItem('theme'); // light, dark, system
+        let val: any = readStorage('theme'); // light, dark, system
         val = val || $themeConfig.theme;
         store.toggleTheme(val);
 
-        val = localStorage.getItem('menu'); // vertical, collapsible-vertical, horizontal
+        val = readStorage('menu'); // vertical, collapsible-vertical, horizontal
         val = val || $themeConfig.menu;
         store.toggleMenu(val);
 
-        val = localStorage.getItem('layout'); // full, boxed-layout
+        val = readStorage('layout'); // full, boxed-layout
         val = val || $themeConfig.layout;
         store.toggleLayout(val);
 
-        val = localStorage.getItem('i18n_locale'); // en, da, de, el, es, fr, hu, it, ja, pl, pt, ru, sv, tr, zh
-
-        val = val || $themeConfig.locale;
+        // The first run resets any saved locale to the default once; later runs honour the saved choice.
+        // An unsupported saved code (e.g. fr, ae) falls back to the default, and toggleLocale stores rtlClass=ltr.
+        const localeResetDone = readStorage(LOCALE_RESET_MARKER) !== null;
+        val = (localeResetDone && readStorage('i18n_locale')) || $themeConfig.locale; // vi, en
 
         const list = store.languageList;
-        const item = list.find((item: any) => item.code === val);
-        if (item) {
-            this.toggleLanguage(item, setLocale);
+        const item = list.find((item: any) => item.code === val) || list.find((item: any) => item.code === $themeConfig.locale);
+        this.toggleLanguage(item, setLocale);
+        if (!localeResetDone) {
+            writeStorage(LOCALE_RESET_MARKER, '1');
         }
 
-        val = localStorage.getItem('rtlClass'); // rtl, ltr
+        val = readStorage('rtlClass'); // rtl, ltr
         val = val || $themeConfig.rtlClass;
         store.toggleRTL(val);
 
-        val = localStorage.getItem('animation'); // animate__fadeIn, animate__fadeInDown, animate__fadeInUp, animate__fadeInLeft, animate__fadeInRight, animate__slideInDown, animate__slideInLeft, animate__slideInRight, animate__zoomIn
+        val = readStorage('animation'); // animate__fadeIn, animate__fadeInDown, animate__fadeInUp, animate__fadeInLeft, animate__fadeInRight, animate__slideInDown, animate__slideInLeft, animate__slideInRight, animate__zoomIn
         val = val || $themeConfig.animation;
         store.toggleAnimation(val);
 
-        val = localStorage.getItem('navbar'); // navbar-sticky, navbar-floating, navbar-static
+        val = readStorage('navbar'); // navbar-sticky, navbar-floating, navbar-static
         val = val || $themeConfig.navbar;
         store.toggleNavbar(val);
 
-        val = localStorage.getItem('semidark');
+        val = readStorage('semidark');
         val = val === 'true' ? true : $themeConfig.semidark;
         store.toggleSemidark(val);
     },
@@ -54,7 +85,7 @@ export default {
         } else {
             let code = store.locale || null;
             if (!code) {
-                code = localStorage.getItem('i18n_locale');
+                code = readStorage('i18n_locale');
             }
 
             item = store.languageList.find((d: any) => d.code === code);
@@ -64,7 +95,7 @@ export default {
         }
 
         if (!lang) {
-            lang = store.languageList.find((d: any) => d.code === 'en');
+            lang = store.languageList.find((d: any) => d.code === 'vi');
         }
 
         store.toggleLocale(lang.code, setLocale);

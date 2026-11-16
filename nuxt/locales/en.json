@@ -147,5 +147,89 @@
     "reminder_days_overdue": "{days} day overdue | {days} days overdue",
     "reminder_due_today": "Due today",
     "reminder_days_remaining": "Due in {days} day | Due in {days} days",
-    "expected_transactions": "Expected transactions"
+    "expected_transactions": "Expected transactions",
+    "common": {
+        "actions": "Actions",
+        "active": "Active",
+        "add": "Add",
+        "apply": "Apply",
+        "cancel": "Cancel",
+        "clearFilters": "Clear filters",
+        "close": "Close",
+        "confirm": "Confirm",
+        "copy": "Copy",
+        "create": "Create",
+        "delete": "Delete",
+        "disabled": "Disabled",
+        "edit": "Edit",
+        "enabled": "Enabled",
+        "error": "Error",
+        "hide": "Hide",
+        "inactive": "Inactive",
+        "loading": "Loading...",
+        "next": "Next",
+        "noData": "No data",
+        "previous": "Previous",
+        "refresh": "Refresh",
+        "reset": "Reset",
+        "retry": "Retry",
+        "save": "Save",
+        "search": "Search",
+        "show": "Show",
+        "showLess": "Show less",
+        "showMore": "Show more",
+        "status": "Status",
+        "success": "Success",
+        "update": "Update",
+        "confirmation": {
+            "title": "Are you sure?",
+            "yesDelete": "Yes, delete it!"
+        },
+        "errors": {
+            "loadFailed": "Unable to load data.",
+            "network": "Network error. Please check your connection.",
+            "sessionExpired": "Your session has expired. Please log in again.",
+            "unknown": "An unexpected error occurred. Please try again."
+        }
+    },
+    "enums": {
+        "transactionType": {
+            "income": "Income",
+            "expense": "Expense",
+            "transfer": "Transfer"
+        },
+        "transactionDirection": {
+            "revenue": "Income",
+            "spent": "Expense"
+        },
+        "categoryType": {
+            "income": "Income",
+            "expense": "Expense",
+            "transfer": "Transfer",
+            "fee": "Fee",
+            "other": "Other"
+        },
+        "expectedTransactionStatus": {
+            "pending": "Pending",
+            "confirmed": "Confirmed",
+            "cancelled": "Cancelled",
+            "completed": "Completed",
+            "overdue": "Overdue"
+        },
+        "recurrenceFrequency": {
+            "daily": "Daily",
+            "weekly": "Weekly",
+            "biweekly": "Every two weeks",
+            "monthly": "Monthly",
+            "quarterly": "Quarterly",
+            "semiAnnually": "Every six months",
+            "annually": "Annually",
+            "custom": "Custom"
+        },
+        "apiKeyStatus": {
+            "active": "Active",
+            "revoked": "Revoked",
+            "expired": "Expired"
+        }
+    }
 }

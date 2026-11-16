@@ -134,8 +134,8 @@
     "reminder_empty": "Không có giao dịch dự kiến sắp đến hạn hoặc quá hạn.",
     "reminder_unnamed_template": "Giao dịch định kỳ chưa đặt tên",
     "reminder_due_date": "Ngày đến hạn: {date}",
-    "reminder_type_income": "Thu nhập",
-    "reminder_type_expense": "Chi phí",
+    "reminder_type_income": "Thu",
+    "reminder_type_expense": "Chi",
     "reminder_type_transfer": "Chuyển khoản",
     "reminder_type_unknown": "Loại giao dịch không được hỗ trợ",
     "reminder_status_pending": "Chờ xử lý",
@@ -147,5 +147,89 @@
     "reminder_days_overdue": "Quá hạn {days} ngày",
     "reminder_due_today": "Đến hạn hôm nay",
     "reminder_days_remaining": "Còn {days} ngày",
-    "expected_transactions": "Giao dịch dự kiến"
+    "expected_transactions": "Giao dịch dự kiến",
+    "common": {
+        "actions": "Thao tác",
+        "active": "Hoạt động",
+        "add": "Thêm",
+        "apply": "Áp dụng",
+        "cancel": "Hủy",
+        "clearFilters": "Xóa bộ lọc",
+        "close": "Đóng",
+        "confirm": "Xác nhận",
+        "copy": "Sao chép",
+        "create": "Tạo mới",
+        "delete": "Xóa",
+        "disabled": "Đã tắt",
+        "edit": "Sửa",
+        "enabled": "Đã bật",
+        "error": "Lỗi",
+        "hide": "Ẩn",
+        "inactive": "Không hoạt động",
+        "loading": "Đang tải...",
+        "next": "Tiếp",
+        "noData": "Không có dữ liệu",
+        "previous": "Trước",
+        "refresh": "Làm mới",
+        "reset": "Đặt lại",
+        "retry": "Thử lại",
+        "save": "Lưu",
+        "search": "Tìm kiếm",
+        "show": "Hiện",
+        "showLess": "Thu gọn",
+        "showMore": "Xem thêm",
+        "status": "Trạng thái",
+        "success": "Thành công",
+        "update": "Cập nhật",
+        "confirmation": {
+            "title": "Bạn có chắc chắn?",
+            "yesDelete": "Có, xóa!"
+        },
+        "errors": {
+            "loadFailed": "Không thể tải dữ liệu.",
+            "network": "Lỗi mạng. Vui lòng kiểm tra kết nối.",
+            "sessionExpired": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
+            "unknown": "Đã xảy ra lỗi không mong muốn. Vui lòng thử lại."
+        }
+    },
+    "enums": {
+        "transactionType": {
+            "income": "Thu",
+            "expense": "Chi",
+            "transfer": "Chuyển khoản"
+        },
+        "transactionDirection": {
+            "revenue": "Thu",
+            "spent": "Chi"
+        },
+        "categoryType": {
+            "income": "Thu",
+            "expense": "Chi",
+            "transfer": "Chuyển khoản",
+            "fee": "Phí",
+            "other": "Khác"
+        },
+        "expectedTransactionStatus": {
+            "pending": "Chờ xử lý",
+            "confirmed": "Đã xác nhận",
+            "cancelled": "Đã hủy",
+            "completed": "Hoàn thành",
+            "overdue": "Quá hạn"
+        },
+        "recurrenceFrequency": {
+            "daily": "Hàng ngày",
+            "weekly": "Hàng tuần",
+            "biweekly": "Hai tuần một lần",
+            "monthly": "Hàng tháng",
+            "quarterly": "Hàng quý",
+            "semiAnnually": "Nửa năm",
+            "annually": "Hàng năm",
+            "custom": "Tùy chỉnh"
+        },
+        "apiKeyStatus": {
+            "active": "Hoạt động",
+            "revoked": "Đã thu hồi",
+            "expired": "Hết hạn"
+        }
+    }
 } 
