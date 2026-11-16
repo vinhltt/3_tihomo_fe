@@ -1,24 +1,83 @@
 import { logger } from '~/utils/logger'
+import { formatMoney } from '~/utils/display-format'
 import type { 
   TransactionViewModel, 
   TransactionCreateRequest, 
   TransactionUpdateRequest,
   TransactionFilter,
-  TransactionDirectionType
+  TransactionDirectionType,
+  CategoryType
 } from '~/types/transaction'
-import type { FilterBodyRequest, ApiResponse } from '~/types/api'
+import type { FilterBodyRequest, ApiResponse, ApiError } from '~/types/api'
 import type { IBasePaging } from '~/types/recurring-transaction'
 import { FilterLogicalOperator, FilterType, SortDirection } from '~/types/api'
 import { 
   TransactionDirectionConst,
   convertToBackendRequest, 
   convertToBackendUpdateRequest,
-  formatDisplayAmount,
   getAmountClass,
   getTransactionDirection,
   getAmount,
   CategoryTypeConst
 } from '~/types/transaction'
+
+// The backend serializes CategoryType by name ("Expense"); values built on the client use the numeric constants.
+const categoryTypeLabelKeys: Record<keyof typeof CategoryTypeConst, string> = {
+  Income: 'enums.categoryType.income',
+  Expense: 'enums.categoryType.expense',
+  Transfer: 'enums.categoryType.transfer',
+  Fee: 'enums.categoryType.fee',
+  Other: 'enums.categoryType.other'
+}
+
+const findCategoryTypeName = (value: CategoryType | string | null | undefined): keyof typeof CategoryTypeConst | undefined => {
+  const name = String(value ?? '').trim().toLowerCase()
+  return (Object.keys(CategoryTypeConst) as (keyof typeof CategoryTypeConst)[]).find(
+    (candidate) => candidate.toLowerCase() === name || CategoryTypeConst[candidate] === value
+  )
+}
+
+/**
+ * Gets the i18n key of a category type label from its enum name (any case) or numeric value; undefined when the
+ * value is empty or unknown. (EN)
+ *
+ * Lấy key i18n của nhãn loại danh mục từ tên enum (không phân biệt hoa thường) hoặc giá trị số; undefined khi giá trị
+ * rỗng hoặc không xác định. (VI)
+ */
+export const getCategoryTypeLabelKey = (value: CategoryType | string | null | undefined): string | undefined => {
+  const match = findCategoryTypeName(value)
+  return match ? categoryTypeLabelKeys[match] : undefined
+}
+
+/**
+ * Gets the numeric category type from its enum name (any case) or numeric value; undefined when the value is empty
+ * or unknown. (EN)
+ *
+ * Lấy giá trị số của loại danh mục từ tên enum (không phân biệt hoa thường) hoặc giá trị số; undefined khi giá trị
+ * rỗng hoặc không xác định. (VI)
+ */
+export const getCategoryTypeValue = (value: CategoryType | string | null | undefined): CategoryType | undefined => {
+  const match = findCategoryTypeName(value)
+  return match ? CategoryTypeConst[match] : undefined
+}
+
+/**
+ * Converts a caught error to the display error shape: a frontend message keeps its messageKey, a backend message is
+ * kept verbatim, and an error with neither falls back to fallbackKey. (EN)
+ *
+ * Chuyển lỗi bắt được sang dạng lỗi hiển thị: thông báo FE giữ messageKey, thông báo backend giữ nguyên văn, lỗi không
+ * có cả hai dùng fallbackKey. (VI)
+ */
+export const toTransactionErrorState = (
+  err: unknown,
+  fallbackKey: string
+): Pick<ApiError, 'messageKey' | 'messageParams' | 'message'> => {
+  const apiError = err as Partial<ApiError> | null
+  if (apiError?.messageKey) {
+    return { messageKey: apiError.messageKey, messageParams: apiError.messageParams, message: apiError.message ?? '' }
+  }
+  return apiError?.message ? { message: apiError.message } : { messageKey: fallbackKey, message: '' }
+}
 
 export const useTransactions = () => {
   const { postForm, putForm, delete: deleteRequest, post } = useApi()
@@ -27,7 +86,8 @@ export const useTransactions = () => {
   const transactions = ref<TransactionViewModel[]>([])
   const selectedTransaction = ref<TransactionViewModel | null>(null)
   const isLoading = ref(false)
-  const error = ref<string | null>(null)
+  // Always carries a fallback messageKey; message is kept for logging only.
+  const error = ref<Pick<ApiError, 'messageKey' | 'messageParams' | 'message'> | null>(null)
   const pagination = ref({
     pageIndex: 1,
     pageSize: 20,
@@ -134,7 +194,7 @@ export const useTransactions = () => {
 
       return response
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to fetch transactions'
+      error.value = { messageKey: 'transactions.errors.loadFailed', message: err instanceof Error ? err.message : 'Failed to fetch transactions' }
       throw err
     } finally {
       isLoading.value = false
@@ -175,7 +235,7 @@ export const useTransactions = () => {
       selectedTransaction.value = response
       return response
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to fetch transaction'
+      error.value = { messageKey: 'transactions.errors.loadOneFailed', message: err instanceof Error ? err.message : 'Failed to fetch transaction' }
       throw err
     } finally {
       isLoading.value = false
@@ -200,7 +260,7 @@ export const useTransactions = () => {
       
       return response
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to create transaction'
+      error.value = { messageKey: 'transactions.errors.createFailed', message: err instanceof Error ? err.message : 'Failed to create transaction' }
       throw err
     } finally {
       isLoading.value = false
@@ -231,7 +291,7 @@ export const useTransactions = () => {
       
       return response
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to update transaction'
+      error.value = { messageKey: 'transactions.errors.updateFailed', message: err instanceof Error ? err.message : 'Failed to update transaction' }
       throw err
     } finally {
       isLoading.value = false
@@ -254,7 +314,7 @@ export const useTransactions = () => {
       
       return true
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to delete transaction'
+      error.value = { messageKey: 'transactions.errors.deleteFailed', message: err instanceof Error ? err.message : 'Failed to delete transaction' }
       throw err
     } finally {
       isLoading.value = false
@@ -262,7 +322,12 @@ export const useTransactions = () => {
   }
 
   // Helper functions
-  const getDisplayAmount = (transaction: TransactionViewModel) => formatDisplayAmount(transaction)
+  // Signed amount as a plain number, without a currency symbol.
+  const getDisplayAmount = (transaction: TransactionViewModel) => {
+    if (transaction.revenueAmount > 0) return `+${formatMoney(transaction.revenueAmount)}`
+    if (transaction.spentAmount > 0) return `-${formatMoney(transaction.spentAmount)}`
+    return formatMoney(0)
+  }
   const getDisplayClass = (transaction: TransactionViewModel) => getAmountClass(transaction)
   const getDirection = (transaction: TransactionViewModel) => getTransactionDirection(transaction)
   const getAmountValue = (transaction: TransactionViewModel) => getAmount(transaction)

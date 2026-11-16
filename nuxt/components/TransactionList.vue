@@ -2,14 +2,14 @@
   <div class="transaction-list">
     <!-- List Header -->
     <div class="flex items-center justify-between mb-4">
-      <h6 class="text-lg font-semibold">{{ title }}</h6>
+      <h6 class="text-lg font-semibold">{{ titleText }}</h6>
       
       <!-- View Options -->
       <div class="flex items-center gap-2">
         <button 
           @click="toggleViewMode"
           class="btn btn-sm btn-outline-secondary"
-          :title="isCompactView ? 'Chế độ chi tiết' : 'Chế độ đơn giản'"
+          :title="isCompactView ? t('transactions.list.detailedView') : t('transactions.list.compactView')"
         >
           {{ isCompactView ? '📋' : '📄' }}
         </button>
@@ -18,7 +18,7 @@
           @click="refreshList"
           :disabled="loading"
           class="btn btn-sm btn-outline-primary"
-          title="Làm mới danh sách"
+          :title="t('common.refresh')"
         >
           <span :class="{ 'animate-spin': loading }">↻</span>
         </button>
@@ -46,36 +46,36 @@
           <tr>
             <!-- Always visible columns -->
             <th @click="sortBy('transactionDate')" class="sortable-header">
-              Ngày giờ
+              {{ t('transactions.fields.dateTime') }}
               <span v-if="sortField === 'transactionDate'">
                 {{ sortDirection === 'asc' ? '↑' : '↓' }}
               </span>
             </th>
             <th @click="sortBy('description')" class="sortable-header">
-              Mô tả
+              {{ t('transactions.fields.description') }}
               <span v-if="sortField === 'description'">
                 {{ sortDirection === 'asc' ? '↑' : '↓' }}
               </span>
             </th>
             <th @click="sortBy('amount')" class="sortable-header text-right">
-              Số tiền
+              {{ t('transactions.fields.amount') }}
               <span v-if="sortField === 'amount'">
                 {{ sortDirection === 'asc' ? '↑' : '↓' }}
               </span>
             </th>
             <th v-if="!isCompactView" @click="sortBy('balance')" class="sortable-header text-right">
-              Số dư
+              {{ t('transactions.fields.balance') }}
               <span v-if="sortField === 'balance'">
                 {{ sortDirection === 'asc' ? '↑' : '↓' }}
               </span>
             </th>
             
             <!-- Extended columns (advanced mode) -->
-            <th v-if="!isCompactView && showAccountColumn">Tài khoản</th>
-            <th v-if="!isCompactView">Loại</th>
-            <th v-if="!isCompactView">Ghi chú</th>
-            
-            <th class="w-20">Thao tác</th>
+            <th v-if="!isCompactView && showAccountColumn">{{ t('transactions.fields.account') }}</th>
+            <th v-if="!isCompactView">{{ t('transactions.fields.type') }}</th>
+            <th v-if="!isCompactView">{{ t('transactions.fields.note') }}</th>
+
+            <th class="w-20">{{ t('common.actions') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -105,15 +105,14 @@
             
             <!-- Balance (if not compact) -->
             <td v-if="!isCompactView" class="text-right">
-              {{ formatCurrency(transaction.balance) }}
+              {{ formatMoney(transaction.balance) }}
             </td>
             
             <!-- Category Type -->
             <td v-if="!isCompactView">
-              <span v-if="transaction.categoryType" class="text-sm text-gray-600">
-                {{ transaction.categoryType }}
+              <span class="text-sm text-gray-600">
+                {{ categoryTypeLabel(transaction.categoryType) }}
               </span>
-              <span v-else class="text-sm text-gray-400">-</span>
             </td>
             
             <!-- Note -->
@@ -130,14 +129,14 @@
                 <button 
                   @click.stop="selectTransaction(transaction)"
                   class="btn btn-xs btn-outline-primary"
-                  title="Xem chi tiết"
+                  :title="t('common.showDetails')"
                 >
                   👁️
                 </button>
                 <button 
                   @click.stop="editTransaction(transaction)"
                   class="btn btn-xs btn-outline-secondary"
-                  title="Chỉnh sửa"
+                  :title="t('common.edit')"
                 >
                   ✏️
                 </button>
@@ -151,14 +150,14 @@
     <!-- Empty State -->
     <div v-else class="text-center py-12">
       <div class="text-6xl mb-4">📄</div>
-      <h3 class="text-lg font-semibold mb-2">{{ emptyStateTitle }}</h3>
-      <p class="text-gray-500 mb-6">{{ emptyStateMessage }}</p>
+      <h3 class="text-lg font-semibold mb-2">{{ emptyTitleText }}</h3>
+      <p class="text-gray-500 mb-6">{{ emptyMessageText }}</p>
     </div>
 
     <!-- Pagination -->
     <div v-if="totalPages > 1" class="flex items-center justify-between mt-6">
       <div class="text-sm text-gray-600">
-        Hiển thị {{ startIndex + 1 }} - {{ endIndex }} của {{ totalItems }} giao dịch
+        {{ t('transactions.pagination.summary', { from: startIndex + 1, to: endIndex, total: totalItems }) }}
       </div>
       
       <div class="flex gap-2">
@@ -167,11 +166,11 @@
           :disabled="currentPage === 1"
           class="btn btn-sm btn-outline-secondary"
         >
-          ← Trước
+          ← {{ t('common.previous') }}
         </button>
         
         <span class="flex items-center px-3 py-1 text-sm">
-          Trang {{ currentPage }} / {{ totalPages }}
+          {{ t('transactions.pagination.page', { current: currentPage, total: totalPages }) }}
         </span>
         
         <button 
@@ -179,7 +178,7 @@
           :disabled="currentPage === totalPages"
           class="btn btn-sm btn-outline-secondary"
         >
-          Sau →
+          {{ t('common.next') }} →
         </button>
       </div>
     </div>
@@ -187,7 +186,9 @@
 </template>
 
 <script setup lang="ts">
-import type { TransactionViewModel } from '~/types/transaction'
+import type { CategoryType, TransactionViewModel } from '~/types/transaction'
+import { formatDateTime, formatMoney } from '~/utils/display-format'
+import { getCategoryTypeLabelKey } from '~/composables/useTransactions'
 
 
 type SortField = 'transactionDate' | 'description' | 'amount' | 'balance'
@@ -216,16 +217,20 @@ type TransactionListEmits = {
 const props = withDefaults(defineProps<TransactionListProps>(), {
   loading: false,
   selectedTransactionId: null,
-  title: 'Danh sách giao dịch',
   showAccountColumn: false,
   pageSize: 20,
-  emptyStateTitle: 'Chưa có giao dịch nào',
-  emptyStateMessage: 'Không có giao dịch nào trong khoảng thời gian này',
   skeletonRows: 5
 })
 
 // Emits
 const emit = defineEmits<TransactionListEmits>()
+
+const { t } = useI18n()
+
+// withDefaults cannot call t(), so the translated default texts are computed.
+const titleText = computed(() => props.title ?? t('transactions.list.heading'))
+const emptyTitleText = computed(() => props.emptyStateTitle ?? t('transactions.empty.title'))
+const emptyMessageText = computed(() => props.emptyStateMessage ?? t('transactions.empty.description'))
 
 // Reactive data
 const isCompactView = ref(true)
@@ -278,31 +283,18 @@ const displayTransactions = computed(() => {
 })
 
 // Methods
-function formatDateTime(dateString: string): string {
-  const date = new Date(dateString)
-  const day = String(date.getDate()).padStart(2, '0')
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const hours = String(date.getHours()).padStart(2, '0')
-  const minutes = String(date.getMinutes()).padStart(2, '0')
-  
-  return `${day}/${month} ${hours}:${minutes}`
-}
-
 function formatAmount(transaction: TransactionViewModel): string {
   if (transaction.revenueAmount > 0) {
-    return `+${formatCurrency(transaction.revenueAmount)}`
+    return `+${formatMoney(transaction.revenueAmount)}`
   } else {
-    return `-${formatCurrency(transaction.spentAmount)}`
+    return `-${formatMoney(transaction.spentAmount)}`
   }
 }
 
-function formatCurrency(amount: number | null): string {
-  if (amount === null) return '-'
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
-    minimumFractionDigits: 0
-  }).format(amount)
+// An empty or unmapped category type is shown as it was received.
+function categoryTypeLabel(categoryType: CategoryType | string | null | undefined): string {
+  const key = getCategoryTypeLabelKey(categoryType)
+  return key ? t(key) : String(categoryType ?? '')
 }
 
 function getAmountColorClass(transaction: TransactionViewModel): string {

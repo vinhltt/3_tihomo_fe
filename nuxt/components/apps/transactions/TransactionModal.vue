@@ -13,9 +13,9 @@
       <!-- Header -->
       <div class="flex items-center justify-between border-b p-4 dark:border-[#1b2e4b]">
         <h5 class="text-lg font-semibold dark:text-white-light">
-          <span v-if="mode === 'create'">Thêm giao dịch</span>
-          <span v-else-if="mode === 'edit'">Chỉnh sửa giao dịch</span>
-          <span v-else>Chi tiết giao dịch</span>
+          <span v-if="mode === 'create'">{{ t('transactions.form.createTitle') }}</span>
+          <span v-else-if="mode === 'edit'">{{ t('transactions.form.editTitle') }}</span>
+          <span v-else>{{ t('transactions.form.viewTitle') }}</span>
         </h5>
         <button 
           @click="$emit('update:visible', false)"
@@ -30,7 +30,7 @@
         <!-- Loading State -->
         <div v-if="isLoading" class="text-center py-8">
           <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          <p class="mt-2 text-gray-500">Đang xử lý...</p>
+          <p class="mt-2 text-gray-500">{{ t('transactions.form.processing') }}</p>
         </div>
 
         <!-- Form -->
@@ -40,7 +40,7 @@
             <!-- Transaction Direction -->
             <div>
               <label class="text-sm font-medium text-white-dark">
-                Loại giao dịch *
+                {{ t('transactions.fields.direction') }} *
               </label>
               <select 
                 v-model="form.transactionDirection" 
@@ -48,15 +48,15 @@
                 class="form-select"
                 required
               >
-                <option :value="TransactionDirectionConst.Revenue">Thu</option>
-                <option :value="TransactionDirectionConst.Spent">Chi</option>
+                <option :value="TransactionDirectionConst.Revenue">{{ t('enums.transactionDirection.revenue') }}</option>
+                <option :value="TransactionDirectionConst.Spent">{{ t('enums.transactionDirection.spent') }}</option>
               </select>
             </div>
 
             <!-- Amount -->
             <div>
               <label class="text-sm font-medium text-white-dark">
-                Số tiền *
+                {{ t('transactions.fields.amount') }} *
               </label>
               <input 
                 v-model.number="form.amount" 
@@ -64,7 +64,7 @@
                 type="number" 
                 step="0.01"
                 class="form-input"
-                placeholder="Nhập số tiền"
+                :placeholder="t('transactions.placeholders.amount')"
                 required
               />
             </div>
@@ -72,7 +72,7 @@
             <!-- Transaction Date -->
             <div>
               <label class="text-sm font-medium text-white-dark">
-                Ngày giao dịch *
+                {{ t('transactions.fields.transactionDate') }} *
               </label>
               <input 
                 v-model="form.transactionDate" 
@@ -86,7 +86,7 @@
             <!-- Account -->
             <div>
               <label class="text-sm font-medium text-white-dark">
-                Tài khoản * ({{ accounts.length }} accounts)
+                {{ t('transactions.fields.account') }} *
               </label>
               <select 
                 v-model="form.accountId" 
@@ -94,7 +94,7 @@
                 class="form-select"
                 required
               >
-                <option value="">Chọn tài khoản</option>
+                <option value="">{{ t('transactions.placeholders.selectAccount') }}</option>
                 <option 
                   v-for="account in accounts" 
                   :key="account.id" 
@@ -103,13 +103,12 @@
                   {{ account.name }}
                 </option>
               </select>
-              <p class="text-xs text-gray-500 mt-1">Debug: {{ JSON.stringify(accounts) }}</p>
             </div>
 
             <!-- Category Type -->
             <div>
               <label class="text-sm font-medium text-white-dark">
-                Danh mục *
+                {{ t('transactions.fields.category') }} *
               </label>
               <select 
                 v-model="form.categoryType" 
@@ -117,32 +116,32 @@
                 class="form-select"
                 required
               >
-                <option :value="CategoryTypeConst.Income">Thu nhập</option>
-                <option :value="CategoryTypeConst.Expense">Chi tiêu</option>
-                <option :value="CategoryTypeConst.Transfer">Chuyển khoản</option>
-                <option :value="CategoryTypeConst.Fee">Phí</option>
-                <option :value="CategoryTypeConst.Other">Khác</option>
+                <option :value="CategoryTypeConst.Income">{{ t('enums.categoryType.income') }}</option>
+                <option :value="CategoryTypeConst.Expense">{{ t('enums.categoryType.expense') }}</option>
+                <option :value="CategoryTypeConst.Transfer">{{ t('enums.categoryType.transfer') }}</option>
+                <option :value="CategoryTypeConst.Fee">{{ t('enums.categoryType.fee') }}</option>
+                <option :value="CategoryTypeConst.Other">{{ t('enums.categoryType.other') }}</option>
               </select>
             </div>
 
             <!-- Description -->
             <div>
               <label class="text-sm font-medium text-white-dark">
-                Mô tả
+                {{ t('transactions.fields.description') }}
               </label>
               <input 
                 v-model="form.description" 
                 :disabled="mode === 'view'"
                 type="text" 
                 class="form-input"
-                placeholder="Nhập mô tả giao dịch"
+                :placeholder="t('transactions.placeholders.description')"
               />
             </div>
 
             <!-- Balance -->
             <div>
               <label class="text-sm font-medium text-white-dark">
-                Số dư sau giao dịch *
+                {{ t('transactions.fields.balanceAfter') }} *
               </label>
               <input 
                 v-model.number="form.balance" 
@@ -150,7 +149,7 @@
                 type="number" 
                 step="0.01"
                 class="form-input"
-                placeholder="Nhập số dư"
+                :placeholder="t('transactions.placeholders.balance')"
                 required
               />
             </div>
@@ -168,7 +167,7 @@
                 :class="{ 'rotate-180': showAdvanced }"
                 class="w-4 h-4 transition-transform"
               />
-              {{ showAdvanced ? 'Ẩn' : 'Hiện' }} thông tin nâng cao
+              {{ showAdvanced ? t('transactions.form.hideAdvanced') : t('transactions.form.showAdvanced') }}
             </button>
           </div>
 
@@ -176,12 +175,12 @@
           <div v-if="showAdvanced" class="space-y-4 border-t pt-5 dark:border-[#1b2e4b]">
             <!-- Financial Info Group -->
             <div class="space-y-4">
-              <h6 class="text-md font-semibold">Thông tin tài chính mở rộng</h6>
+              <h6 class="text-md font-semibold">{{ t('transactions.form.financialInfo') }}</h6>
               
               <div class="space-y-4">
                 <div>
                   <label class="text-sm font-medium text-white-dark">
-                    So sánh số dư
+                    {{ t('transactions.fields.balanceCompare') }}
                   </label>
                   <input 
                     v-model.number="form.balanceCompare" 
@@ -189,12 +188,12 @@
                     type="number" 
                     step="0.01"
                     class="form-input"
-                    placeholder="Số dư trước đó"
+                    :placeholder="t('transactions.placeholders.previousBalance')"
                   />
                 </div>
                 <div>
                   <label class="text-sm font-medium text-white-dark">
-                    Hạn mức khả dụng
+                    {{ t('accounts.fields.availableLimit') }}
                   </label>
                   <input 
                     v-model.number="form.availableLimit" 
@@ -202,12 +201,12 @@
                     type="number" 
                     step="0.01"
                     class="form-input"
-                    placeholder="Hạn mức"
+                    :placeholder="t('transactions.placeholders.limit')"
                   />
                 </div>
                 <div>
                   <label class="text-sm font-medium text-white-dark">
-                    So sánh hạn mức
+                    {{ t('transactions.fields.availableLimitCompare') }}
                   </label>
                   <input 
                     v-model.number="form.availableLimitCompare" 
@@ -215,12 +214,12 @@
                     type="number" 
                     step="0.01"
                     class="form-input"
-                    placeholder="Hạn mức trước đó"
+                    :placeholder="t('transactions.placeholders.previousLimit')"
                   />
                 </div>
                 <div>
                   <label class="text-sm font-medium text-white-dark">
-                    Tăng hạn mức
+                    {{ t('transactions.fields.increaseCreditLimit') }}
                   </label>
                   <input 
                     v-model.number="form.increaseCreditLimit" 
@@ -228,12 +227,12 @@
                     type="number" 
                     step="0.01"
                     class="form-input"
-                    placeholder="Số tiền tăng"
+                    :placeholder="t('transactions.placeholders.increaseAmount')"
                   />
                 </div>
                 <div>
                   <label class="text-sm font-medium text-white-dark">
-                    % Đã sử dụng
+                    {{ t('transactions.fields.usedPercent') }}
                   </label>
                   <input 
                     v-model.number="form.usedPercent" 
@@ -250,55 +249,55 @@
 
             <!-- Category & Notes Group -->
             <div class="space-y-4">
-              <h6 class="text-md font-semibold">Phân loại & ghi chú</h6>
+              <h6 class="text-md font-semibold">{{ t('transactions.form.classificationNotes') }}</h6>
               
               <div class="space-y-4">
                 <div>
                   <label class="text-sm font-medium text-white-dark">
-                    Tóm tắt danh mục
+                    {{ t('transactions.fields.categorySummary') }}
                   </label>
                   <input 
                     v-model="form.categorySummary" 
                     :disabled="mode === 'view'"
                     type="text" 
                     class="form-input"
-                    placeholder="Tóm tắt"
+                    :placeholder="t('transactions.fields.categorySummary')"
                   />
                 </div>
                 <div>
                   <label class="text-sm font-medium text-white-dark">
-                    Nhóm
+                    {{ t('transactions.fields.group') }}
                   </label>
                   <input 
                     v-model="form.group" 
                     :disabled="mode === 'view'"
                     type="text" 
                     class="form-input"
-                    placeholder="Nhóm giao dịch"
+                    :placeholder="t('transactions.placeholders.group')"
                   />
                 </div>
                 <div>
                   <label class="text-sm font-medium text-white-dark">
-                    Ghi chú
+                    {{ t('transactions.fields.note') }}
                   </label>
                   <textarea 
                     v-model="form.note" 
                     :disabled="mode === 'view'"
                     rows="3"
                     class="form-textarea"
-                    placeholder="Ghi chú chi tiết"
+                    :placeholder="t('transactions.placeholders.note')"
                   ></textarea>
                 </div>
                 <div>
                   <label class="text-sm font-medium text-white-dark">
-                    Import từ
+                    {{ t('transactions.fields.importFrom') }}
                   </label>
                   <input 
                     v-model="form.importFrom" 
                     :disabled="mode === 'view'"
                     type="text" 
                     class="form-input"
-                    placeholder="Nguồn import"
+                    :placeholder="t('transactions.placeholders.importFrom')"
                   />
                 </div>
               </div>
@@ -306,19 +305,19 @@
 
             <!-- Sync & Metadata Group -->
             <div class="space-y-4">
-              <h6 class="text-md font-semibold">Đồng bộ & metadata</h6>
+              <h6 class="text-md font-semibold">{{ t('transactions.form.syncMetadata') }}</h6>
               
               <div class="space-y-4">
                 <div>
                   <label class="text-sm font-medium text-white-dark">
-                    Mã giao dịch
+                    {{ t('transactions.fields.transactionCode') }}
                   </label>
                   <input 
                     v-model="form.transactionCode" 
                     :disabled="mode === 'view'"
                     type="text" 
                     class="form-input"
-                    placeholder="Mã giao dịch"
+                    :placeholder="t('transactions.fields.transactionCode')"
                   />
                 </div>
                 
@@ -332,7 +331,7 @@
                       class="form-checkbox"
                     />
                     <label for="mobile-syncMisa" class="ml-2 text-sm font-medium text-white-dark">
-                      Đồng bộ Misa
+                      {{ t('transactions.fields.syncMisa') }}
                     </label>
                   </div>
                   
@@ -345,7 +344,7 @@
                       class="form-checkbox"
                     />
                     <label for="mobile-syncSms" class="ml-2 text-sm font-medium text-white-dark">
-                      Đồng bộ SMS
+                      {{ t('transactions.fields.syncSms') }}
                     </label>
                   </div>
                   
@@ -358,7 +357,7 @@
                       class="form-checkbox"
                     />
                     <label for="mobile-vn" class="ml-2 text-sm font-medium text-white-dark">
-                      Tiền tệ VN
+                      {{ t('transactions.fields.vnCurrency') }}
                     </label>
                   </div>
                 </div>
@@ -367,8 +366,8 @@
           </div>
 
           <!-- Error Message -->
-          <div v-if="error" class="alert alert-danger">
-            {{ error }}
+          <div v-if="errorText" class="alert alert-danger">
+            {{ errorText }}
           </div>
         </form>
       </div>
@@ -383,13 +382,13 @@
           >
             <icon-save class="w-4 h-4" v-if="!isLoading" />
             <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white" v-else></div>
-            {{ mode === 'create' ? 'Tạo giao dịch' : 'Cập nhật' }}
+            {{ mode === 'create' ? t('transactions.actions.create') : t('common.update') }}
           </button>
           <button 
             @click="$emit('update:visible', false)"
             class="btn btn-outline-danger"
           >
-            Hủy
+            {{ t('common.cancel') }}
           </button>
         </div>
 
@@ -400,20 +399,20 @@
             class="btn btn-warning flex-1"
           >
             <icon-edit class="w-4 h-4" />
-            Chỉnh sửa
+            {{ t('common.edit') }}
           </button>
           <button 
             @click="confirmDelete"
             class="btn btn-danger"
           >
             <icon-trash class="w-4 h-4" />
-            Xóa
+            {{ t('common.delete') }}
           </button>
           <button 
             @click="$emit('update:visible', false)"
             class="btn btn-outline-secondary"
           >
-            Đóng
+            {{ t('common.close') }}
           </button>
         </div>
       </div>
@@ -424,9 +423,12 @@
 <script setup lang="ts">
 import { logger } from '~/utils/logger'
 
+import Swal from 'sweetalert2'
 import type { TransactionViewModel, TransactionCreateRequest, TransactionUpdateRequest, TransactionDirectionType } from '~/types/transaction'
 import type { AccountSelectOption, AccountViewModel } from '~/types/account'
+import type { ApiError } from '~/types/api'
 import { CategoryTypeConst, TransactionDirectionConst } from '~/types/transaction'
+import { getCategoryTypeValue, toTransactionErrorState } from '~/composables/useTransactions'
 
 // Props
 interface Props {
@@ -455,12 +457,18 @@ const emit = defineEmits<{
 }>()
 
 // Composables
+const { t } = useI18n()
 const { createTransaction, updateTransaction, deleteTransaction, createFormDefaults, resetForm } = useTransactions()
 
 // State
 const isLoading = ref(false)
-const error = ref<string | null>(null)
+// Holds a key or a backend message, never translated text, so it follows a locale switch.
+const error = ref<Pick<ApiError, 'messageKey' | 'messageParams' | 'message'> | null>(null)
 const showAdvanced = ref(false)
+
+const errorText = computed(() =>
+  error.value?.messageKey ? t(error.value.messageKey, error.value.messageParams ?? {}) : error.value?.message ?? ''
+)
 
 // Form state
 const form = ref<TransactionCreateRequest>({
@@ -541,7 +549,8 @@ const initializeForm = () => {
       importFrom: props.transaction.importFrom,
       increaseCreditLimit: props.transaction.increaseCreditLimit,
       usedPercent: props.transaction.usedPercent,
-      categoryType: props.transaction.categoryType,
+      // The backend sends the enum name; the select options hold the numeric values. An unknown value stays as sent.
+      categoryType: getCategoryTypeValue(props.transaction.categoryType) ?? props.transaction.categoryType,
       group: props.transaction.group
     } as TransactionCreateRequest
   }
@@ -561,7 +570,7 @@ const handleSubmit = async () => {
       emit('updated')
     }
   } catch (err) {
-    error.value = err instanceof Error ? err.message : 'Có lỗi xảy ra'
+    error.value = toTransactionErrorState(err, 'common.errors.unknown')
   } finally {
     isLoading.value = false
   }
@@ -569,14 +578,29 @@ const handleSubmit = async () => {
 
 const confirmDelete = async () => {
   if (!props.transaction) return
-  
-  if (confirm(`Bạn có chắc muốn xóa giao dịch "${props.transaction.description || 'Không có mô tả'}"?`)) {
+  // The modal can close while the dialog is open, so keep what the dialog was about.
+  const { id, description } = props.transaction
+
+  const result = await Swal.fire({
+    title: t('common.confirmation.title'),
+    text: t('transactions.confirm.delete', { description: description || t('transactions.confirm.noDescription') }),
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: t('common.confirmation.yesDelete'),
+    cancelButtonText: t('common.cancel'),
+    // This modal is a z-[9999] overlay; keep the dialog above it.
+    customClass: { container: '!z-[10001]' }
+  })
+
+  if (result.isConfirmed) {
     try {
       isLoading.value = true
-      await deleteTransaction(props.transaction.id)
+      await deleteTransaction(id)
       emit('deleted')
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Có lỗi xảy ra khi xóa'
+      error.value = toTransactionErrorState(err, 'transactions.errors.deleteFailed')
     } finally {
       isLoading.value = false
     }

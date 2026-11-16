@@ -192,6 +192,7 @@
         "status": "Status",
         "success": "Success",
         "to": "to",
+        "unknown": "Unknown",
         "update": "Update",
         "confirmation": {
             "title": "Are you sure?",
@@ -202,6 +203,12 @@
             "network": "Network error. Please check your connection.",
             "sessionExpired": "Your session has expired. Please log in again.",
             "unknown": "An unexpected error occurred. Please try again."
+        },
+        "validation": {
+            "required": "Please fill in all required fields (*).",
+            "min": "The value must be at least {min}.",
+            "max": "The value must be at most {max}.",
+            "invalid": "Please enter a valid value."
         }
     },
     "enums": {
@@ -687,6 +694,103 @@
             "cardNumberLength": "Card number must be between 13-19 digits",
             "initialBalanceNegative": "Initial balance cannot be negative",
             "availableLimitNegative": "Available limit cannot be negative"
+        }
+    },
+    "transactions": {
+        "list": {
+            "title": "Transaction Management",
+            "titleForAccount": "Transactions - {name}",
+            "description": "Track and manage income and expense transactions",
+            "descriptionForAccount": "Track the transactions of account {name}",
+            "heading": "Transaction list",
+            "total": "Total transactions: {count}",
+            "detailedView": "Detailed view",
+            "compactView": "Compact view"
+        },
+        "filters": {
+            "fromDate": "From date",
+            "toDate": "To date"
+        },
+        "columns": {
+            "button": "Columns",
+            "title": "Choose columns to display",
+            "simple": "Simple",
+            "advanced": "Advanced"
+        },
+        "fields": {
+            "date": "Date",
+            "dateTime": "Date & time",
+            "account": "Account",
+            "description": "Description",
+            "category": "Category",
+            "type": "Type",
+            "amount": "Amount",
+            "balance": "Balance",
+            "note": "Note",
+            "direction": "Transaction type",
+            "transactionDateTime": "Transaction date and time",
+            "transactionDate": "Transaction date",
+            "balanceAfter": "Balance after transaction",
+            "balanceCompare": "Balance comparison",
+            "availableLimitCompare": "Limit comparison",
+            "increaseCreditLimit": "Credit limit increase",
+            "usedPercent": "Usage percentage",
+            "categorySummary": "Category summary",
+            "group": "Group",
+            "importFrom": "Import source",
+            "transactionCode": "Transaction code",
+            "syncMisa": "Sync MISA",
+            "syncSms": "Sync SMS",
+            "vnCurrency": "VN currency"
+        },
+        "placeholders": {
+            "amount": "Enter amount",
+            "description": "Enter transaction description",
+            "selectAccount": "Select account",
+            "balance": "Enter balance",
+            "previousBalance": "Previous balance",
+            "limit": "Limit",
+            "previousLimit": "Previous limit",
+            "increaseAmount": "Increase amount",
+            "note": "Detailed note",
+            "group": "Transaction group",
+            "importFrom": "Data source"
+        },
+        "form": {
+            "createTitle": "Add transaction",
+            "editTitle": "Edit transaction",
+            "viewTitle": "Transaction details",
+            "closeHint": "Close (Esc)",
+            "processing": "Processing...",
+            "showAdvanced": "Show advanced information",
+            "hideAdvanced": "Hide advanced information",
+            "financialInfo": "Extended financial information",
+            "classificationNotes": "Classification & notes",
+            "syncMetadata": "Sync & metadata"
+        },
+        "actions": {
+            "addIncome": "Add income transaction",
+            "addExpense": "Add expense transaction",
+            "create": "Create transaction"
+        },
+        "empty": {
+            "title": "No transactions yet",
+            "description": "No transactions in this period"
+        },
+        "pagination": {
+            "summary": "Showing {from}-{to} of {total} transactions",
+            "page": "Page {current} / {total}"
+        },
+        "confirm": {
+            "delete": "Delete transaction \"{description}\"?",
+            "noDescription": "No description"
+        },
+        "errors": {
+            "loadFailed": "Failed to fetch transactions",
+            "loadOneFailed": "Failed to fetch transaction",
+            "createFailed": "Failed to create transaction",
+            "updateFailed": "Failed to update transaction",
+            "deleteFailed": "Failed to delete transaction"
         }
     }
 }

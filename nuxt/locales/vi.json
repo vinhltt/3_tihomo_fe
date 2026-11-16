@@ -192,6 +192,7 @@
         "status": "Trạng thái",
         "success": "Thành công",
         "to": "đến",
+        "unknown": "Không xác định",
         "update": "Cập nhật",
         "confirmation": {
             "title": "Bạn có chắc chắn?",
@@ -202,6 +203,12 @@
             "network": "Lỗi mạng. Vui lòng kiểm tra kết nối.",
             "sessionExpired": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
             "unknown": "Đã xảy ra lỗi không mong muốn. Vui lòng thử lại."
+        },
+        "validation": {
+            "required": "Vui lòng nhập đầy đủ các trường bắt buộc (*).",
+            "min": "Giá trị phải lớn hơn hoặc bằng {min}.",
+            "max": "Giá trị phải nhỏ hơn hoặc bằng {max}.",
+            "invalid": "Vui lòng nhập giá trị hợp lệ."
         }
     },
     "enums": {
@@ -687,6 +694,103 @@
             "cardNumberLength": "Số thẻ phải có từ 13 đến 19 chữ số",
             "initialBalanceNegative": "Số dư ban đầu không được âm",
             "availableLimitNegative": "Hạn mức khả dụng không được âm"
+        }
+    },
+    "transactions": {
+        "list": {
+            "title": "Quản lý Giao dịch",
+            "titleForAccount": "Giao dịch - {name}",
+            "description": "Theo dõi và quản lý các giao dịch thu chi",
+            "descriptionForAccount": "Theo dõi giao dịch của tài khoản {name}",
+            "heading": "Danh sách giao dịch",
+            "total": "Tổng: {count} giao dịch",
+            "detailedView": "Chế độ chi tiết",
+            "compactView": "Chế độ đơn giản"
+        },
+        "filters": {
+            "fromDate": "Từ ngày",
+            "toDate": "Đến ngày"
+        },
+        "columns": {
+            "button": "Cột",
+            "title": "Chọn cột hiển thị",
+            "simple": "Đơn giản",
+            "advanced": "Nâng cao"
+        },
+        "fields": {
+            "date": "Ngày",
+            "dateTime": "Ngày giờ",
+            "account": "Tài khoản",
+            "description": "Mô tả",
+            "category": "Danh mục",
+            "type": "Loại",
+            "amount": "Số tiền",
+            "balance": "Số dư",
+            "note": "Ghi chú",
+            "direction": "Loại giao dịch",
+            "transactionDateTime": "Ngày và giờ giao dịch",
+            "transactionDate": "Ngày giao dịch",
+            "balanceAfter": "Số dư sau giao dịch",
+            "balanceCompare": "So sánh số dư",
+            "availableLimitCompare": "So sánh hạn mức",
+            "increaseCreditLimit": "Tăng hạn mức tín dụng",
+            "usedPercent": "Phần trăm sử dụng",
+            "categorySummary": "Tóm tắt danh mục",
+            "group": "Nhóm",
+            "importFrom": "Nguồn import",
+            "transactionCode": "Mã giao dịch",
+            "syncMisa": "Đồng bộ Misa",
+            "syncSms": "Đồng bộ SMS",
+            "vnCurrency": "Tiền tệ VN"
+        },
+        "placeholders": {
+            "amount": "Nhập số tiền",
+            "description": "Nhập mô tả giao dịch",
+            "selectAccount": "Chọn tài khoản",
+            "balance": "Nhập số dư",
+            "previousBalance": "Số dư trước đó",
+            "limit": "Hạn mức",
+            "previousLimit": "Hạn mức trước đó",
+            "increaseAmount": "Số tiền tăng",
+            "note": "Ghi chú chi tiết",
+            "group": "Nhóm giao dịch",
+            "importFrom": "Nguồn dữ liệu"
+        },
+        "form": {
+            "createTitle": "Thêm giao dịch",
+            "editTitle": "Chỉnh sửa giao dịch",
+            "viewTitle": "Chi tiết giao dịch",
+            "closeHint": "Đóng (ESC)",
+            "processing": "Đang xử lý...",
+            "showAdvanced": "Hiện thông tin nâng cao",
+            "hideAdvanced": "Ẩn thông tin nâng cao",
+            "financialInfo": "Thông tin tài chính mở rộng",
+            "classificationNotes": "Phân loại & ghi chú",
+            "syncMetadata": "Đồng bộ & metadata"
+        },
+        "actions": {
+            "addIncome": "Thêm giao dịch Thu",
+            "addExpense": "Thêm giao dịch Chi",
+            "create": "Tạo giao dịch"
+        },
+        "empty": {
+            "title": "Chưa có giao dịch nào",
+            "description": "Không có giao dịch nào trong khoảng thời gian này"
+        },
+        "pagination": {
+            "summary": "Hiển thị {from}-{to} trong tổng số {total} giao dịch",
+            "page": "Trang {current} / {total}"
+        },
+        "confirm": {
+            "delete": "Xóa giao dịch \"{description}\"?",
+            "noDescription": "Không có mô tả"
+        },
+        "errors": {
+            "loadFailed": "Không thể tải danh sách giao dịch",
+            "loadOneFailed": "Không thể tải giao dịch",
+            "createFailed": "Không thể tạo giao dịch",
+            "updateFailed": "Không thể cập nhật giao dịch",
+            "deleteFailed": "Không thể xóa giao dịch"
         }
     }
 } 
