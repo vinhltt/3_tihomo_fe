@@ -2,10 +2,10 @@
     <div class="space-y-6">
         <div class="flex flex-wrap items-start justify-between gap-4">
             <div>
-                <h1 class="text-2xl font-semibold dark:text-white-light">Giao dịch dự kiến</h1>
-                <p class="mt-1 text-gray-500">Theo dõi từng kỳ, ghi nhận thanh toán hoặc liên kết giao dịch đã có.</p>
+                <h1 class="text-2xl font-semibold dark:text-white-light">{{ t('expected_transactions') }}</h1>
+                <p class="mt-1 text-gray-500">{{ t('expected.description') }}</p>
             </div>
-            <NuxtLink to="/apps/recurring-transactions" class="btn btn-outline-primary">Quản lý mẫu định kỳ</NuxtLink>
+            <NuxtLink to="/apps/recurring-transactions" class="btn btn-outline-primary">{{ t('expected.manageTemplates') }}</NuxtLink>
         </div>
 
         <ExpectedTransactionSuccessPanel v-if="success" :payload="success" @dismiss="success = null" />
@@ -14,23 +14,23 @@
             v-model="filters"
             :template-options="templateOptions"
             :templates-loading="templatesLoading"
-            :templates-error="templatesError"
+            :templates-error="templatesErrorText"
             :date-range-error="dateRangeError"
             @reset="resetFilters"
             @retry-templates="loadTemplateOptions"
         />
 
         <section v-if="(targetLoading && !queryTarget) || targetError || (queryTarget && !isPending(queryTarget))" class="panel">
-            <p v-if="targetLoading && !queryTarget" role="status" class="text-gray-500">Đang tải kỳ được chọn từ nhắc hạn...</p>
+            <p v-if="targetLoading && !queryTarget" role="status" class="text-gray-500">{{ t('expected.target.loading') }}</p>
             <div v-else-if="targetError" role="alert" class="text-danger">
-                <p>Không thể chọn kỳ: {{ targetError }}</p>
-                <button type="button" class="btn btn-sm btn-outline-primary mt-2" @click="loadQueryTarget()">Thử tải lại kỳ được chọn</button>
+                <p>{{ t('expected.target.loadFailed', { error: errorText(targetError) }) }}</p>
+                <button type="button" class="btn btn-sm btn-outline-primary mt-2" @click="loadQueryTarget()">{{ t('expected.target.retry') }}</button>
             </div>
             <div v-else-if="queryTarget" class="space-y-2 text-sm">
-                <p class="font-semibold">Kỳ được chọn đã xử lý, không thể thay đổi.</p>
-                <p>{{ queryTarget.templateName || 'Không gắn mẫu' }} · {{ formatDate(queryTarget.expectedDate) }} · {{ formatCurrency(queryTarget.expectedAmount) }}</p>
-                <p class="break-all">Mã kỳ: {{ queryTarget.id }}</p>
-                <p v-if="queryTarget.actualTransactionId" class="break-all">Giao dịch thực: {{ queryTarget.actualTransactionId }}</p>
+                <p class="font-semibold">{{ t('expected.target.processed') }}</p>
+                <p>{{ queryTarget.templateName || t('expected.template.none') }} · {{ formatDate(queryTarget.expectedDate) }} · {{ formatCurrency(queryTarget.expectedAmount) }}</p>
+                <p class="break-all">{{ t('expected.fields.periodId') }}: {{ queryTarget.id }}</p>
+                <p v-if="queryTarget.actualTransactionId" class="break-all">{{ t('expected.fields.actualTransaction') }}: {{ queryTarget.actualTransactionId }}</p>
             </div>
         </section>
 
@@ -38,7 +38,7 @@
             :transactions="transactions"
             :pagination="pagination"
             :loading="loading"
-            :list-error="listError"
+            :list-error="listErrorText"
             :list-error-after-commit="listErrorAfterCommit"
             :authenticated="auth.isAuthenticated"
             :date-range-error="dateRangeError"
@@ -70,7 +70,7 @@ import ExpectedTransactionSuccessPanel from '~/components/apps/expected-transact
 import ExpectedTransactionTable from '~/components/apps/expected-transactions/ExpectedTransactionTable.vue'
 import { useExpectedTransactions } from '~/composables/useExpectedTransactions'
 import { useAuthStore } from '~/stores/auth'
-import type { Pagination } from '~/types/api'
+import type { ApiError, Pagination } from '~/types/api'
 import type {
     ActionMode,
     CommittedPayload,
@@ -90,18 +90,18 @@ const filters = ref<ExpectedTransactionFilterForm>(emptyFilters())
 const transactions = ref<ExpectedTransactionViewModel[]>([])
 const pagination = ref<Pagination>(emptyPagination())
 const loading = ref(false)
-const listError = ref<string | null>(null)
+const listError = ref<Pick<ApiError, 'messageKey' | 'messageParams' | 'message'> | null>(null)
 const listErrorAfterCommit = ref(false)
-const dateRangeError = ref<string | null>(null)
+const dateRangeError = ref(false)
 const templateOptions = ref<Array<Pick<RecurringTransactionTemplateViewModel, 'id' | 'name'>>>([])
 const templatesLoading = ref(false)
-const templatesError = ref<string | null>(null)
+const templatesError = ref<Pick<ApiError, 'messageKey' | 'messageParams' | 'message'> | null>(null)
 const selectedTransaction = ref<ExpectedTransactionViewModel | null>(null)
 const actionMode = ref<ActionMode | null>(null)
 const success = ref<CommittedPayload | null>(null)
 const queryTarget = ref<ExpectedTransactionViewModel | null>(null)
 const targetLoading = ref(false)
-const targetError = ref<string | null>(null)
+const targetError = ref<Pick<ApiError, 'messageKey' | 'messageParams' | 'message'> | null>(null)
 let mounted = false
 let disposed = false
 let resettingSession = false
@@ -118,7 +118,15 @@ const queryId = computed(() => {
     return typeof id === 'string' ? id : Array.isArray(id) ? id[0] || '' : ''
 })
 
-useHead({ title: 'Giao dịch dự kiến' })
+const { t } = useI18n()
+
+// A frontend message carries messageKey; a backend message is shown verbatim. Resolved at render, so it follows a locale switch.
+const errorText = (error: Pick<ApiError, 'messageKey' | 'messageParams' | 'message'> | null): string | null =>
+    error ? (error.messageKey ? t(error.messageKey, error.messageParams ?? {}) : error.message) : null
+const listErrorText = computed(() => errorText(listError.value))
+const templatesErrorText = computed(() => errorText(templatesError.value))
+
+useHead({ title: computed(() => t('expected_transactions')) })
 
 const loadTransactions = async (page = pagination.value.pageIndex, afterCommit = false): Promise<void> => {
     const sequence = ++listSequence
@@ -128,12 +136,12 @@ const loadTransactions = async (page = pagination.value.pageIndex, afterCommit =
 
     listError.value = null
     listErrorAfterCommit.value = false
-    dateRangeError.value = null
+    dateRangeError.value = false
     if (filters.value.dateFrom && filters.value.dateTo && filters.value.dateFrom > filters.value.dateTo) {
         // A filter validation error, not a load failure: no request and no retry.
         transactions.value = []
         loading.value = false
-        dateRangeError.value = 'Ngày bắt đầu không được sau ngày kết thúc.'
+        dateRangeError.value = true
         return
     }
 
@@ -158,7 +166,7 @@ const loadTransactions = async (page = pagination.value.pageIndex, afterCommit =
         pagination.value = response.pagination
     } catch (error) {
         if (!isCurrent()) return
-        listError.value = errorMessage(error, 'Vui lòng thử tải lại danh sách.')
+        listError.value = errorMessage(error, 'expected.errors.retryList')
         listErrorAfterCommit.value = afterCommit
     } finally {
         if (isCurrent()) {
@@ -184,7 +192,7 @@ const loadTemplateOptions = async (): Promise<void> => {
         const options = await getTemplateOptions(controller.signal)
         if (isCurrent()) templateOptions.value = options
     } catch (error) {
-        if (isCurrent()) templatesError.value = errorMessage(error, 'Vui lòng thử tải lại mẫu định kỳ.')
+        if (isCurrent()) templatesError.value = errorMessage(error, 'expected.errors.retryTemplates')
     } finally {
         if (isCurrent()) {
             templatesLoading.value = false
@@ -229,7 +237,7 @@ const loadQueryTarget = async (openDialog = true): Promise<void> => {
         queryTarget.value = transaction
         if (openDialog && isPending(transaction)) openAction(transaction, isIncomeExpense(transaction) ? 'payment' : 'link')
     } catch (error) {
-        if (isCurrent()) targetError.value = errorMessage(error, 'Vui lòng thử tải lại kỳ được chọn.')
+        if (isCurrent()) targetError.value = errorMessage(error, 'expected.errors.retryTarget')
     } finally {
         if (isCurrent()) {
             targetLoading.value = false
@@ -269,7 +277,7 @@ const clearSessionState = (): void => {
     loading.value = false
     listError.value = null
     listErrorAfterCommit.value = false
-    dateRangeError.value = null
+    dateRangeError.value = false
     pendingCommitRefresh = false
     templateOptions.value = []
     templatesLoading.value = false

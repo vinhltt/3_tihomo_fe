@@ -152,6 +152,7 @@
         "actions": "Thao tác",
         "active": "Hoạt động",
         "add": "Thêm",
+        "all": "Tất cả",
         "apply": "Áp dụng",
         "cancel": "Hủy",
         "clearFilters": "Xóa bộ lọc",
@@ -670,7 +671,8 @@
             "gbp": "Bảng Anh"
         },
         "dropdown": {
-            "allAccounts": "Tất cả tài khoản"
+            "allAccounts": "Tất cả tài khoản",
+            "loading": "Đang tải tài khoản..."
         },
         "confirm": {
             "delete": "Xóa tài khoản \"{name}\"?",
@@ -683,6 +685,7 @@
         },
         "errors": {
             "loadFailed": "Không thể tải danh sách tài khoản",
+            "loadFailedDetail": "Không thể tải tài khoản: {error}",
             "deleteFailed": "Không thể xóa tài khoản",
             "saveFailed": "Không thể lưu tài khoản"
         },
@@ -791,6 +794,215 @@
             "createFailed": "Không thể tạo giao dịch",
             "updateFailed": "Không thể cập nhật giao dịch",
             "deleteFailed": "Không thể xóa giao dịch"
+        }
+    },
+    "recurring": {
+        "list": {
+            "title": "Quản lý Giao dịch Định kỳ",
+            "addNew": "Thêm mẫu mới",
+            "saved": "Đã lưu mẫu giao dịch định kỳ.",
+            "loadFailed": "Không thể tải mẫu giao dịch định kỳ: {error}",
+            "empty": "Không có mẫu giao dịch định kỳ nào"
+        },
+        "filters": {
+            "allFrequencies": "Tất cả tần suất"
+        },
+        "fields": {
+            "name": "Tên mẫu",
+            "frequency": "Tần suất",
+            "nextExecutionDate": "Ngày tiếp theo",
+            "repeatFrequency": "Tần suất lặp lại",
+            "customIntervalDays": "Số ngày tùy chỉnh",
+            "startDate": "Ngày bắt đầu",
+            "endDate": "Ngày kết thúc",
+            "daysInAdvance": "Số ngày tạo trước",
+            "daysInAdvanceHint": "Số ngày trước để tạo giao dịch dự kiến",
+            "isActive": "Kích hoạt mẫu",
+            "autoGenerate": "Tự động tạo giao dịch dự kiến"
+        },
+        "placeholders": {
+            "name": "Ví dụ: Tiền điện hàng tháng",
+            "description": "Mô tả chi tiết về giao dịch định kỳ này",
+            "category": "Ví dụ: Hóa đơn, Giải trí, Lương",
+            "days": "Số ngày",
+            "notes": "Ghi chú bổ sung về mẫu giao dịch này"
+        },
+        "modal": {
+            "createTitle": "Tạo mẫu giao dịch định kỳ mới",
+            "editTitle": "Chỉnh sửa mẫu giao dịch định kỳ",
+            "noAccounts": "Chưa có tài khoản để tạo mẫu.",
+            "frequencySection": "Cài đặt tần suất",
+            "advancedSection": "Cài đặt nâng cao",
+            "create": "Tạo mẫu"
+        },
+        "actions": {
+            "pause": "Tạm dừng",
+            "activate": "Kích hoạt"
+        },
+        "pagination": {
+            "summary": "Hiển thị {from} - {to} trong tổng số {total} mẫu"
+        },
+        "confirm": {
+            "delete": "Xóa mẫu \"{name}\"?"
+        },
+        "errors": {
+            "invalidData": "Dữ liệu mẫu giao dịch định kỳ không hợp lệ ({field}: {value})",
+            "loadFailed": "Lỗi khi tải danh sách mẫu giao dịch định kỳ",
+            "createFailed": "Lỗi khi tạo mẫu giao dịch định kỳ",
+            "updateFailed": "Lỗi khi cập nhật mẫu giao dịch định kỳ",
+            "saveFailed": "Không thể lưu mẫu giao dịch định kỳ. Vui lòng thử lại."
+        }
+    },
+    "expected": {
+        "description": "Theo dõi từng kỳ, ghi nhận thanh toán hoặc liên kết giao dịch đã có.",
+        "manageTemplates": "Quản lý mẫu định kỳ",
+        "target": {
+            "loading": "Đang tải kỳ được chọn từ nhắc hạn...",
+            "loadFailed": "Không thể chọn kỳ: {error}",
+            "retry": "Thử tải lại kỳ được chọn",
+            "processed": "Kỳ được chọn đã xử lý, không thể thay đổi."
+        },
+        "filters": {
+            "allStatuses": "Tất cả trạng thái",
+            "template": "Mẫu định kỳ",
+            "allTemplates": "Tất cả mẫu",
+            "templatesLoading": "Đang tải mẫu định kỳ...",
+            "noTemplates": "Chưa có mẫu định kỳ.",
+            "templatesLoadFailed": "Không thể tải mẫu định kỳ: {error}",
+            "retryTemplates": "Thử tải lại mẫu",
+            "dateRangeInvalid": "Ngày bắt đầu không được sau ngày kết thúc."
+        },
+        "list": {
+            "heading": "Danh sách kỳ",
+            "reload": "Tải lại danh sách",
+            "notice": "Ghi nhận không cập nhật số dư tài khoản và không thực hiện thanh toán hộ bạn. Nếu đóng hộp thoại khi đang gửi, yêu cầu vẫn có thể được lưu; hãy tải lại danh sách trước khi thao tác lại.",
+            "loading": "Đang tải giao dịch dự kiến...",
+            "loadFailed": "Không thể tải danh sách giao dịch dự kiến: {error}",
+            "reloadAfterCommitFailed": "Thao tác đã thành công, nhưng không thể tải lại danh sách: {error}",
+            "retry": "Thử tải lại danh sách",
+            "signInRequired": "Vui lòng đăng nhập để xem giao dịch dự kiến.",
+            "invalidDateRange": "Khoảng ngày không hợp lệ. Hãy sửa bộ lọc ngày để xem danh sách.",
+            "empty": "Không có giao dịch dự kiến phù hợp với bộ lọc.",
+            "processed": "Kỳ đã xử lý, không thể thay đổi."
+        },
+        "columns": {
+            "periodTemplate": "Kỳ / Mẫu định kỳ",
+            "accountType": "Tài khoản / Loại",
+            "processing": "Thông tin xử lý"
+        },
+        "fields": {
+            "periodId": "Mã kỳ",
+            "expectedDate": "Ngày dự kiến",
+            "currentAmount": "Số tiền hiện hành",
+            "originalAmount": "Số tiền gốc",
+            "adjusted": "Đã điều chỉnh",
+            "generatedAt": "Sinh kỳ",
+            "processedAt": "Xử lý",
+            "processedTime": "Thời điểm xử lý",
+            "actualTransaction": "Giao dịch thực",
+            "linkedActualTransaction": "Giao dịch thực đã liên kết",
+            "reason": "Lý do",
+            "savedReason": "Lý do đã lưu"
+        },
+        "template": {
+            "none": "Không gắn mẫu",
+            "unavailable": "Mẫu không còn khả dụng",
+            "unnamed": "Mẫu chưa có tên"
+        },
+        "account": {
+            "none": "Chưa gắn tài khoản",
+            "unavailable": "Tài khoản không khả dụng",
+            "unnamed": "Tài khoản chưa có tên"
+        },
+        "due": {
+            "overdue": "Quá hạn {days} ngày",
+            "today": "Đến hạn hôm nay",
+            "remaining": "Còn {days} ngày"
+        },
+        "actions": {
+            "payment": "Ghi nhận thanh toán",
+            "link": "Liên kết giao dịch có sẵn",
+            "adjust": "Chỉnh số tiền",
+            "cancel": "Hủy kỳ"
+        },
+        "pagination": {
+            "summary": "Hiển thị {from}–{to} trong {total} kỳ"
+        },
+        "summary": {
+            "adjustedNote": "Đã điều chỉnh; số tiền gốc luôn là số tiền trước lần chỉnh đầu tiên."
+        },
+        "success": {
+            "payment": "Đã ghi nhận thanh toán và lưu giao dịch thực.",
+            "link": "Đã liên kết giao dịch có sẵn với kỳ.",
+            "cancel": "Đã hủy kỳ.",
+            "adjust": "Đã điều chỉnh số tiền của kỳ.",
+            "savedActualTransactionId": "Mã giao dịch thực đã lưu",
+            "incomeAmount": "Số tiền thu",
+            "expenseAmount": "Số tiền chi",
+            "balanceNote": "Ghi nhận không cập nhật số dư tài khoản.",
+            "savedNote": "Kết quả đã được lưu. Việc tải lại danh sách không thay đổi kết quả này.",
+            "dismiss": "Đóng thông báo"
+        },
+        "payment": {
+            "amount": "Số tiền thanh toán (cố định)",
+            "date": "Ngày giao dịch (cố định)",
+            "fixedNote": "Số tiền và ngày lấy từ kỳ. Muốn đổi số tiền, hãy đóng hộp thoại và chọn “Chỉnh số tiền” trước.",
+            "boundAccount": "Tài khoản đã gắn với kỳ (không thể thay đổi)",
+            "account": "Tài khoản nhận giao dịch",
+            "selectAccount": "Chọn tài khoản của bạn",
+            "accountHint": "Lựa chọn này chỉ dùng cho giao dịch thực, không sửa tài khoản của kỳ gốc.",
+            "retryAccounts": "Thử tải lại tài khoản",
+            "noAccounts": "Chưa có tài khoản của bạn để ghi nhận. Hãy tạo tài khoản trước khi tiếp tục.",
+            "boundAccountUnavailable": "Tài khoản đã gắn không còn khả dụng. Không thể thay bằng tài khoản khác trong thao tác ghi nhận.",
+            "notice": "Ghi nhận không cập nhật số dư tài khoản và không thực hiện thanh toán hộ bạn. Hệ thống lưu giao dịch thực và xác nhận kỳ trong một yêu cầu."
+        },
+        "link": {
+            "search": "Tìm giao dịch có sẵn",
+            "searchPlaceholder": "Tìm theo mô tả hoặc danh mục",
+            "hint": "Chọn một giao dịch của bạn. Liên kết không tạo thêm giao dịch; máy chủ kiểm tra giao dịch chưa gắn với kỳ khác.",
+            "loading": "Đang tải giao dịch có sẵn...",
+            "loadFailed": "Không thể tải giao dịch: {error}",
+            "retry": "Thử tải lại giao dịch",
+            "empty": "Không có giao dịch phù hợp để lựa chọn.",
+            "select": "Chọn",
+            "descriptionId": "Mô tả / Mã",
+            "selectTransaction": "Chọn giao dịch {id}",
+            "selected": "Giao dịch đã chọn"
+        },
+        "modal": {
+            "closeWhileSaving": "Đóng (không hủy yêu cầu)",
+            "saveFailed": "Không thể hoàn tất thao tác: {error}",
+            "paymentNoAutoRetry": "Không tự động gửi lại yêu cầu thanh toán. Nếu chưa rõ kết quả, hãy đóng hộp thoại và tải lại danh sách trước khi thao tác lại.",
+            "paymentUnknown": "Chưa rõ yêu cầu thanh toán đã được lưu hay chưa. Ghi nhận bị khóa cho lần mở hộp thoại này để tránh tạo giao dịch thực trùng lặp.",
+            "paymentUnknownHint": "Hãy đóng hộp thoại và tải lại danh sách trước khi thao tác lại. Tải lại trạng thái kỳ chỉ để kiểm tra kết quả, không mở khóa thao tác.",
+            "reloadState": "Tải lại trạng thái kỳ",
+            "reloadingLocked": "Đang tải lại trạng thái mới nhất của kỳ; thao tác vẫn bị khóa.",
+            "reloadingChanged": "Kỳ đã thay đổi. Đang tải lại trạng thái mới nhất; chưa thể gửi lại thao tác.",
+            "reloadFailed": "Không thể tải lại trạng thái mới nhất: {error}",
+            "stillLocked": "Thao tác vẫn bị khóa. Nội dung đã nhập và lỗi ban đầu được giữ nguyên.",
+            "retryReloadState": "Thử tải lại trạng thái kỳ",
+            "reloaded": "Đã tải lại trạng thái mới nhất. Hãy kiểm tra lại thông tin kỳ; nội dung đã nhập được giữ nguyên. Không tự động gửi lại thao tác.",
+            "changed": "Kỳ đã thay đổi. Cần tải lại trạng thái mới nhất trước khi thao tác.",
+            "notAllowed": "Kỳ không còn cho phép thao tác này. Kỳ đã xử lý không thể thay đổi; chuyển khoản chỉ được liên kết giao dịch có sẵn hoặc hủy kỳ.",
+            "newAmount": "Số tiền mới",
+            "newAmountHint": "Số tiền phải lớn hơn 0. Các lần chỉnh tiếp theo vẫn giữ số tiền gốc trước lần chỉnh đầu tiên.",
+            "cancelReason": "Lý do hủy kỳ",
+            "adjustReason": "Lý do điều chỉnh",
+            "reasonHint": "Lý do là bắt buộc và sẽ được lưu cùng kỳ.",
+            "cancelHint": "Hủy kỳ không tạo giao dịch thực. Kỳ đã hủy không thể ghi nhận hoặc chỉnh sửa tiếp.",
+            "savingNotice": "Đang gửi yêu cầu. Đóng hộp thoại không hủy yêu cầu và không có nghĩa là thao tác đã được hoàn tác. Nếu đóng lúc này, hãy tải lại danh sách để biết kết quả trước khi thao tác lại.",
+            "sessionChanged": "Phiên đăng nhập đã thay đổi. Vui lòng đóng hộp thoại và tải lại danh sách."
+        },
+        "errors": {
+            "unsupportedStatus": "API trả về trạng thái kỳ không được hỗ trợ: {value}.",
+            "unsupportedType": "API trả về loại giao dịch kỳ không được hỗ trợ: {value}.",
+            "invalidPaging": "Chỉ số trang và số dòng mỗi trang phải là số nguyên dương.",
+            "retryList": "Vui lòng thử tải lại danh sách.",
+            "retryTemplates": "Vui lòng thử tải lại mẫu định kỳ.",
+            "retryTarget": "Vui lòng thử tải lại kỳ được chọn.",
+            "retryState": "Vui lòng thử tải lại trạng thái kỳ.",
+            "retryTransactions": "Vui lòng thử tải lại giao dịch.",
+            "checkAndRetry": "Vui lòng kiểm tra thông tin và thử lại."
         }
     }
 } 

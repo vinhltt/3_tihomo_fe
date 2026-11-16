@@ -1,4 +1,5 @@
 import type { AccountSelection, ApiError } from '~/types'
+import { errorMessage } from '~/utils/expected-transaction-formatters'
 
 export const useAccountsSimple = () => {
   const { get } = useApi()
@@ -7,7 +8,8 @@ export const useAccountsSimple = () => {
   // Reactive state
   const accounts = ref<AccountSelection[]>([])
   const isLoading = ref(false)
-  const error = ref<string | null>(null)
+  // Display error shape: a frontend message carries messageKey, a backend message is kept verbatim.
+  const error = ref<Pick<ApiError, 'messageKey' | 'messageParams' | 'message'> | null>(null)
   let requestSequence = 0
   let readController: AbortController | null = null
 
@@ -54,7 +56,7 @@ export const useAccountsSimple = () => {
       }
     } catch (err) {
       if (isCurrentRequest() && !controller.signal.aborted) {
-        error.value = (err as ApiError)?.message || 'Lỗi khi tải danh sách tài khoản'
+        error.value = errorMessage(err, 'accounts.errors.loadFailed')
         accounts.value = []
       }
     } finally {
