@@ -4,7 +4,7 @@
       <!-- Header -->
       <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4 dark:border-gray-700">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-          {{ isEdit ? 'Edit Account' : 'Create New Account' }}
+          {{ isEdit ? t('accounts.actions.edit') : t('accounts.modal.createTitle') }}
         </h3>
         <button
           type="button"
@@ -20,24 +20,24 @@
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <!-- Account Name -->
           <div class="sm:col-span-2">
-            <label for="name" class="form-label">Account Name *</label>
+            <label for="name" class="form-label">{{ t('accounts.fields.name') }} *</label>
             <input
               id="name"
               v-model="form.name"
               type="text"
               class="form-input"
               :class="{ 'border-red-500': errors.name }"
-              placeholder="Enter account name"
+              :placeholder="t('accounts.modal.namePlaceholder')"
               required
             />
             <div v-if="errors.name" class="mt-1 text-sm text-red-500">
-              {{ errors.name }}
+              {{ t(errors.name) }}
             </div>
           </div>
 
           <!-- Account Type -->
           <div>
-            <label for="type" class="form-label">Account Type *</label>
+            <label for="type" class="form-label">{{ t('accounts.fields.type') }} *</label>
             <select
               id="type"
               v-model="form.type"
@@ -45,21 +45,21 @@
               :class="{ 'border-red-500': errors.type }"
               required
             >
-              <option value="">Select account type</option>
-              <option value="Bank">Bank Account</option>
-              <option value="Wallet">Digital Wallet</option>
-              <option value="CreditCard">Credit Card</option>
-              <option value="DebitCard">Debit Card</option>
-              <option value="Cash">Cash</option>
+              <option value="">{{ t('accounts.modal.selectType') }}</option>
+              <option value="Bank">{{ t('enums.accountType.bank') }}</option>
+              <option value="Wallet">{{ t('enums.accountType.wallet') }}</option>
+              <option value="CreditCard">{{ t('enums.accountType.creditCard') }}</option>
+              <option value="DebitCard">{{ t('enums.accountType.debitCard') }}</option>
+              <option value="Cash">{{ t('enums.accountType.cash') }}</option>
             </select>
             <div v-if="errors.type" class="mt-1 text-sm text-red-500">
-              {{ errors.type }}
+              {{ t(errors.type) }}
             </div>
           </div>
 
           <!-- Currency -->
           <div>
-            <label for="currency" class="form-label">Currency *</label>
+            <label for="currency" class="form-label">{{ t('accounts.fields.currency') }} *</label>
             <select
               id="currency"
               v-model="form.currency"
@@ -67,84 +67,78 @@
               :class="{ 'border-red-500': errors.currency }"
               required
             >
-              <option value="">Select currency</option>
-              <option value="VND">VND - Vietnamese Dong</option>
-              <option value="USD">USD - US Dollar</option>
-              <option value="EUR">EUR - Euro</option>
-              <option value="JPY">JPY - Japanese Yen</option>
-              <option value="GBP">GBP - British Pound</option>
+              <option value="">{{ t('accounts.modal.selectCurrency') }}</option>
+              <option value="VND">VND - {{ t('accounts.currencyNames.vnd') }}</option>
+              <option value="USD">USD - {{ t('accounts.currencyNames.usd') }}</option>
+              <option value="EUR">EUR - {{ t('accounts.currencyNames.eur') }}</option>
+              <option value="JPY">JPY - {{ t('accounts.currencyNames.jpy') }}</option>
+              <option value="GBP">GBP - {{ t('accounts.currencyNames.gbp') }}</option>
             </select>
             <div v-if="errors.currency" class="mt-1 text-sm text-red-500">
-              {{ errors.currency }}
+              {{ t(errors.currency) }}
             </div>
           </div>
 
           <!-- Card Number -->
           <div v-if="showCardNumber" class="sm:col-span-2">
-            <label for="cardNumber" class="form-label">Card Number</label>
+            <label for="cardNumber" class="form-label">{{ t('accounts.fields.cardNumber') }}</label>
             <input
               id="cardNumber"
               v-model="form.cardNumber"
               type="text"
               class="form-input"
               :class="{ 'border-red-500': errors.cardNumber }"
-              placeholder="Enter card number"
+              :placeholder="t('accounts.modal.cardNumberPlaceholder')"
               maxlength="19"
               @input="formatCardNumber"
             />
             <div v-if="errors.cardNumber" class="mt-1 text-sm text-red-500">
-              {{ errors.cardNumber }}
+              {{ t(errors.cardNumber) }}
             </div>
             <div class="mt-1 text-sm text-gray-500">
-              Card number will be masked for security
+              {{ t('accounts.modal.cardNumberHint') }}
             </div>
           </div>
 
           <!-- Initial Balance -->
           <div v-if="!isEdit">
-            <label for="initialBalance" class="form-label">Initial Balance *</label>
+            <label for="initialBalance" class="form-label">{{ t('accounts.fields.initialBalance') }} *</label>
             <div class="relative">
               <input
                 id="initialBalance"
                 v-model.number="form.initialBalance"
                 type="number"
                 step="0.01"
-                class="form-input pl-8"
+                class="form-input"
                 :class="{ 'border-red-500': errors.initialBalance }"
                 placeholder="0.00"
                 required
               />
-              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                {{ getCurrencySymbol(form.currency) }}
-              </span>
             </div>
             <div v-if="errors.initialBalance" class="mt-1 text-sm text-red-500">
-              {{ errors.initialBalance }}
+              {{ t(errors.initialBalance) }}
             </div>
           </div>
 
           <!-- Available Limit -->
           <div v-if="showAvailableLimit">
-            <label for="availableLimit" class="form-label">Available Limit</label>
+            <label for="availableLimit" class="form-label">{{ t('accounts.fields.availableLimit') }}</label>
             <div class="relative">
               <input
                 id="availableLimit"
                 v-model.number="form.availableLimit"
                 type="number"
                 step="0.01"
-                class="form-input pl-8"
+                class="form-input"
                 :class="{ 'border-red-500': errors.availableLimit }"
                 placeholder="0.00"
               />
-              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                {{ getCurrencySymbol(form.currency) }}
-              </span>
             </div>
             <div v-if="errors.availableLimit" class="mt-1 text-sm text-red-500">
-              {{ errors.availableLimit }}
+              {{ t(errors.availableLimit) }}
             </div>
             <div class="mt-1 text-sm text-gray-500">
-              Credit limit for credit cards or spending limit for other accounts
+              {{ t('accounts.modal.availableLimitHint') }}
             </div>
           </div>
         </div>
@@ -156,7 +150,7 @@
             class="btn btn-outline-secondary"
             @click="closeModal"
           >
-            Cancel
+            {{ t('common.cancel') }}
           </button>
           <button
             type="submit"
@@ -166,7 +160,7 @@
             <span v-if="isSubmitting" class="mr-2">
               <div class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
             </span>
-            {{ isEdit ? 'Update Account' : 'Create Account' }}
+            {{ isEdit ? t('accounts.actions.update') : t('accounts.actions.create') }}
           </button>
         </div>
       </form>
@@ -179,9 +173,11 @@ import { logger } from '~/utils/logger'
 
 import { useAccounts } from '@/composables/useAccounts'
 import type { Account, AccountCreateRequest, AccountUpdateRequest, AccountType } from '~/types'
+import type { ApiError } from '~/types/api'
 import Swal from 'sweetalert2'
 
-const { createAccount, updateAccount, getCurrencySymbol, validateAccountForm } = useAccounts()
+const { t } = useI18n()
+const { createAccount, updateAccount, validateAccountForm } = useAccounts()
 
 type AccountForm = {
   name: string
@@ -311,25 +307,23 @@ const handleSubmit = async () => {
     emit('saved')
   } catch (error: any) {
     logger.error('Error saving account:', error)
-    
-    let errorMessage = 'Failed to save account'
-    if (error.data?.message) {
-      errorMessage = error.data.message
-    } else if (error.message) {
-      errorMessage = error.message
-    }
+
+    // A frontend message carries messageKey; a backend message is shown verbatim.
+    const apiError = error as Partial<ApiError> | null
+    const errorMessage = apiError?.messageKey
+      ? t(apiError.messageKey, apiError.messageParams ?? {})
+      : apiError?.message || t('accounts.errors.saveFailed')
 
     Swal.fire({
       icon: 'error',
-      title: 'Error',
-      text: errorMessage
+      title: t('common.error'),
+      text: errorMessage,
+      confirmButtonText: t('common.ok')
     })
   } finally {
     isSubmitting.value = false
   }
 }
-
-// getCurrencySymbol is now imported from useAccounts composable
 
 // Initialize form when account prop changes
 watch(

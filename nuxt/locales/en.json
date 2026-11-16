@@ -167,15 +167,18 @@
         "enabled": "Enabled",
         "error": "Error",
         "export": "Export",
+        "filters": "Filters",
         "hide": "Hide",
         "inactive": "Inactive",
         "loading": "Loading...",
         "next": "Next",
         "noData": "No data",
         "of": "of",
+        "ok": "OK",
         "previous": "Previous",
         "refresh": "Refresh",
         "reset": "Reset",
+        "results": "results",
         "retry": "Retry",
         "save": "Save",
         "saveChanges": "Save changes",
@@ -239,6 +242,13 @@
             "active": "Active",
             "revoked": "Revoked",
             "expired": "Expired"
+        },
+        "accountType": {
+            "bank": "Bank Account",
+            "wallet": "Digital Wallet",
+            "creditCard": "Credit Card",
+            "debitCard": "Debit Card",
+            "cash": "Cash"
         }
     },
     "shell": {
@@ -575,6 +585,108 @@
                 "loopback": "Loopback addresses",
                 "allIpv4": "All IPv4 addresses (not recommended)"
             }
+        }
+    },
+    "accounts": {
+        "list": {
+            "title": "Account Management",
+            "addNew": "Add a new account"
+        },
+        "actions": {
+            "add": "Add Account",
+            "create": "Create Account",
+            "update": "Update Account",
+            "edit": "Edit Account",
+            "delete": "Delete account",
+            "viewTransactions": "View transactions",
+            "viewAllTransactions": "View All Transactions",
+            "backToList": "Back to Accounts"
+        },
+        "filters": {
+            "searchPlaceholder": "Search accounts...",
+            "allTypes": "All Types",
+            "allCurrencies": "All Currencies"
+        },
+        "fields": {
+            "name": "Account Name",
+            "type": "Account Type",
+            "currency": "Currency",
+            "currentBalance": "Current Balance",
+            "initialBalance": "Initial Balance",
+            "availableLimit": "Available Limit",
+            "cardNumber": "Card Number",
+            "createdDate": "Created Date",
+            "updatedDate": "Last Updated",
+            "createdBy": "Created By"
+        },
+        "empty": {
+            "title": "No accounts yet",
+            "description": "Create your first account to start managing your finances",
+            "createFirst": "Create your first account"
+        },
+        "detail": {
+            "title": "Account Details",
+            "pageTitleFallback": "Account",
+            "notFound": "Account Not Found",
+            "notFoundDescription": "The account you're looking for doesn't exist or has been deleted.",
+            "createdOn": "Created {date}",
+            "information": "Account Information",
+            "balanceHistory": "Balance History",
+            "period": {
+                "last7Days": "Last 7 Days",
+                "last30Days": "Last 30 Days",
+                "last90Days": "Last 90 Days",
+                "lastYear": "Last Year"
+            },
+            "noChartData": "No chart data available",
+            "recentTransactions": "Recent Transactions",
+            "date": "Date",
+            "description": "Description",
+            "amount": "Amount",
+            "balance": "Balance",
+            "noTransactions": "No transactions found"
+        },
+        "modal": {
+            "createTitle": "Create New Account",
+            "namePlaceholder": "Enter account name",
+            "selectType": "Select account type",
+            "selectCurrency": "Select currency",
+            "cardNumberPlaceholder": "Enter card number",
+            "cardNumberHint": "Card number will be masked for security",
+            "availableLimitHint": "Credit limit for credit cards or spending limit for other accounts"
+        },
+        "currencyNames": {
+            "vnd": "Vietnamese Dong",
+            "usd": "US Dollar",
+            "eur": "Euro",
+            "jpy": "Japanese Yen",
+            "gbp": "British Pound"
+        },
+        "dropdown": {
+            "allAccounts": "All accounts"
+        },
+        "confirm": {
+            "delete": "Delete account \"{name}\"?",
+            "deleteIrreversible": "Delete account \"{name}\"? This action cannot be undone."
+        },
+        "messages": {
+            "created": "Account created successfully",
+            "updated": "Account updated successfully",
+            "deleted": "Account deleted successfully"
+        },
+        "errors": {
+            "loadFailed": "Failed to fetch accounts",
+            "deleteFailed": "Failed to delete account",
+            "saveFailed": "Failed to save account"
+        },
+        "validation": {
+            "nameRequired": "Account name is required",
+            "nameMinLength": "Account name must be at least 2 characters",
+            "typeRequired": "Account type is required",
+            "currencyRequired": "Currency is required",
+            "cardNumberLength": "Card number must be between 13-19 digits",
+            "initialBalanceNegative": "Initial balance cannot be negative",
+            "availableLimitNegative": "Available limit cannot be negative"
         }
     }
 }

@@ -167,15 +167,18 @@
         "enabled": "Đã bật",
         "error": "Lỗi",
         "export": "Xuất",
+        "filters": "Bộ lọc",
         "hide": "Ẩn",
         "inactive": "Không hoạt động",
         "loading": "Đang tải...",
         "next": "Tiếp",
         "noData": "Không có dữ liệu",
         "of": "trên",
+        "ok": "Đồng ý",
         "previous": "Trước",
         "refresh": "Làm mới",
         "reset": "Đặt lại",
+        "results": "kết quả",
         "retry": "Thử lại",
         "save": "Lưu",
         "saveChanges": "Lưu thay đổi",
@@ -239,6 +242,13 @@
             "active": "Hoạt động",
             "revoked": "Đã thu hồi",
             "expired": "Hết hạn"
+        },
+        "accountType": {
+            "bank": "Tài khoản ngân hàng",
+            "wallet": "Ví điện tử",
+            "creditCard": "Thẻ tín dụng",
+            "debitCard": "Thẻ ghi nợ",
+            "cash": "Tiền mặt"
         }
     },
     "shell": {
@@ -575,6 +585,108 @@
                 "loopback": "Địa chỉ loopback",
                 "allIpv4": "Mọi địa chỉ IPv4 (không khuyến nghị)"
             }
+        }
+    },
+    "accounts": {
+        "list": {
+            "title": "Quản lý tài khoản",
+            "addNew": "Thêm tài khoản mới"
+        },
+        "actions": {
+            "add": "Thêm tài khoản",
+            "create": "Tạo tài khoản",
+            "update": "Cập nhật tài khoản",
+            "edit": "Sửa tài khoản",
+            "delete": "Xóa tài khoản",
+            "viewTransactions": "Xem giao dịch",
+            "viewAllTransactions": "Xem tất cả giao dịch",
+            "backToList": "Quay lại danh sách tài khoản"
+        },
+        "filters": {
+            "searchPlaceholder": "Tìm tài khoản...",
+            "allTypes": "Tất cả loại",
+            "allCurrencies": "Tất cả tiền tệ"
+        },
+        "fields": {
+            "name": "Tên tài khoản",
+            "type": "Loại tài khoản",
+            "currency": "Tiền tệ",
+            "currentBalance": "Số dư hiện tại",
+            "initialBalance": "Số dư ban đầu",
+            "availableLimit": "Hạn mức khả dụng",
+            "cardNumber": "Số thẻ",
+            "createdDate": "Ngày tạo",
+            "updatedDate": "Cập nhật lần cuối",
+            "createdBy": "Người tạo"
+        },
+        "empty": {
+            "title": "Chưa có tài khoản nào",
+            "description": "Tạo tài khoản đầu tiên để bắt đầu quản lý tài chính",
+            "createFirst": "Tạo tài khoản đầu tiên"
+        },
+        "detail": {
+            "title": "Chi tiết tài khoản",
+            "pageTitleFallback": "Tài khoản",
+            "notFound": "Không tìm thấy tài khoản",
+            "notFoundDescription": "Tài khoản bạn đang tìm không tồn tại hoặc đã bị xóa.",
+            "createdOn": "Tạo lúc {date}",
+            "information": "Thông tin tài khoản",
+            "balanceHistory": "Lịch sử số dư",
+            "period": {
+                "last7Days": "7 ngày qua",
+                "last30Days": "30 ngày qua",
+                "last90Days": "90 ngày qua",
+                "lastYear": "Năm qua"
+            },
+            "noChartData": "Chưa có dữ liệu biểu đồ",
+            "recentTransactions": "Giao dịch gần đây",
+            "date": "Ngày",
+            "description": "Mô tả",
+            "amount": "Số tiền",
+            "balance": "Số dư",
+            "noTransactions": "Không có giao dịch nào"
+        },
+        "modal": {
+            "createTitle": "Tạo tài khoản mới",
+            "namePlaceholder": "Nhập tên tài khoản",
+            "selectType": "Chọn loại tài khoản",
+            "selectCurrency": "Chọn tiền tệ",
+            "cardNumberPlaceholder": "Nhập số thẻ",
+            "cardNumberHint": "Số thẻ sẽ được che bớt để bảo mật",
+            "availableLimitHint": "Hạn mức tín dụng của thẻ tín dụng hoặc hạn mức chi tiêu của các tài khoản khác"
+        },
+        "currencyNames": {
+            "vnd": "Đồng Việt Nam",
+            "usd": "Đô la Mỹ",
+            "eur": "Euro",
+            "jpy": "Yên Nhật",
+            "gbp": "Bảng Anh"
+        },
+        "dropdown": {
+            "allAccounts": "Tất cả tài khoản"
+        },
+        "confirm": {
+            "delete": "Xóa tài khoản \"{name}\"?",
+            "deleteIrreversible": "Xóa tài khoản \"{name}\"? Thao tác này không thể hoàn tác."
+        },
+        "messages": {
+            "created": "Đã tạo tài khoản",
+            "updated": "Đã cập nhật tài khoản",
+            "deleted": "Đã xóa tài khoản"
+        },
+        "errors": {
+            "loadFailed": "Không thể tải danh sách tài khoản",
+            "deleteFailed": "Không thể xóa tài khoản",
+            "saveFailed": "Không thể lưu tài khoản"
+        },
+        "validation": {
+            "nameRequired": "Vui lòng nhập tên tài khoản",
+            "nameMinLength": "Tên tài khoản phải có ít nhất 2 ký tự",
+            "typeRequired": "Vui lòng chọn loại tài khoản",
+            "currencyRequired": "Vui lòng chọn tiền tệ",
+            "cardNumberLength": "Số thẻ phải có từ 13 đến 19 chữ số",
+            "initialBalanceNegative": "Số dư ban đầu không được âm",
+            "availableLimitNegative": "Hạn mức khả dụng không được âm"
         }
     }
 } 

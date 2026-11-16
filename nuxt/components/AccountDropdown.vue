@@ -12,7 +12,7 @@
       ]"
     >
       <!-- Option "Tất cả tài khoản" -->
-      <option value="">{{ allAccountsText }}</option>
+      <option value="">{{ allAccountsLabel }}</option>
       
       <!-- Danh sách accounts -->
       <option 
@@ -23,7 +23,7 @@
       >
         {{ account.name }}
         <span v-if="showBalance && account.currentBalance !== null">
-          ({{ formatCurrency(account.currentBalance) }})
+          ({{ formatMoney(account.currentBalance) }})
         </span>
       </option>
     </select>
@@ -41,6 +41,8 @@
 </template>
 
 <script setup lang="ts">
+import { formatMoney } from '~/utils/display-format'
+
 // Types cho AccountDropdown component
 type Account = {
   id: string
@@ -70,7 +72,6 @@ type AccountDropdownEmits = {
 // Props với default values
 const props = withDefaults(defineProps<AccountDropdownProps>(), {
   label: '',
-  allAccountsText: 'Tất cả tài khoản',
   showBalance: false,
   disabled: false,
   error: '',
@@ -80,6 +81,11 @@ const props = withDefaults(defineProps<AccountDropdownProps>(), {
 
 // Emits
 const emit = defineEmits<AccountDropdownEmits>()
+
+const { t } = useI18n()
+
+// The default text is translated at render time, so it follows the active locale.
+const allAccountsLabel = computed(() => props.allAccountsText ?? t('accounts.dropdown.allAccounts'))
 
 // Computed properties
 const availableAccounts = computed(() => {
@@ -110,15 +116,6 @@ function handleChange(event: Event) {
   
   // Emit change event với additional info
   emit('change', value, account)
-}
-
-function formatCurrency(amount: number | null): string {
-  if (amount === null) return '-'
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
-    minimumFractionDigits: 0
-  }).format(amount)
 }
 
 // Expose methods cho parent component
