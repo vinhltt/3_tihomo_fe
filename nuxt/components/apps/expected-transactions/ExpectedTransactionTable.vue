@@ -52,7 +52,7 @@
                             <p v-if="transaction.originalAmount != null" class="mt-1 text-xs text-gray-500">{{ t('expected.fields.originalAmount') }}: {{ formatCurrency(transaction.originalAmount) }}</p>
                         </td>
                         <td>
-                            <span class="badge" :class="statusClass(transaction.displayStatus)">{{ labelText(statusLabel(transaction.displayStatus)) }}</span>
+                            <span class="badge whitespace-nowrap" :class="statusClass(transaction.displayStatus)">{{ labelText(statusLabel(transaction.displayStatus)) }}</span>
                         </td>
                         <td class="min-w-[180px] max-w-xs text-sm">
                             <p>{{ t('expected.fields.generatedAt') }}: {{ formatTimestamp(transaction.generatedAt) }}</p>

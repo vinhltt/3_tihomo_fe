@@ -157,10 +157,10 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Request Volume Chart -->
         <div class="panel">
-          <div class="mb-5 flex items-center justify-between">
+          <div class="mb-5 flex flex-wrap items-center justify-between gap-2">
             <h5 class="text-lg font-semibold dark:text-white-light">{{ $t('apiKey.analyticsPage.requestVolumeByHour') }}</h5>
             <div class="dropdown">
-              <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle">
+              <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle whitespace-nowrap">
                 {{ $t('apiKey.analyticsPage.viewOptions') }}
               </button>
             </div>
@@ -258,11 +258,11 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- IP Address Analysis -->
         <div class="panel">
-          <div class="mb-5 flex items-center justify-between">
+          <div class="mb-5 flex flex-wrap items-center justify-between gap-2">
             <h5 class="text-lg font-semibold dark:text-white-light">{{ $t('apiKey.analyticsPage.ipAnalysis') }}</h5>
             <button
               @click="showIpManagement = true"
-              class="btn btn-outline-primary btn-sm"
+              class="btn btn-outline-primary btn-sm whitespace-nowrap"
             >
               <icon-cog-6-tooth class="h-4 w-4 mr-2" />
               {{ $t('apiKey.analyticsPage.manageIps') }}

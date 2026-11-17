@@ -6,7 +6,7 @@
         <div class="flex items-center space-x-3 mb-2">
           <button
             @click="$router.back()"
-            class="btn btn-outline-secondary btn-sm"
+            class="btn btn-outline-secondary btn-sm whitespace-nowrap"
           >
             <icon-arrow-left class="h-4 w-4 mr-2" />
             {{ $t('common.back') }}
@@ -109,7 +109,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <h6 class="font-medium text-gray-900 dark:text-white">{{ $t('apiKey.usagePage.usageAnalytics') }}</h6>
           
-          <div class="flex items-center space-x-3">
+          <div class="flex flex-wrap items-center gap-3">
             <!-- Time Range Buttons -->
             <div class="btn-group">
               <button
@@ -117,7 +117,7 @@
                 :key="range.value"
                 @click="selectedTimeRange = range.value"
                 :class="[
-                  'btn btn-sm',
+                  'btn btn-sm whitespace-nowrap',
                   selectedTimeRange === range.value ? 'btn-primary' : 'btn-outline-primary'
                 ]"
               >
@@ -232,13 +232,13 @@
 
       <!-- Recent Requests Table -->
       <div class="panel">
-        <div class="mb-5 flex items-center justify-between">
+        <div class="mb-5 flex flex-wrap items-center justify-between gap-2">
           <h5 class="text-lg font-semibold dark:text-white-light">{{ $t('apiKey.usagePage.recentRequests') }}</h5>
           <div class="flex items-center space-x-2">
             <button
               @click="toggleAutoRefresh"
               :class="[
-                'btn btn-sm',
+                'btn btn-sm whitespace-nowrap',
                 autoRefresh ? 'btn-success' : 'btn-outline-secondary'
               ]"
             >

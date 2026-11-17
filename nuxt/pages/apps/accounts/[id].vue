@@ -34,11 +34,11 @@
       <div v-else>
         <!-- Header with Account Info -->
         <div class="mb-6">
-          <div class="flex items-center justify-between mb-4">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
             <div>
               <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ account.name }}</h2>
-              <div class="flex items-center gap-3 mt-2">
-                <span class="badge" :class="getAccountTypeBadgeClass(account.type)">
+              <div class="flex flex-wrap items-center gap-3 mt-2">
+                <span class="badge whitespace-nowrap" :class="getAccountTypeBadgeClass(account.type)">
                   {{ accountTypeLabel(account.type) }}
                 </span>
                 <span class="text-sm text-gray-500">
@@ -47,11 +47,11 @@
               </div>
             </div>
             <div class="flex gap-3">
-              <button type="button" class="btn btn-outline-primary" @click="openEditModal">
+              <button type="button" class="btn btn-outline-primary whitespace-nowrap" @click="openEditModal">
                 <icon-edit class="h-4 w-4 ltr:mr-2 rtl:ml-2" />
                 {{ t('accounts.actions.edit') }}
               </button>
-              <button type="button" class="btn btn-outline-danger" @click="confirmDelete">
+              <button type="button" class="btn btn-outline-danger whitespace-nowrap" @click="confirmDelete">
                 <icon-trash class="h-4 w-4 ltr:mr-2 rtl:ml-2" />
                 {{ t('common.delete') }}
               </button>
@@ -188,9 +188,9 @@
 
         <!-- Recent Transactions -->
         <div class="panel">
-          <div class="mb-5 flex items-center justify-between">
+          <div class="mb-5 flex flex-wrap items-center justify-between gap-2">
             <h6 class="text-lg font-semibold">{{ t('accounts.detail.recentTransactions') }}</h6>
-            <NuxtLink to="/apps/transactions" class="btn btn-outline-primary btn-sm">
+            <NuxtLink to="/apps/transactions" class="btn btn-outline-primary btn-sm whitespace-nowrap">
               {{ t('accounts.actions.viewAllTransactions') }}
             </NuxtLink>
           </div>

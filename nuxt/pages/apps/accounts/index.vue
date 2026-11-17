@@ -12,9 +12,9 @@
 
     <div class="pt-5">
       <!-- Header -->
-      <div class="mb-5 flex items-center justify-between">
+      <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
         <h5 class="text-lg font-semibold dark:text-white-light">{{ t('accounts.list.title') }}</h5>
-        <button type="button" class="btn btn-primary" @click="openCreateModal">
+        <button type="button" class="btn btn-primary whitespace-nowrap" @click="openCreateModal">
           <icon-plus class="h-5 w-5 ltr:mr-2 rtl:ml-2" />
           {{ t('accounts.actions.add') }}
         </button>

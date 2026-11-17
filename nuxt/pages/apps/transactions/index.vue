@@ -165,11 +165,11 @@
           <div v-else-if="!transactions.length" class="text-center py-8">
             <icon-folder class="w-16 h-16 mx-auto text-gray-400 mb-4" />
             <p class="text-gray-500">{{ t('transactions.empty.title') }}</p>
-            <div class="flex gap-2 justify-center mt-4">
-              <button @click="() => openCreateModal(TransactionDirectionConst.Revenue)" class="btn btn-success btn-sm">
+            <div class="flex flex-wrap gap-2 justify-center mt-4">
+              <button @click="() => openCreateModal(TransactionDirectionConst.Revenue)" class="btn btn-success btn-sm whitespace-nowrap">
                 {{ t('transactions.actions.addIncome') }}
               </button>
-              <button @click="() => openCreateModal(TransactionDirectionConst.Spent)" class="btn btn-danger btn-sm">
+              <button @click="() => openCreateModal(TransactionDirectionConst.Spent)" class="btn btn-danger btn-sm whitespace-nowrap">
                 {{ t('transactions.actions.addExpense') }}
               </button>
             </div>
