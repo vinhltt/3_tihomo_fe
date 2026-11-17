@@ -1,6 +1,11 @@
 import { logger } from '~/utils/logger'
 import { ref, computed } from 'vue'
 import type { SocialLoginRequest, SocialLoginResponse } from '@/types/auth'
+import type { ApiError } from '@/types/api'
+
+// A frontend message carries messageKey so the page can translate it; the English message stays for logs.
+const facebookError = (messageKey: string, message: string): Error & Pick<ApiError, 'messageKey' | 'messageParams'> =>
+  Object.assign(new Error(message), { messageKey, messageParams: { provider: 'Facebook' } })
 
 /**
  * Facebook Authentication composable for handling Facebook Login (EN)
@@ -9,7 +14,8 @@ import type { SocialLoginRequest, SocialLoginResponse } from '@/types/auth'
 export const useFacebookAuth = () => {
   const config = useRuntimeConfig()
   const isLoading = ref(false)
-  const error = ref<string | null>(null)
+  // Display error shape: a frontend message carries messageKey, a backend message is kept verbatim.
+  const error = ref<Pick<ApiError, 'messageKey' | 'messageParams' | 'message'> | null>(null)
   
   // Check if Facebook app ID is configured
   const isConfigured = computed(() => {
@@ -24,7 +30,7 @@ export const useFacebookAuth = () => {
   const initializeFacebook = (): Promise<void> => {
     return new Promise((resolve, reject) => {
       if (!isConfigured.value) {
-        reject(new Error('Facebook App ID not configured'))
+        reject(facebookError('auth.errors.providerNotConfigured', 'Facebook App ID not configured'))
         return
       }
 
@@ -58,7 +64,7 @@ export const useFacebookAuth = () => {
         }
       }
       script.onerror = () => {
-        reject(new Error('Failed to load Facebook SDK'))
+        reject(facebookError('auth.errors.sdkLoadFailed', 'Failed to load Facebook SDK'))
       }
       document.head.appendChild(script)
     })
@@ -75,13 +81,13 @@ export const useFacebookAuth = () => {
         error.value = null
 
         if (!isConfigured.value) {
-          throw new Error('Facebook authentication not configured')
+          throw facebookError('auth.errors.providerNotConfigured', 'Facebook authentication not configured')
         }
 
         await initializeFacebook()
 
         if (!window.FB) {
-          throw new Error('Facebook SDK not loaded')
+          throw facebookError('auth.errors.sdkNotLoaded', 'Facebook SDK not loaded')
         }        // Check current login status
         window.FB.getLoginStatus((response: any) => {
           if (response.status === 'connected') {
@@ -94,17 +100,19 @@ export const useFacebookAuth = () => {
                 if (loginResponse.authResponse) {
                   resolve(loginResponse.authResponse.accessToken)
                 } else {
-                  reject(new Error('Facebook login was cancelled or failed'))
+                  reject(facebookError('auth.errors.cancelled', 'Facebook login was cancelled or failed'))
                 }
               }, { scope: 'email' })
             } else {
-              reject(new Error('Facebook SDK not available'))
+              reject(facebookError('auth.errors.sdkNotLoaded', 'Facebook SDK not available'))
             }
           }
         })
 
       } catch (err: any) {
-        error.value = err.message || 'Facebook sign-in failed'
+        error.value = err?.messageKey
+          ? { messageKey: err.messageKey, messageParams: err.messageParams, message: err.message }
+          : { messageKey: 'auth.errors.providerFailed', messageParams: { provider: 'Facebook' }, message: err?.message || 'Facebook sign-in failed' }
         reject(err)
       } finally {
         isLoading.value = false
@@ -141,7 +149,7 @@ export const useFacebookAuth = () => {
       let response: SocialLoginResponse
       
       if (!rawResponse) {
-        throw new Error('Empty response from API')
+        throw facebookError('auth.errors.emptyResponse', 'Empty response from API')
       }
 
       if ('data' in rawResponse && typeof rawResponse.data === 'object') {
@@ -153,7 +161,7 @@ export const useFacebookAuth = () => {
       }
 
       if (!response.accessToken) {
-        throw new Error('Access token missing from Facebook API response')
+        throw facebookError('auth.errors.missingAccessToken', 'Access token missing from Facebook API response')
       }
 
     return response
@@ -176,7 +184,9 @@ export const useFacebookAuth = () => {
       
       return authResponse
     } catch (err: any) {
-      error.value = err.message || 'Facebook authentication failed'
+      error.value = err?.messageKey
+        ? { messageKey: err.messageKey, messageParams: err.messageParams, message: err.message }
+        : { messageKey: 'auth.errors.providerFailed', messageParams: { provider: 'Facebook' }, message: err?.message || 'Facebook authentication failed' }
       throw err
     } finally {
       isLoading.value = false

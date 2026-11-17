@@ -1,5 +1,6 @@
 import { logger } from '~/utils/logger'
 import type { SocialProvider, SocialLoginResponse } from '@/types/auth'
+import type { ApiError } from '@/types/api'
 
 /**
  * Unified Social Authentication composable (EN)
@@ -10,7 +11,8 @@ export const useSocialAuth = () => {
   const facebookAuth = useFacebookAuth()
   
   const isLoading = ref(false)
-  const error = ref<string | null>(null)
+  // Display error shape: a frontend message carries messageKey, a backend message is kept verbatim.
+  const error = ref<Pick<ApiError, 'messageKey' | 'messageParams' | 'message'> | null>(null)
 
   /**
    * Check if any social provider is configured (EN)
@@ -41,21 +43,33 @@ export const useSocialAuth = () => {
       switch (provider) {
         case 'Google':
           if (!googleAuth.isConfigured.value) {
-            throw new Error('Google authentication is not configured')
+            throw Object.assign(new Error('Google authentication is not configured'), {
+              messageKey: 'auth.errors.providerNotConfigured',
+              messageParams: { provider }
+            })
           }
           return await googleAuth.login()
 
         case 'Facebook':
           if (!facebookAuth.isConfigured.value) {
-            throw new Error('Facebook authentication is not configured')
+            throw Object.assign(new Error('Facebook authentication is not configured'), {
+              messageKey: 'auth.errors.providerNotConfigured',
+              messageParams: { provider }
+            })
           }
           return await facebookAuth.login()
 
         default:
-          throw new Error(`Unsupported social provider: ${provider}`)
+          throw Object.assign(new Error(`Unsupported social provider: ${provider}`), {
+            messageKey: 'auth.errors.unsupportedProvider',
+            messageParams: { provider }
+          })
       }
     } catch (err: any) {
-      error.value = err.message || `${provider} authentication failed`
+      // The page translates messageKey; an error without one (e.g. a network failure) gets the provider fallback.
+      error.value = err?.messageKey
+        ? { messageKey: err.messageKey, messageParams: err.messageParams, message: err.message }
+        : { messageKey: 'auth.errors.providerFailed', messageParams: { provider }, message: err?.message || `${provider} authentication failed` }
       throw err
     } finally {
       isLoading.value = false

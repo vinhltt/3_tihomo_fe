@@ -1,15 +1,15 @@
 <template>
     <div>
         <div class="absolute inset-0">
-            <img src="/assets/images/auth/bg-gradient.png" alt="image" class="h-full w-full object-cover" />
+            <img src="/assets/images/auth/bg-gradient.png" :alt="$t('auth.login.imageAlt')" class="h-full w-full object-cover" />
         </div>
         <div
             class="relative flex min-h-screen items-center justify-center bg-[url(/assets/images/auth/map.png)] bg-cover bg-center bg-no-repeat px-6 py-10 dark:bg-[#060818] sm:px-16"
         >
-            <img src="/assets/images/auth/coming-soon-object1.png" alt="image" class="absolute left-0 top-1/2 h-full max-h-[893px] -translate-y-1/2" />
-            <img src="/assets/images/auth/coming-soon-object2.png" alt="image" class="absolute left-24 top-0 h-40 md:left-[30%]" />
-            <img src="/assets/images/auth/coming-soon-object3.png" alt="image" class="absolute right-0 top-0 h-[300px]" />
-            <img src="/assets/images/auth/polygon-object.svg" alt="image" class="absolute bottom-0 end-[28%]" />
+            <img src="/assets/images/auth/coming-soon-object1.png" :alt="$t('auth.login.imageAlt')" class="absolute left-0 top-1/2 h-full max-h-[893px] -translate-y-1/2" />
+            <img src="/assets/images/auth/coming-soon-object2.png" :alt="$t('auth.login.imageAlt')" class="absolute left-24 top-0 h-40 md:left-[30%]" />
+            <img src="/assets/images/auth/coming-soon-object3.png" :alt="$t('auth.login.imageAlt')" class="absolute right-0 top-0 h-[300px]" />
+            <img src="/assets/images/auth/polygon-object.svg" :alt="$t('auth.login.imageAlt')" class="absolute bottom-0 end-[28%]" />
             <div
                 class="relative flex w-full max-w-[1502px] flex-col justify-between overflow-hidden rounded-md bg-white/60 backdrop-blur-lg dark:bg-black/50 lg:min-h-[758px] lg:flex-row lg:gap-10 xl:gap-0"
             >
@@ -21,17 +21,17 @@
                     ></div>
                     <div class="ltr:xl:-skew-x-[14deg] rtl:xl:skew-x-[14deg]">
                         <NuxtLink to="/" class="ms-10 block w-48 lg:w-72">
-                            <img src="/assets/images/auth/logo-white.svg" alt="Logo" class="w-full" />
+                            <img src="/assets/images/auth/logo-white.svg" :alt="$t('auth.login.logoAlt')" class="w-full" />
                         </NuxtLink>
                         <div class="mt-24 hidden w-full max-w-[430px] lg:block">
-                            <img src="/assets/images/auth/login.svg" alt="Cover Image" class="w-full" />
+                            <img src="/assets/images/auth/login.svg" :alt="$t('auth.login.coverImageAlt')" class="w-full" />
                         </div>
                     </div>
                 </div>
                 <div class="relative flex w-full flex-col items-center justify-center gap-6 px-4 pb-16 pt-6 sm:px-6 lg:max-w-[667px]">
                     <div class="flex w-full max-w-[440px] items-center gap-2 lg:absolute lg:end-6 lg:top-6 lg:max-w-full">
                         <NuxtLink to="/" class="block w-8 lg:hidden">
-                            <img src="/assets/images/logo.svg" alt="Logo" class="mx-auto w-10" />
+                            <img src="/assets/images/logo.svg" :alt="$t('auth.login.logoAlt')" class="mx-auto w-10" />
                         </NuxtLink>
                         <div class="dropdown ms-auto w-max">
                             <client-only>
@@ -41,7 +41,7 @@
                                         class="flex items-center gap-2.5 rounded-lg border border-white-dark/30 bg-white px-2 py-1.5 text-white-dark hover:border-primary hover:text-primary dark:bg-black"
                                     >
                                         <div>
-                                            <img :src="currentFlag" alt="image" class="h-5 w-5 rounded-full object-cover" />
+                                            <img :src="currentFlag" :alt="$t('shell.language.switcher')" class="h-5 w-5 rounded-full object-cover" />
                                         </div>
                                         <div class="text-base font-bold uppercase">{{ store.locale }}</div>
                                         <span class="shrink-0">
@@ -62,7 +62,7 @@
                                                     >
                                                         <img
                                                             class="h-5 w-5 rounded-full object-cover"
-                                                            :src="`/assets/images/flags/${item.code.toUpperCase()}.svg`"
+                                                            :src="`/assets/images/flags/${item.flag}.svg`"
                                                             alt=""
                                                         />
                                                         <span class="ltr:ml-3 rtl:mr-3">{{ item.name }}</span>
@@ -77,17 +77,17 @@
                     </div>
                     <div class="w-full max-w-[440px] lg:mt-16">
                         <div class="mb-10">
-                            <h1 class="text-3xl font-extrabold uppercase !leading-snug text-primary md:text-4xl">Sign in</h1>
-                            <p class="text-base font-bold leading-normal text-white-dark">Enter your email and password to login</p>
+                            <h1 class="text-3xl font-extrabold uppercase !leading-snug text-primary md:text-4xl">{{ $t('auth.login.signIn') }}</h1>
+                            <p class="text-base font-bold leading-normal text-white-dark">{{ $t('auth.login.subtitle') }}</p>
                         </div>                        <form class="space-y-5 dark:text-white" @submit.prevent="handleLogin">
                             <div>
-                                <label for="Email">Email</label>
+                                <label for="Email">{{ $t('auth.login.email') }}</label>
                                 <div class="relative text-white-dark">
                                     <input
                                         id="Email"
                                         v-model="loginForm.email"
                                         type="email"
-                                        placeholder="Enter Email"
+                                        :placeholder="$t('auth.login.emailPlaceholder')"
                                         class="form-input ps-10 placeholder:text-white-dark"
                                         :class="{ 'border-red-500': emailError }"
                                         required
@@ -96,16 +96,16 @@
                                         <icon-mail :fill="true" />
                                     </span>
                                 </div>
-                                <p v-if="emailError" class="mt-1 text-sm text-red-500">{{ emailError }}</p>
+                                <p v-if="emailError" class="mt-1 text-sm text-red-500">{{ $t(emailError) }}</p>
                             </div>
                             <div>
-                                <label for="Password">Password</label>
+                                <label for="Password">{{ $t('auth.login.password') }}</label>
                                 <div class="relative text-white-dark">
                                     <input
                                         id="Password"
                                         v-model="loginForm.password"
                                         type="password"
-                                        placeholder="Enter Password"
+                                        :placeholder="$t('auth.login.passwordPlaceholder')"
                                         class="form-input ps-10 placeholder:text-white-dark"
                                         :class="{ 'border-red-500': passwordError }"
                                         required
@@ -114,7 +114,7 @@
                                         <icon-lock-dots :fill="true" />
                                     </span>
                                 </div>
-                                <p v-if="passwordError" class="mt-1 text-sm text-red-500">{{ passwordError }}</p>
+                                <p v-if="passwordError" class="mt-1 text-sm text-red-500">{{ $t(passwordError) }}</p>
                             </div>
                             <div>
                                 <label class="flex cursor-pointer items-center">
@@ -123,19 +123,19 @@
                                         type="checkbox"
                                         class="form-checkbox bg-white dark:bg-black"
                                     />
-                                    <span class="text-white-dark">Remember me</span>
+                                    <span class="text-white-dark">{{ $t('auth.login.rememberMe') }}</span>
                                 </label>
                             </div>
 
                             <!-- Error Message -->
-                            <div v-if="error" class="rounded-md bg-red-50 p-4 dark:bg-red-900/10">
+                            <div v-if="loginError" class="rounded-md bg-red-50 p-4 dark:bg-red-900/10">
                                 <div class="flex">
                                     <div class="ml-3">
                                         <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
-                                            Login Failed
+                                            {{ $t('auth.login.failedTitle') }}
                                         </h3>
                                         <div class="mt-2 text-sm text-red-700 dark:text-red-300">
-                                            <p>{{ error }}</p>
+                                            <p>{{ loginErrorText }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -152,13 +152,13 @@
                                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                     </svg>
                                 </span>
-                                {{ isLoading ? 'Signing in...' : 'Sign in' }}
+                                {{ isLoading ? $t('auth.login.signingIn') : $t('auth.login.signIn') }}
                             </button>
                         </form>
 
                         <div class="relative my-7 text-center md:mb-9">
                             <span class="absolute inset-x-0 top-1/2 h-px w-full -translate-y-1/2 bg-white-light dark:bg-white-dark"></span>
-                            <span class="relative bg-white px-2 font-bold uppercase text-white-dark dark:bg-dark dark:text-white-light">or</span>
+                            <span class="relative bg-white px-2 font-bold uppercase text-white-dark dark:bg-dark dark:text-white-light">{{ $t('auth.login.or') }}</span>
                         </div>                        <div class="mb-10 md:mb-[60px]">
                             <div class="space-y-3">
                                 <!-- Google Login Button -->
@@ -175,7 +175,11 @@
                                         </svg>
                                     </span>
                                     <icon-google class="mr-2" />
-                                    {{ socialLoading && currentSocialProvider === 'Google' ? 'Signing in with Google...' : 'Continue with Google' }}
+                                    {{
+                                        socialLoading && currentSocialProvider === 'Google'
+                                            ? $t('auth.login.signingInWith', { provider: 'Google' })
+                                            : $t('auth.login.continueWith', { provider: 'Google' })
+                                    }}
                                 </button>
 
                                 <!-- Facebook Login Button -->
@@ -192,7 +196,11 @@
                                         </svg>
                                     </span>
                                     <icon-facebook-circle class="mr-2" />
-                                    {{ socialLoading && currentSocialProvider === 'Facebook' ? 'Signing in with Facebook...' : 'Continue with Facebook' }}
+                                    {{
+                                        socialLoading && currentSocialProvider === 'Facebook'
+                                            ? $t('auth.login.signingInWith', { provider: 'Facebook' })
+                                            : $t('auth.login.continueWith', { provider: 'Facebook' })
+                                    }}
                                 </button>
                             </div>
 
@@ -201,23 +209,23 @@
                                 <div class="flex">
                                     <div class="ml-3">
                                         <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
-                                            Social Login Failed
+                                            {{ $t('auth.login.socialFailedTitle') }}
                                         </h3>
                                         <div class="mt-2 text-sm text-red-700 dark:text-red-300">
-                                            <p>{{ socialError }}</p>
+                                            <p>{{ socialErrorText }}</p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="text-center dark:text-white">
-                            Don't have an account ?
+                            {{ $t('auth.login.noAccount') }}
                             <NuxtLink to="/auth/cover-signup" class="uppercase text-primary underline transition hover:text-black dark:hover:text-white">
-                                SIGN UP
+                                {{ $t('auth.login.signUp') }}
                             </NuxtLink>
                         </div>
                     </div>
-                    <p class="absolute bottom-6 w-full text-center dark:text-white">© {{ new Date().getFullYear() }}.VRISTO All Rights Reserved.</p>
+                    <p class="absolute bottom-6 w-full text-center dark:text-white">{{ $t('shell.footer.copyright', { year: new Date().getFullYear() }) }}</p>
                 </div>
             </div>
         </div>
@@ -231,8 +239,11 @@ import { useAuth } from '@/composables/useAuth'
 import { useSocialAuth } from '@/composables/useSocialAuth'
 import { useAuthStore } from '@/stores/auth'
 import type { SocialProvider } from '@/types/auth'
+import type { ApiError } from '@/types/api'
 
-useHead({ title: 'Login with Google - Cover' })
+const { t, setLocale } = useI18n()
+
+useHead({ title: computed(() => t('auth.login.metaTitle')) })
 
 definePageMeta({
     layout: 'auth-layout',
@@ -241,12 +252,22 @@ definePageMeta({
 })
 
 const store = useAppStore()
-const { login, isLoading, error, clearError } = useAuth()
+const { login, isLoading, error: loginError, clearError } = useAuth()
 const { loginWith, isLoading: socialLoading, error: socialError, initializeProviders } = useSocialAuth()
 const authStore = useAuthStore()
 const router = useRouter()
 const route = useRoute()
-const { setLocale } = useI18n()
+
+// A frontend message carries messageKey; a backend message is shown verbatim.
+const loginErrorText = computed(() => {
+    const apiError = loginError.value as Partial<ApiError> | null
+    return apiError?.messageKey ? t(apiError.messageKey, apiError.messageParams ?? {}) : apiError?.message || t('auth.errors.loginFailed')
+})
+
+const socialErrorText = computed(() => {
+    const apiError = socialError.value as Partial<ApiError> | null
+    return apiError?.messageKey ? t(apiError.messageKey, apiError.messageParams ?? {}) : apiError?.message || t('auth.errors.socialLoginFailed')
+})
 
 // Form state
 const loginForm = reactive({
@@ -255,6 +276,7 @@ const loginForm = reactive({
 })
 
 const rememberMe = ref(false)
+// Validation messages hold a translation key; the template translates them.
 const emailError = ref('')
 const passwordError = ref('')
 const currentSocialProvider = ref<SocialProvider | null>(null)
@@ -267,18 +289,18 @@ const validateForm = (): boolean => {
     let isValid = true
 
     if (!loginForm.email) {
-        emailError.value = 'Email is required'
+        emailError.value = 'auth.validation.emailRequired'
         isValid = false
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginForm.email)) {
-        emailError.value = 'Please enter a valid email address'
+        emailError.value = 'auth.validation.emailInvalid'
         isValid = false
     }
 
     if (!loginForm.password) {
-        passwordError.value = 'Password is required'
+        passwordError.value = 'auth.validation.passwordRequired'
         isValid = false
     } else if (loginForm.password.length < 6) {
-        passwordError.value = 'Password must be at least 6 characters'
+        passwordError.value = 'auth.validation.passwordMinLength'
         isValid = false
     }
 
@@ -361,7 +383,8 @@ const changeLanguage = (item: any) => {
 }
 
 const currentFlag = computed(() => {
-    return `/assets/images/flags/${store.locale?.toUpperCase()}.svg`
+    const current = store.languageList.find((item) => item.code === store.locale)
+    return `/assets/images/flags/${current?.flag}.svg`
 })
 
 // Initialize social providers on mount
@@ -376,11 +399,11 @@ onMounted(async () => {
 // Clear errors when user starts typing
 watch(() => loginForm.email, () => {
     if (emailError.value) emailError.value = ''
-    if (error.value) clearError()
+    if (loginError.value) clearError()
 })
 
 watch(() => loginForm.password, () => {
     if (passwordError.value) passwordError.value = ''
-    if (error.value) clearError()
+    if (loginError.value) clearError()
 })
 </script>

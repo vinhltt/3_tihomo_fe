@@ -1,6 +1,11 @@
 import { logger } from '~/utils/logger'
 import { ref, computed } from 'vue'
 import type { SocialLoginRequest, SocialLoginResponse } from '@/types/auth'
+import type { ApiError } from '@/types/api'
+
+// A frontend message carries messageKey so the page can translate it; the English message stays for logs.
+const googleError = (messageKey: string, message: string): Error & Pick<ApiError, 'messageKey' | 'messageParams'> =>
+  Object.assign(new Error(message), { messageKey, messageParams: { provider: 'Google' } })
 
 /**
  * Google Authentication composable for handling Google Sign-In (EN)
@@ -9,7 +14,8 @@ import type { SocialLoginRequest, SocialLoginResponse } from '@/types/auth'
 export const useGoogleAuth = () => {
   const config = useRuntimeConfig()
   const isLoading = ref(false)
-  const error = ref<string | null>(null)
+  // Display error shape: a frontend message carries messageKey, a backend message is kept verbatim.
+  const error = ref<Pick<ApiError, 'messageKey' | 'messageParams' | 'message'> | null>(null)
   
   // Check if Google client ID is configured
   const isConfigured = computed(() => {
@@ -24,7 +30,7 @@ export const useGoogleAuth = () => {
   const initializeGoogle = (): Promise<void> => {
     return new Promise((resolve, reject) => {
       if (!isConfigured.value) {
-        reject(new Error('Google Client ID not configured'))
+        reject(googleError('auth.errors.providerNotConfigured', 'Google Client ID not configured'))
         return
       }
 
@@ -50,7 +56,7 @@ export const useGoogleAuth = () => {
         resolve()
       }
       script.onerror = () => {
-        reject(new Error('Failed to load Google SDK'))
+        reject(googleError('auth.errors.sdkLoadFailed', 'Failed to load Google SDK'))
       }
       document.head.appendChild(script)
     })
@@ -66,7 +72,7 @@ export const useGoogleAuth = () => {
         error.value = null
 
         if (!isConfigured.value) {
-          throw new Error('Google authentication not configured')
+          throw googleError('auth.errors.providerNotConfigured', 'Google authentication not configured')
         }
 
         await initializeGoogle()
@@ -87,7 +93,7 @@ export const useGoogleAuth = () => {
                 // This is the Google ID token (JWT format) that backend expects
                 resolve(response.credential)
               } else {
-                reject(new Error('No credential received from Google'))
+                reject(googleError('auth.errors.noCredential', 'No credential received from Google'))
               }
             }
           })
@@ -123,11 +129,13 @@ export const useGoogleAuth = () => {
             }
           })
         } else {
-          throw new Error('Google SDK not loaded')
+          throw googleError('auth.errors.sdkNotLoaded', 'Google SDK not loaded')
         }
 
       } catch (err: any) {
-        error.value = err.message || 'Google sign-in failed'
+        error.value = err?.messageKey
+          ? { messageKey: err.messageKey, messageParams: err.messageParams, message: err.message }
+          : { messageKey: 'auth.errors.providerFailed', messageParams: { provider: 'Google' }, message: err?.message || 'Google sign-in failed' }
         reject(err)
       } finally {
         isLoading.value = false
@@ -170,7 +178,7 @@ export const useGoogleAuth = () => {
       let response: SocialLoginResponse
       
       if (!rawResponse) {
-        throw new Error('Empty response from API')
+        throw googleError('auth.errors.emptyResponse', 'Empty response from API')
       }
 
       // Check if response is wrapped in { data: ... } structure
@@ -185,7 +193,7 @@ export const useGoogleAuth = () => {
 
       // Validate required fields
       if (!response.accessToken) {
-        throw new Error('Access token missing from API response')
+        throw googleError('auth.errors.missingAccessToken', 'Access token missing from API response')
       }
 
       logger.dev('✅ API Authentication successful - Full response:', {
@@ -224,7 +232,9 @@ export const useGoogleAuth = () => {
       
       return authResponse
     } catch (err: any) {
-      error.value = err.message || 'Google authentication failed'
+      error.value = err?.messageKey
+        ? { messageKey: err.messageKey, messageParams: err.messageParams, message: err.message }
+        : { messageKey: 'auth.errors.providerFailed', messageParams: { provider: 'Google' }, message: err?.message || 'Google authentication failed' }
       throw err
     } finally {
       isLoading.value = false

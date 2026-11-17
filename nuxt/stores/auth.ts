@@ -1,13 +1,15 @@
 import { logger } from '~/utils/logger'
 import { defineStore } from 'pinia'
 import type { LoginRequest, LoginResponse, User, ApiResponse } from '@/types/auth'
+import type { ApiError } from '@/types/api'
 
 type AuthState = {
   user: User | null
   token: string | null
   refreshToken: string | null
   isLoading: boolean
-  error: string | null
+  // Display error shape: a frontend message carries messageKey, a backend message is kept verbatim.
+  error: Pick<ApiError, 'messageKey' | 'messageParams' | 'message'> | null
   isAuthenticated: boolean
 }
 
@@ -89,7 +91,7 @@ export const useAuthStore = defineStore('auth', {
         }
       } catch (error: any) {
         logger.error('Auth initialization error:', error)
-        this.error = 'Failed to initialize authentication'
+        this.error = { messageKey: 'auth.errors.initFailed', message: 'Failed to initialize authentication' }
         // Set clean state on error
         this.isAuthenticated = false
         this.token = null
@@ -140,10 +142,12 @@ export const useAuthStore = defineStore('auth', {
           return true
         }
 
-        this.error = 'Login failed'
+        this.error = { messageKey: 'auth.errors.loginFailed', message: 'Login failed' }
         return false
       } catch (error: any) {
-        this.error = error.data?.message || 'Login failed. Please try again.'
+        this.error = error.data?.message
+          ? { message: error.data.message }
+          : { messageKey: 'auth.errors.loginFailed', message: 'Login failed. Please try again.' }
         return false
       } finally {
         this.isLoading = false
@@ -252,11 +256,11 @@ export const useAuthStore = defineStore('auth', {
       try {
         // Validate response has required data
         if (!socialResponse) {
-          throw new Error('Social login response is empty')
+          throw Object.assign(new Error('Social login response is empty'), { messageKey: 'auth.errors.emptyResponse' })
         }
 
         if (!socialResponse.accessToken) {
-          throw new Error('Access token is missing from social login response')
+          throw Object.assign(new Error('Access token is missing from social login response'), { messageKey: 'auth.errors.missingAccessToken' })
         }
 
         // Store tokens first
@@ -324,7 +328,9 @@ export const useAuthStore = defineStore('auth', {
 
         return true
       } catch (error: any) {
-        this.error = error.message || 'Social login failed'
+        this.error = error?.messageKey
+          ? { messageKey: error.messageKey, message: error.message }
+          : { messageKey: 'auth.errors.socialLoginFailed', message: error?.message || 'Social login failed' }
         logger.error('❌ Social login storage error:', error)
         return false
       } finally {
