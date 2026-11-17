@@ -194,7 +194,7 @@ export const useRecurringTransactions = () => {
     const getTemplatesByAccount = async (accountId: string) => {
         try {
             const response = await $api.get<RecurringTransactionTemplateViewModel[]>(
-                `/api/RecurringTransactionTemplate/account/${accountId}`
+                `/api/core-finance/RecurringTransactionTemplate/account/${accountId}`
             )
             return response || []
         } catch (error) {
@@ -248,7 +248,7 @@ export const useRecurringTransactions = () => {
     // Delete template
     const deleteTemplate = async (id: string) => {
         try {
-            await $api.delete(`/api/RecurringTransactionTemplate/${id}`)
+            await $api.delete(`/api/core-finance/RecurringTransactionTemplate/${id}`)
             return true
         } catch (error) {
             logger.error('Error deleting recurring transaction template:', error)
@@ -259,9 +259,10 @@ export const useRecurringTransactions = () => {
     // Toggle active status
     const toggleActiveStatus = async (templateId: string, isActive: boolean) => {
         try {
+            // ofetch skips JSON serialization for a falsy body, so send the JSON literal explicitly
             const response = await $api.patch<{ success: boolean, message: string }>(
-                `/api/RecurringTransactionTemplate/${templateId}/toggle-active`,
-                isActive
+                `/api/core-finance/RecurringTransactionTemplate/${templateId}/toggle-active`,
+                JSON.stringify(isActive)
             )
             return response.success
         } catch (error) {
@@ -274,7 +275,7 @@ export const useRecurringTransactions = () => {
     const calculateNextExecutionDate = async (templateId: string) => {
         try {
             const response = await $api.get<{ nextExecutionDate: string }>(
-                `/api/RecurringTransactionTemplate/${templateId}/next-execution-date`
+                `/api/core-finance/RecurringTransactionTemplate/${templateId}/next-execution-date`
             )
             return response.nextExecutionDate
         } catch (error) {
@@ -287,7 +288,7 @@ export const useRecurringTransactions = () => {
     const generateExpectedTransactions = async (templateId: string, daysInAdvance: number = 30) => {
         try {
             const response = await $api.post<{ success: boolean, message: string}>(
-                `/api/RecurringTransactionTemplate/${templateId}/generate-expected-transactions?daysInAdvance=${daysInAdvance}`
+                `/api/core-finance/RecurringTransactionTemplate/${templateId}/generate-expected-transactions?daysInAdvance=${daysInAdvance}`
             )
             return response.success
         } catch (error) {
@@ -300,7 +301,7 @@ export const useRecurringTransactions = () => {
     const generateAllExpectedTransactions = async () => {
         try {
             const response = await $api.post<{ success: boolean, message: string}>(
-                '/api/RecurringTransactionTemplate/generate-all-expected-transactions'
+                '/api/core-finance/RecurringTransactionTemplate/generate-all-expected-transactions'
             )
             return response.success
         } catch (error) {

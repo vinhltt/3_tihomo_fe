@@ -12,7 +12,7 @@ export const useApi = () => {
   const apiCall = async <T>(
     endpoint: string,
     options: {
-      method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
+      method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
       body?: any
       query?: Record<string, any>
       isFormData?: boolean
@@ -180,6 +180,13 @@ export const useApi = () => {
   }
 
   /**
+   * PATCH request
+   */
+  const patch = <T>(endpoint: string, body?: any): Promise<T> => {
+    return apiCall<T>(endpoint, { method: 'PATCH', body })
+  }
+
+  /**
    * PUT request with form data
    */
   const putForm = <T>(endpoint: string, body?: any): Promise<T> => {
@@ -199,6 +206,7 @@ export const useApi = () => {
     post,
     postForm,
     put,
+    patch,
     putForm,
     delete: del
   }

@@ -927,7 +927,9 @@
             "loadFailed": "Failed to load recurring transaction templates",
             "createFailed": "Failed to create recurring transaction template",
             "updateFailed": "Failed to update recurring transaction template",
-            "saveFailed": "Unable to save the recurring transaction template. Please try again."
+            "saveFailed": "Unable to save the recurring transaction template. Please try again.",
+            "deleteFailed": "Failed to delete recurring transaction template",
+            "toggleFailed": "Failed to change recurring transaction template status"
         }
     },
     "expected": {

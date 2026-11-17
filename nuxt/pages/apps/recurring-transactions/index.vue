@@ -310,6 +310,8 @@ const toggleTemplateStatus = async (template: RecurringTransactionTemplateViewMo
     const success = await toggleActiveStatus(template.id, !template.isActive)
     if (success) {
         await getTemplates()
+    } else {
+        showErrorMessage(t('recurring.errors.toggleFailed'))
     }
 }
 
@@ -328,8 +330,19 @@ const deleteTemplate = async (template: RecurringTransactionTemplateViewModel) =
         const success = await deleteTemplateApi(template.id)
         if (success) {
             await getTemplates()
+        } else {
+            showErrorMessage(t('recurring.errors.deleteFailed'))
         }
     }
+}
+
+const showErrorMessage = (message: string) => {
+    Swal.fire({
+        icon: 'error',
+        title: t('common.error'),
+        text: message,
+        confirmButtonText: t('common.ok')
+    })
 }
 
 const closeModal = () => {

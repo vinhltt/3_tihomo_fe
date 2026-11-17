@@ -927,7 +927,9 @@
             "loadFailed": "Lỗi khi tải danh sách mẫu giao dịch định kỳ",
             "createFailed": "Lỗi khi tạo mẫu giao dịch định kỳ",
             "updateFailed": "Lỗi khi cập nhật mẫu giao dịch định kỳ",
-            "saveFailed": "Không thể lưu mẫu giao dịch định kỳ. Vui lòng thử lại."
+            "saveFailed": "Không thể lưu mẫu giao dịch định kỳ. Vui lòng thử lại.",
+            "deleteFailed": "Lỗi khi xóa mẫu giao dịch định kỳ",
+            "toggleFailed": "Lỗi khi đổi trạng thái mẫu giao dịch định kỳ"
         }
     },
     "expected": {
