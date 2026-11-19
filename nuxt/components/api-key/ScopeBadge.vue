@@ -32,65 +32,72 @@ const props = withDefaults(defineProps<Props>(), {
   variant: 'solid'
 })
 
-// Scope mappings
+const { t } = useI18n()
+
+// Scope mappings; label and description are translation keys
 const scopeConfig = {
   [ApiKeyScope.Read]: {
-    label: 'Read',
+    labelKey: 'apiKey.scope.read',
     color: 'blue',
     icon: 'IconEye',
-    description: 'View data only'
+    descriptionKey: 'apiKey.scopeDescription.read'
   },
   [ApiKeyScope.Write]: {
-    label: 'Write',
+    labelKey: 'apiKey.scope.write',
     color: 'green',
     icon: 'IconEdit',
-    description: 'Create and modify data'
+    descriptionKey: 'apiKey.scopeDescription.write'
   },
   [ApiKeyScope.Delete]: {
-    label: 'Delete',
+    labelKey: 'apiKey.scope.delete',
     color: 'red',
     icon: 'IconTrash',
-    description: 'Delete data'
+    descriptionKey: 'apiKey.scopeDescription.delete'
   },
   [ApiKeyScope.Admin]: {
-    label: 'Admin',
+    labelKey: 'apiKey.scope.admin',
     color: 'purple',
     icon: 'IconCrown',
-    description: 'Full administrative access'
+    descriptionKey: 'apiKey.scopeDescription.admin'
   },
   [ApiKeyScope.TransactionsRead]: {
-    label: 'Txn Read',
+    labelKey: 'apiKey.scope.transactionsRead',
     color: 'cyan',
     icon: 'IconCreditCard',
-    description: 'View transaction data'
+    descriptionKey: 'apiKey.scopeDescription.transactionsRead'
   },
   [ApiKeyScope.TransactionsWrite]: {
-    label: 'Txn Write',
+    labelKey: 'apiKey.scope.transactionsWrite',
     color: 'teal',
     icon: 'IconCreditCard',
-    description: 'Create and modify transactions'
+    descriptionKey: 'apiKey.scopeDescription.transactionsWrite'
   },
   [ApiKeyScope.AccountsRead]: {
-    label: 'Acc Read',
+    labelKey: 'apiKey.scope.accountsRead',
     color: 'indigo',
     icon: 'IconBank',
-    description: 'View account data'
+    descriptionKey: 'apiKey.scopeDescription.accountsRead'
   },
   [ApiKeyScope.AccountsWrite]: {
-    label: 'Acc Write',
+    labelKey: 'apiKey.scope.accountsWrite',
     color: 'violet',
     icon: 'IconBank',
-    description: 'Create and modify accounts'
+    descriptionKey: 'apiKey.scopeDescription.accountsWrite'
   }
 }
 
 // Computed properties
 const scopeInfo = computed(() => {
-  return scopeConfig[props.scope as ApiKeyScope] || {
-    label: props.scope,
+  const config = scopeConfig[props.scope as ApiKeyScope]
+  if (config) {
+    return { label: t(config.labelKey), color: config.color, icon: config.icon, description: t(config.descriptionKey) }
+  }
+  // A scope missing from the map is shown verbatim, as the backend sent it.
+  return {
+    label: String(props.scope ?? ''),
     color: 'gray',
     icon: 'IconKey',
-    description: 'Custom scope'
+    description: t('apiKey.scopeDescription.custom')
   }
 })
 

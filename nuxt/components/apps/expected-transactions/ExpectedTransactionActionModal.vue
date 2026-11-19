@@ -11,38 +11,38 @@
         >
             <div class="flex items-center justify-between gap-4 border-b border-gray-200 p-5 dark:border-gray-700">
                 <h2 class="text-lg font-semibold">{{ title }}</h2>
-                <button type="button" class="btn btn-sm btn-outline-secondary" @click="closeModal">{{ saving ? 'Đóng (không hủy yêu cầu)' : 'Đóng' }}</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" @click="closeModal">{{ saving ? t('expected.modal.closeWhileSaving') : t('common.close') }}</button>
             </div>
 
             <form v-if="currentTransaction" class="space-y-5 p-5" @submit.prevent="submitAction">
                 <ExpectedTransactionSummary :transaction="currentTransaction" />
 
                 <div v-if="saveError" role="alert" class="rounded-lg border border-danger/20 bg-danger/10 p-3 text-danger">
-                    <p>Không thể hoàn tất thao tác: {{ saveError }}</p>
+                    <p>{{ t('expected.modal.saveFailed', { error: errorText(saveError) }) }}</p>
                     <ul v-if="validationErrors.length" class="mt-2 list-disc pl-5">
                         <li v-for="(message, index) in validationErrors" :key="index">{{ message }}</li>
                     </ul>
-                    <p v-if="mode === 'payment'" class="mt-2 text-sm">Không tự động gửi lại yêu cầu thanh toán. Nếu chưa rõ kết quả, hãy đóng hộp thoại và tải lại danh sách trước khi thao tác lại.</p>
+                    <p v-if="mode === 'payment'" class="mt-2 text-sm">{{ t('expected.modal.paymentNoAutoRetry') }}</p>
                 </div>
                 <div v-if="paymentOutcomeUnknown" class="rounded-lg border border-warning/30 bg-warning/10 p-3 text-sm text-warning">
-                    <p>Chưa rõ yêu cầu thanh toán đã được lưu hay chưa. Ghi nhận bị khóa cho lần mở hộp thoại này để tránh tạo giao dịch thực trùng lặp.</p>
-                    <p class="mt-1">Hãy đóng hộp thoại và tải lại danh sách trước khi thao tác lại. Tải lại trạng thái kỳ chỉ để kiểm tra kết quả, không mở khóa thao tác.</p>
-                    <button v-if="!canonicalError" type="button" class="btn btn-sm btn-outline-primary mt-2" :disabled="canonicalLoading" @click="reloadCanonical">Tải lại trạng thái kỳ</button>
+                    <p>{{ t('expected.modal.paymentUnknown') }}</p>
+                    <p class="mt-1">{{ t('expected.modal.paymentUnknownHint') }}</p>
+                    <button v-if="!canonicalError" type="button" class="btn btn-sm btn-outline-primary mt-2" :disabled="canonicalLoading" @click="reloadCanonical">{{ t('expected.modal.reloadState') }}</button>
                 </div>
                 <div v-if="conflictBlocked || canonicalReadComplete" class="rounded-lg border border-warning/30 bg-warning/10 p-3 text-sm text-warning">
                     <p v-if="canonicalLoading" role="status">
-                        {{ paymentOutcomeUnknown ? 'Đang tải lại trạng thái mới nhất của kỳ; thao tác vẫn bị khóa.' : 'Kỳ đã thay đổi. Đang tải lại trạng thái mới nhất; chưa thể gửi lại thao tác.' }}
+                        {{ paymentOutcomeUnknown ? t('expected.modal.reloadingLocked') : t('expected.modal.reloadingChanged') }}
                     </p>
                     <template v-else-if="canonicalError">
-                        <p role="alert">Không thể tải lại trạng thái mới nhất: {{ canonicalError }}</p>
-                        <p class="mt-1">Thao tác vẫn bị khóa. Nội dung đã nhập và lỗi ban đầu được giữ nguyên.</p>
-                        <button type="button" class="btn btn-sm btn-outline-primary mt-2" @click="reloadCanonical">Thử tải lại trạng thái kỳ</button>
+                        <p role="alert">{{ t('expected.modal.reloadFailed', { error: errorText(canonicalError) }) }}</p>
+                        <p class="mt-1">{{ t('expected.modal.stillLocked') }}</p>
+                        <button type="button" class="btn btn-sm btn-outline-primary mt-2" @click="reloadCanonical">{{ t('expected.modal.retryReloadState') }}</button>
                     </template>
-                    <p v-else-if="canonicalReadComplete">Đã tải lại trạng thái mới nhất. Hãy kiểm tra lại thông tin kỳ; nội dung đã nhập được giữ nguyên. Không tự động gửi lại thao tác.</p>
-                    <p v-else>Kỳ đã thay đổi. Cần tải lại trạng thái mới nhất trước khi thao tác.</p>
+                    <p v-else-if="canonicalReadComplete">{{ t('expected.modal.reloaded') }}</p>
+                    <p v-else>{{ t('expected.modal.changed') }}</p>
                 </div>
                 <p v-if="!actionAllowed" role="alert" class="rounded-lg bg-warning/10 p-3 text-warning">
-                    Kỳ không còn cho phép thao tác này. Kỳ đã xử lý không thể thay đổi; chuyển khoản chỉ được liên kết giao dịch có sẵn hoặc hủy kỳ.
+                    {{ t('expected.modal.notAllowed') }}
                 </p>
 
                 <ExpectedTransactionPaymentFields
@@ -69,28 +69,27 @@
 
                 <template v-else-if="mode === 'adjust'">
                     <div>
-                        <label for="expected-new-amount" class="mb-1 block text-sm font-medium">Số tiền mới *</label>
+                        <label for="expected-new-amount" class="mb-1 block text-sm font-medium">{{ t('expected.modal.newAmount') }} *</label>
                         <input id="expected-new-amount" v-model="newAmount" type="number" min="0" step="any" class="form-input" :disabled="saving || conflictBlocked" required />
-                        <p class="mt-1 text-sm text-gray-500">Số tiền phải lớn hơn 0. Các lần chỉnh tiếp theo vẫn giữ số tiền gốc trước lần chỉnh đầu tiên.</p>
+                        <p class="mt-1 text-sm text-gray-500">{{ t('expected.modal.newAmountHint') }}</p>
                     </div>
                 </template>
 
                 <div v-if="mode === 'cancel' || mode === 'adjust'">
-                    <label for="expected-action-reason" class="mb-1 block text-sm font-medium">{{ mode === 'cancel' ? 'Lý do hủy kỳ *' : 'Lý do điều chỉnh *' }}</label>
+                    <label for="expected-action-reason" class="mb-1 block text-sm font-medium">{{ mode === 'cancel' ? t('expected.modal.cancelReason') : t('expected.modal.adjustReason') }} *</label>
                     <textarea id="expected-action-reason" v-model="reason" rows="3" class="form-textarea" :disabled="saving || conflictBlocked" required></textarea>
-                    <p class="mt-1 text-sm text-gray-500">Lý do là bắt buộc và sẽ được lưu cùng kỳ.</p>
+                    <p class="mt-1 text-sm text-gray-500">{{ t('expected.modal.reasonHint') }}</p>
                 </div>
-                <p v-if="mode === 'cancel'" class="text-sm text-gray-500">Hủy kỳ không tạo giao dịch thực. Kỳ đã hủy không thể ghi nhận hoặc chỉnh sửa tiếp.</p>
+                <p v-if="mode === 'cancel'" class="text-sm text-gray-500">{{ t('expected.modal.cancelHint') }}</p>
                 <p v-if="saving" role="status" class="rounded-lg bg-warning/10 p-3 text-sm text-warning">
-                    Đang gửi yêu cầu. Đóng hộp thoại không hủy yêu cầu và không có nghĩa là thao tác đã được hoàn tác.
-                    Nếu đóng lúc này, hãy tải lại danh sách để biết kết quả trước khi thao tác lại.
+                    {{ t('expected.modal.savingNotice') }}
                 </p>
                 <div class="flex justify-end gap-3 border-t border-gray-200 pt-4 dark:border-gray-700">
-                    <button type="button" class="btn btn-outline-secondary" @click="closeModal">{{ saving ? 'Đóng (không hủy yêu cầu)' : 'Đóng' }}</button>
-                    <button type="submit" class="btn" :class="mode === 'cancel' ? 'btn-danger' : 'btn-primary'" :disabled="!canSubmit">{{ saving ? 'Đang xử lý...' : title }}</button>
+                    <button type="button" class="btn btn-outline-secondary" @click="closeModal">{{ saving ? t('expected.modal.closeWhileSaving') : t('common.close') }}</button>
+                    <button type="submit" class="btn" :class="mode === 'cancel' ? 'btn-danger' : 'btn-primary'" :disabled="!canSubmit">{{ saving ? t('transactions.form.processing') : title }}</button>
                 </div>
             </form>
-            <div v-else class="p-5 text-gray-500">Phiên đăng nhập đã thay đổi. Vui lòng đóng hộp thoại và tải lại danh sách.</div>
+            <div v-else class="p-5 text-gray-500">{{ t('expected.modal.sessionChanged') }}</div>
         </section>
     </div>
 </template>
@@ -126,13 +125,13 @@ const newAmount = ref<number | string>(props.transaction.expectedAmount)
 const reason = ref('')
 const saving = ref(false)
 const committed = ref(false)
-const saveError = ref<string | null>(null)
+const saveError = ref<Pick<ApiError, 'messageKey' | 'messageParams' | 'message'> | null>(null)
 const validationErrors = ref<string[]>([])
 const conflictBlocked = ref(false)
 // Sticky for this mount: a network/5xx payment may still have committed, so a canonical read never unlocks it.
 const paymentOutcomeUnknown = ref(false)
 const canonicalLoading = ref(false)
-const canonicalError = ref<string | null>(null)
+const canonicalError = ref<Pick<ApiError, 'messageKey' | 'messageParams' | 'message'> | null>(null)
 const canonicalReadComplete = ref(false)
 const accountReadLoading = ref(props.mode === 'payment')
 const selectedActual = ref<TransactionViewModel | null>(null)
@@ -154,14 +153,19 @@ let accountController: AbortController | null = null
 let canonicalController: AbortController | null = null
 let previousFocus: HTMLElement | null = null
 
+const { t } = useI18n()
+
+// A frontend message carries messageKey; a backend message is shown verbatim.
+const errorText = (error: Pick<ApiError, 'messageKey' | 'messageParams' | 'message'> | null): string =>
+    error?.messageKey ? t(error.messageKey, error.messageParams ?? {}) : error?.message || t('common.errors.unknown')
 const isCurrentSession = (): boolean => mounted.value && !disposed && !closed &&
     !!sessionToken && auth.isAuthenticated && auth.token === sessionToken
 const title = computed(() => {
     switch (props.mode) {
-        case 'payment': return 'Ghi nhận thanh toán'
-        case 'link': return 'Liên kết giao dịch có sẵn'
-        case 'cancel': return 'Hủy kỳ'
-        case 'adjust': return 'Chỉnh số tiền'
+        case 'payment': return t('expected.actions.payment')
+        case 'link': return t('expected.actions.link')
+        case 'cancel': return t('expected.actions.cancel')
+        case 'adjust': return t('expected.actions.adjust')
     }
 })
 const accountsLoading = computed(() => accountReadLoading.value || helperAccountsLoading.value)
@@ -242,7 +246,7 @@ const reloadCanonical = async (): Promise<void> => {
         conflictBlocked.value = false
         emit('canonical', transaction)
     } catch (error) {
-        if (isCurrent()) canonicalError.value = errorMessage(error, 'Vui lòng thử tải lại trạng thái kỳ.')
+        if (isCurrent()) canonicalError.value = errorMessage(error, 'expected.errors.retryState')
     } finally {
         if (isCurrent()) {
             canonicalLoading.value = false
@@ -287,7 +291,7 @@ const submitAction = async (): Promise<void> => {
     } catch (error) {
         if (!isCurrent()) return
         const apiError = error as Partial<ApiError> | null
-        saveError.value = errorMessage(error, 'Vui lòng kiểm tra thông tin và thử lại.')
+        saveError.value = errorMessage(error, 'expected.errors.checkAndRetry')
         validationErrors.value = Object.values(apiError?.errors || {}).flat()
         if (apiError?.statusCode === 409) {
             conflictBlocked.value = true

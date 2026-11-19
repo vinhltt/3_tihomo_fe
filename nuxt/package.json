@@ -15,7 +15,8 @@
         "test:watch": "vitest watch",
         "migrate:logger": "node scripts/migrate-console-to-logger.cjs",
         "migrate:logger:dry-run": "node scripts/migrate-console-to-logger.cjs --dry-run",
-        "verify:production": "node scripts/verify-production-build.cjs"
+        "verify:production": "node scripts/verify-production-build.cjs",
+        "i18n:check": "node scripts/check-i18n-keys.mjs"
     },
 
     "devDependencies": {

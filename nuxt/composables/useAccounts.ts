@@ -8,6 +8,7 @@ import type {
   FilterBodyRequest,
   ApiResponse 
 } from '~/types'
+import { formatDate as formatDisplayDate, formatMoney } from '~/utils/display-format'
 import { useApi } from './useApi'
 
 export const useAccounts = () => {
@@ -44,17 +45,19 @@ export const useAccounts = () => {
   }
 
   /**
-   * Format account type for display
+   * Gets the i18n key of an account type label; undefined for an empty or unknown type. (EN)
+   *
+   * Lấy key i18n của nhãn loại tài khoản; undefined khi loại rỗng hoặc không xác định. (VI)
    */
-  const formatAccountType = (type: AccountType): string => {
-    const typeMap: Record<AccountType, string> = {
-      Bank: 'Bank Account',
-      Wallet: 'Digital Wallet',
-      CreditCard: 'Credit Card', 
-      DebitCard: 'Debit Card',
-      Cash: 'Cash'
+  const getAccountTypeLabelKey = (type?: AccountType | null): string | undefined => {
+    const keyMap: Record<AccountType, string> = {
+      Bank: 'enums.accountType.bank',
+      Wallet: 'enums.accountType.wallet',
+      CreditCard: 'enums.accountType.creditCard',
+      DebitCard: 'enums.accountType.debitCard',
+      Cash: 'enums.accountType.cash'
     }
-    return typeMap[type] || type
+    return type ? keyMap[type] : undefined
   }
 
   /**
@@ -80,22 +83,11 @@ export const useAccounts = () => {
   }
 
   /**
-   * Format currency amount
+   * Formats an amount as a plain number, without currency symbol or code. (EN)
+   *
+   * Định dạng số tiền thành số thuần, không kèm ký hiệu hay mã tiền tệ. (VI)
    */
-  const formatCurrency = (amount: number, currency = 'USD'): string => {
-    try {
-      const formatter = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency,
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2
-      })
-      return formatter.format(amount)
-    } catch {
-      // Fallback if currency is not supported
-      return `${currency} ${amount.toLocaleString()}`
-    }
-  }
+  const formatCurrency = (amount: number | null | undefined): string => formatMoney(amount)
 
   /**
    * Get balance text color class
@@ -107,74 +99,53 @@ export const useAccounts = () => {
   }
 
   /**
-   * Get currency symbol
+   * Formats a date for display as yyyy/MM/dd. (EN)
+   *
+   * Định dạng ngày để hiển thị dạng yyyy/MM/dd. (VI)
    */
-  const getCurrencySymbol = (currency: string): string => {
-    const symbols: Record<string, string> = {
-      VND: '₫',
-      USD: '$',
-      EUR: '€',
-      JPY: '¥',
-      GBP: '£'
-    }
-    return symbols[currency] || currency
-  }
+  const formatDate = (dateString?: string): string => formatDisplayDate(dateString)
 
   /**
-   * Format date for display
-   */
-  const formatDate = (dateString?: string): string => {
-    if (!dateString) return '-'
-    try {
-      return new Date(dateString).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-      })
-    } catch {
-      return '-'
-    }
-  }
-
-  /**
-   * Validate account form data
+   * Validates account form data; each error is an i18n key that the component translates. (EN)
+   *
+   * Kiểm tra dữ liệu form tài khoản; mỗi lỗi là một key i18n để component dịch. (VI)
    */
   const validateAccountForm = (data: Partial<AccountCreateRequest | AccountUpdateRequest>): Record<string, string> => {
     const errors: Record<string, string> = {}
 
     // Name validation
     if (!data.name?.trim()) {
-      errors.name = 'Account name is required'
+      errors.name = 'accounts.validation.nameRequired'
     } else if (data.name.length < 2) {
-      errors.name = 'Account name must be at least 2 characters'
+      errors.name = 'accounts.validation.nameMinLength'
     }
 
     // Type validation  
     if (!data.type) {
-      errors.type = 'Account type is required'
+      errors.type = 'accounts.validation.typeRequired'
     }
 
     // Currency validation
     if (!data.currency) {
-      errors.currency = 'Currency is required'
+      errors.currency = 'accounts.validation.currencyRequired'
     }
 
     // Card number validation for card types
     if (['CreditCard', 'DebitCard'].includes(data.type as string) && data.cardNumber) {
       const cardNumberClean = data.cardNumber.replace(/\s/g, '')
       if (cardNumberClean.length < 13 || cardNumberClean.length > 19) {
-        errors.cardNumber = 'Card number must be between 13-19 digits'
+        errors.cardNumber = 'accounts.validation.cardNumberLength'
       }
     }
 
     // Initial balance validation (for create requests)
     if ('initialBalance' in data && typeof data.initialBalance === 'number' && data.initialBalance < 0) {
-      errors.initialBalance = 'Initial balance cannot be negative'
+      errors.initialBalance = 'accounts.validation.initialBalanceNegative'
     }
 
     // Available limit validation
     if (data.availableLimit !== undefined && data.availableLimit < 0) {
-      errors.availableLimit = 'Available limit cannot be negative'
+      errors.availableLimit = 'accounts.validation.availableLimitNegative'
     }
 
     return errors
@@ -189,12 +160,11 @@ export const useAccounts = () => {
     deleteAccount,
     
     // Utility methods
-    formatAccountType,
+    getAccountTypeLabelKey,
     getAccountTypeBadgeClass,
     maskCardNumber,
     formatCurrency,
     getBalanceClass,
-    getCurrencySymbol,
     formatDate,
     validateAccountForm
   }

@@ -6,15 +6,15 @@
         <div class="flex items-center space-x-3 mb-2">
           <button
             @click="$router.back()"
-            class="btn btn-outline-secondary btn-sm"
+            class="btn btn-outline-secondary btn-sm whitespace-nowrap"
           >
             <icon-arrow-left class="h-4 w-4 mr-2" />
-            Back
+            {{ $t('common.back') }}
           </button>
-          <h5 class="font-semibold text-lg dark:text-white-light">API Key Usage Analytics</h5>
+          <h5 class="font-semibold text-lg dark:text-white-light">{{ $t('apiKey.usagePage.title') }}</h5>
         </div>
         <p class="text-sm text-gray-500 dark:text-gray-400">
-          Detailed usage statistics for: <span class="font-medium text-primary">{{ apiKey?.name || keyId }}</span>
+          {{ $t('apiKey.usagePage.subtitle') }} <span class="font-medium text-primary">{{ apiKey?.name || keyId }}</span>
         </p>
       </div>
 
@@ -26,20 +26,20 @@
     <div v-if="loading" class="flex items-center justify-center py-20">
       <div class="text-center">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-        <p class="text-gray-500">Loading usage analytics...</p>
+        <p class="text-gray-500">{{ $t('apiKey.usagePage.loading') }}</p>
       </div>
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="panel !p-8 text-center">
+    <div v-else-if="loadError" class="panel !p-8 text-center">
       <div class="w-16 h-16 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center mx-auto mb-4">
         <icon-exclamation-triangle class="h-8 w-8 text-red-600" />
       </div>
-      <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">Failed to load analytics</h3>
-      <p class="text-gray-500 mb-4">{{ error }}</p>
+      <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">{{ $t('apiKey.detail.loadFailedTitle') }}</h3>
+      <p class="text-gray-500 mb-4">{{ errorText }}</p>
       <button @click="refreshData" class="btn btn-primary">
         <icon-arrow-path class="h-4 w-4 mr-2" />
-        Retry
+        {{ $t('common.retry') }}
       </button>
     </div>
 
@@ -53,9 +53,9 @@
               <icon-chart-bar class="h-8 w-8 text-primary" />
             </div>
             <div>
-              <p class="text-sm text-gray-500 dark:text-gray-400">Total Requests</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">{{ $t('apiKey.usagePage.totalRequests') }}</p>
               <p class="text-xl font-semibold text-gray-900 dark:text-white">
-                {{ usageStats?.totalRequests?.toLocaleString() || '0' }}
+                {{ formatNumber(usageStats?.totalRequests ?? 0) }}
               </p>
             </div>
           </div>
@@ -67,9 +67,9 @@
               <icon-clock class="h-8 w-8 text-success" />
             </div>
             <div>
-              <p class="text-sm text-gray-500 dark:text-gray-400">Today's Requests</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">{{ $t('apiKey.usagePage.todayRequests') }}</p>
               <p class="text-xl font-semibold text-success">
-                {{ usageStats?.todayRequests?.toLocaleString() || '0' }}
+                {{ formatNumber(usageStats?.todayRequests ?? 0) }}
               </p>
             </div>
           </div>
@@ -81,9 +81,9 @@
               <icon-signal class="h-8 w-8 text-info" />
             </div>
             <div>
-              <p class="text-sm text-gray-500 dark:text-gray-400">Success Rate</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">{{ $t('apiKey.usagePage.successRate') }}</p>
               <p class="text-xl font-semibold text-info">
-                {{ usageStats?.successRate?.toFixed(1) || '0' }}%
+                {{ formatNumber(usageStats?.successRate ?? 0) }}%
               </p>
             </div>
           </div>
@@ -95,9 +95,9 @@
               <icon-bolt class="h-8 w-8 text-warning" />
             </div>
             <div>
-              <p class="text-sm text-gray-500 dark:text-gray-400">Avg Response Time</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">{{ $t('apiKey.usagePage.avgResponseTime') }}</p>
               <p class="text-xl font-semibold text-warning">
-                {{ usageStats?.avgResponseTime || '0' }}ms
+                {{ formatNumber(usageStats?.avgResponseTime ?? 0) }}ms
               </p>
             </div>
           </div>
@@ -107,9 +107,9 @@
       <!-- Time Range Selector -->
       <div class="panel !p-4">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <h6 class="font-medium text-gray-900 dark:text-white">Usage Analytics</h6>
+          <h6 class="font-medium text-gray-900 dark:text-white">{{ $t('apiKey.usagePage.usageAnalytics') }}</h6>
           
-          <div class="flex items-center space-x-3">
+          <div class="flex flex-wrap items-center gap-3">
             <!-- Time Range Buttons -->
             <div class="btn-group">
               <button
@@ -117,11 +117,11 @@
                 :key="range.value"
                 @click="selectedTimeRange = range.value"
                 :class="[
-                  'btn btn-sm',
+                  'btn btn-sm whitespace-nowrap',
                   selectedTimeRange === range.value ? 'btn-primary' : 'btn-outline-primary'
                 ]"
               >
-                {{ range.label }}
+                {{ $t(range.labelKey) }}
               </button>
             </div>
             
@@ -142,19 +142,20 @@
         <!-- Requests Over Time Chart -->
         <div class="panel">
           <div class="mb-5 flex items-center justify-between">
-            <h5 class="text-lg font-semibold dark:text-white-light">Requests Over Time</h5>
+            <h5 class="text-lg font-semibold dark:text-white-light">{{ $t('apiKey.usagePage.requestsOverTime') }}</h5>
           </div>
           
           <client-only>
             <apexchart
               v-if="requestsChartData"
+              :key="`requests-chart-${locale}`"
               height="300"
               type="line"
               :options="requestsChartOptions"
               :series="requestsChartData"
             />
             <div v-else class="flex items-center justify-center h-64">
-              <p class="text-gray-500">No data available</p>
+              <p class="text-gray-500">{{ $t('common.noData') }}</p>
             </div>
           </client-only>
         </div>
@@ -162,19 +163,20 @@
         <!-- Status Code Distribution -->
         <div class="panel">
           <div class="mb-5 flex items-center justify-between">
-            <h5 class="text-lg font-semibold dark:text-white-light">Response Status Distribution</h5>
+            <h5 class="text-lg font-semibold dark:text-white-light">{{ $t('apiKey.usagePage.statusDistribution') }}</h5>
           </div>
           
           <client-only>
             <apexchart
               v-if="statusChartData"
+              :key="`status-chart-${locale}`"
               height="300"
               type="donut"
               :options="statusChartOptions"
               :series="statusChartData"
             />
             <div v-else class="flex items-center justify-center h-64">
-              <p class="text-gray-500">No data available</p>
+              <p class="text-gray-500">{{ $t('common.noData') }}</p>
             </div>
           </client-only>
         </div>
@@ -183,9 +185,9 @@
       <!-- Rate Limiting Progress -->
       <div class="panel" v-if="apiKey?.securitySettings?.enableRateLimiting">
         <div class="mb-5">
-          <h5 class="text-lg font-semibold dark:text-white-light mb-2">Rate Limiting Status</h5>
+          <h5 class="text-lg font-semibold dark:text-white-light mb-2">{{ $t('apiKey.usagePage.rateLimitingStatus') }}</h5>
           <p class="text-sm text-gray-500 dark:text-gray-400">
-            Current usage against configured rate limits
+            {{ $t('apiKey.usagePage.rateLimitingDescription') }}
           </p>
         </div>
         
@@ -194,10 +196,10 @@
           <div v-if="apiKey.rateLimitPerMinute">
             <div class="flex items-center justify-between mb-2">
               <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Per Minute Limit
+                {{ $t('apiKey.usagePage.perMinuteLimit') }}
               </span>
               <span class="text-sm text-gray-500">
-                {{ usageStats?.currentMinuteRequests || 0 }} / {{ apiKey.rateLimitPerMinute }}
+                {{ formatNumber(usageStats?.currentMinuteRequests ?? 0) }} / {{ formatNumber(apiKey.rateLimitPerMinute) }}
               </span>
             </div>
             <div class="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
@@ -212,10 +214,10 @@
           <div v-if="apiKey.rateLimitPerDay">
             <div class="flex items-center justify-between mb-2">
               <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Per Day Limit
+                {{ $t('apiKey.usagePage.perDayLimit') }}
               </span>
               <span class="text-sm text-gray-500">
-                {{ usageStats?.todayRequests || 0 }} / {{ apiKey.rateLimitPerDay }}
+                {{ formatNumber(usageStats?.todayRequests ?? 0) }} / {{ formatNumber(apiKey.rateLimitPerDay) }}
               </span>
             </div>
             <div class="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
@@ -230,18 +232,18 @@
 
       <!-- Recent Requests Table -->
       <div class="panel">
-        <div class="mb-5 flex items-center justify-between">
-          <h5 class="text-lg font-semibold dark:text-white-light">Recent Requests</h5>
+        <div class="mb-5 flex flex-wrap items-center justify-between gap-2">
+          <h5 class="text-lg font-semibold dark:text-white-light">{{ $t('apiKey.usagePage.recentRequests') }}</h5>
           <div class="flex items-center space-x-2">
             <button
               @click="toggleAutoRefresh"
               :class="[
-                'btn btn-sm',
+                'btn btn-sm whitespace-nowrap',
                 autoRefresh ? 'btn-success' : 'btn-outline-secondary'
               ]"
             >
               <icon-arrow-path :class="['h-4 w-4 mr-2', autoRefresh && 'animate-spin']" />
-              {{ autoRefresh ? 'Auto Refresh ON' : 'Auto Refresh OFF' }}
+              {{ autoRefresh ? $t('apiKey.usagePage.autoRefreshOn') : $t('apiKey.usagePage.autoRefreshOff') }}
             </button>
           </div>
         </div>
@@ -250,12 +252,12 @@
           <table class="table-hover">
             <thead>
               <tr>
-                <th>Timestamp</th>
-                <th>Method</th>
-                <th>Endpoint</th>
-                <th>Status</th>
-                <th>Response Time</th>
-                <th>IP Address</th>
+                <th>{{ $t('apiKey.usagePage.timestamp') }}</th>
+                <th>{{ $t('apiKey.usagePage.method') }}</th>
+                <th>{{ $t('apiKey.usagePage.endpoint') }}</th>
+                <th>{{ $t('common.status') }}</th>
+                <th>{{ $t('apiKey.detail.responseTime') }}</th>
+                <th>{{ $t('apiKey.usagePage.ipAddress') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -285,7 +287,7 @@
                   </span>
                 </td>
                 <td>
-                  <span class="text-sm">{{ request.responseTime }}ms</span>
+                  <span class="text-sm">{{ formatNumber(request.responseTime) }}ms</span>
                 </td>
                 <td>
                   <span class="font-mono text-sm text-gray-600 dark:text-gray-400">
@@ -299,7 +301,7 @@
           <!-- Empty state for recent requests -->
           <div v-if="!recentRequests?.length" class="text-center py-8">
             <icon-document-chart-bar class="h-12 w-12 text-gray-400 mx-auto mb-2" />
-            <p class="text-gray-500">No recent requests</p>
+            <p class="text-gray-500">{{ $t('apiKey.usagePage.noRecentRequests') }}</p>
           </div>
         </div>
       </div>
@@ -309,12 +311,17 @@
 
 <script setup lang="ts">
 import { logger } from '~/utils/logger'
+import { formatDateTime, formatNumber } from '~/utils/display-format'
 
 import type { ApiKey } from '~/types/api-key'
+import type { ApiError } from '~/types/api'
+
+// Charts are keyed by locale: vue3-apexcharts does not redraw labels and legends when only the options change.
+const { t, locale } = useI18n()
 
 // Meta tags
 useHead({
-  title: 'API Key Usage Analytics - TiHoMo'
+  title: computed(() => t('apiKey.usagePage.metaTitle'))
 })
 
 // Route parameters
@@ -327,18 +334,24 @@ const { getApiKey } = useApiKeys()
 // Reactive state
 const loading = ref(true)
 const refreshing = ref(false)
-const error = ref<string>('')
+const loadError = ref<Pick<ApiError, 'messageKey' | 'messageParams' | 'message'> | null>(null)
 const apiKey = ref<ApiKey | null>(null)
 const autoRefresh = ref(false)
 const autoRefreshInterval = ref<NodeJS.Timeout>()
 
+// A frontend message carries messageKey; a backend message is shown verbatim.
+const errorText = computed(() => {
+  const apiError = loadError.value as Partial<ApiError> | null
+  return apiError?.messageKey ? t(apiError.messageKey, apiError.messageParams ?? {}) : apiError?.message || t('apiKey.errors.fetchOneFailed')
+})
+
 // Time range selection
 const selectedTimeRange = ref('7d')
 const timeRanges = [
-  { label: '1D', value: '1d' },
-  { label: '7D', value: '7d' },
-  { label: '30D', value: '30d' },
-  { label: '90D', value: '90d' }
+  { labelKey: 'apiKey.detail.timeRange.day1', value: '1d' },
+  { labelKey: 'apiKey.detail.timeRange.days7', value: '7d' },
+  { labelKey: 'apiKey.detail.timeRange.days30', value: '30d' },
+  { labelKey: 'apiKey.detail.timeRange.days90', value: '90d' }
 ]
 
 // Mock data - Replace with real API calls
@@ -382,16 +395,16 @@ const recentRequests = ref([
 
 // Breadcrumb
 const breadcrumbs = computed(() => [
-  { name: 'Apps', href: '/apps' },
-  { name: 'API Keys', href: '/apps/api-keys' },
-  { name: 'Usage Analytics', href: `#` }
+  { name: '', labelKey: 'apps', href: '/apps' },
+  { name: '', labelKey: 'api_keys', href: '/apps/api-keys' },
+  { name: '', labelKey: 'apiKey.usagePage.usageAnalytics', href: `#` }
 ])
 
 // Chart data
 const requestsChartData = computed(() => {
   // Mock data - replace with real API data
   return [{
-    name: 'Requests',
+    name: t('apiKey.detail.requests'),
     data: [65, 78, 90, 85, 95, 88, 92, 89, 102, 95, 88, 96]
   }]
 })
@@ -414,7 +427,7 @@ const statusChartData = computed(() => [85, 10, 3, 2])
 const statusChartOptions = computed(() => ({
   chart: { toolbar: { show: false } },
   colors: ['#00ab55', '#e7515a', '#e2a03f', '#805dca'],
-  labels: ['2xx Success', '4xx Client Error', '5xx Server Error', '3xx Redirect'],
+  labels: [t('apiKey.usagePage.status2xx'), t('apiKey.usagePage.status4xx'), t('apiKey.usagePage.status5xx'), t('apiKey.usagePage.status3xx')],
   legend: { position: 'bottom' }
 }))
 
@@ -448,7 +461,7 @@ const loadApiKey = async (): Promise<void> => {
       }
     } as ApiKey
   } catch (err) {
-    error.value = 'Failed to load API key data'
+    loadError.value = { messageKey: 'apiKey.errors.fetchOneFailed', message: 'Failed to load API key data' }
     logger.error('Error loading API key:', err)
   } finally {
     loading.value = false
@@ -485,18 +498,6 @@ const toggleAutoRefresh = (): void => {
 /**
  * Utility functions
  */
-const formatDateTime = (dateString: string): string => {
-  const date = new Date(dateString)
-  return date.toLocaleString('vi-VN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit'
-  })
-}
-
 const getMethodColor = (method: string): string => {
   const colors = {
     GET: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',

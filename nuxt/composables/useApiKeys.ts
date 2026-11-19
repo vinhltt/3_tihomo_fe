@@ -14,6 +14,7 @@ import type {
   UseApiKeysReturn
 } from '~/types/api-key'
 import { ApiKeyStatus } from '~/types/api-key'
+import type { ApiError } from '~/types/api'
 
 /**
  * Composable for API Key management operations (EN)
@@ -29,7 +30,8 @@ export const useApiKeys = () => {
   const apiKeys = ref<ApiKey[]>([])
   const selectedApiKey = ref<ApiKey | null>(null)
   const isLoading = ref(false)
-  const error = ref<string | null>(null)
+  // The component renders messageKey; message is kept for logs only.
+  const error = ref<Pick<ApiError, 'messageKey' | 'messageParams' | 'message'> | null>(null)
   const pagination = ref({
     nextCursor: null as string | null,
     hasMore: false,
@@ -90,7 +92,7 @@ export const useApiKeys = () => {
         }
       }
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to fetch API keys'
+      error.value = { messageKey: 'apiKey.errors.fetchFailed', message: err instanceof Error ? err.message : 'Failed to fetch API keys' }
       logger.error('Failed to fetch API keys:', err)
       throw err
     } finally {
@@ -118,7 +120,7 @@ export const useApiKeys = () => {
       
       return response
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to create simple API key'
+      error.value = { messageKey: 'apiKey.errors.createFailed', message: err instanceof Error ? err.message : 'Failed to create simple API key' }
       logger.error('Failed to create simple API key:', err)
       throw err
     } finally {
@@ -146,7 +148,7 @@ export const useApiKeys = () => {
       
       return response
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to create API key'
+      error.value = { messageKey: 'apiKey.errors.createFailed', message: err instanceof Error ? err.message : 'Failed to create API key' }
       logger.error('Failed to create API key:', err)
       throw err
     } finally {
@@ -180,7 +182,7 @@ export const useApiKeys = () => {
         }
       }
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to update API key'
+      error.value = { messageKey: 'apiKey.errors.updateFailed', message: err instanceof Error ? err.message : 'Failed to update API key' }
       logger.error('Failed to update API key:', err)
       throw err
     } finally {
@@ -214,7 +216,7 @@ export const useApiKeys = () => {
         selectedApiKey.value = { ...selectedApiKey.value, status: ApiKeyStatus.Revoked, isActive: false }
       }
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to revoke API key'
+      error.value = { messageKey: 'apiKey.errors.revokeFailed', message: err instanceof Error ? err.message : 'Failed to revoke API key' }
       logger.error('Failed to revoke API key:', err)
       throw err
     } finally {
@@ -251,7 +253,7 @@ export const useApiKeys = () => {
       
       return response
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to rotate API key'
+      error.value = { messageKey: 'apiKey.errors.rotateFailed', message: err instanceof Error ? err.message : 'Failed to rotate API key' }
       logger.error('Failed to rotate API key:', err)
       throw err
     } finally {
@@ -284,7 +286,7 @@ export const useApiKeys = () => {
       
       return response
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to fetch API key'
+      error.value = { messageKey: 'apiKey.errors.fetchOneFailed', message: err instanceof Error ? err.message : 'Failed to fetch API key' }
       logger.error('Failed to fetch API key:', err)
       return null
     } finally {
@@ -305,7 +307,7 @@ export const useApiKeys = () => {
       
       return response
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to verify API key'
+      error.value = { messageKey: 'apiKey.errors.verifyFailed', message: err instanceof Error ? err.message : 'Failed to verify API key' }
       logger.error('Failed to verify API key:', err)
       return null
     } finally {
@@ -336,7 +338,7 @@ export const useApiKeys = () => {
       
       return response
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to fetch API key usage'
+      error.value = { messageKey: 'apiKey.errors.usageFailed', message: err instanceof Error ? err.message : 'Failed to fetch API key usage' }
       logger.error('Failed to fetch API key usage:', err)
       return null
     } finally {

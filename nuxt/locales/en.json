@@ -147,5 +147,984 @@
     "reminder_days_overdue": "{days} day overdue | {days} days overdue",
     "reminder_due_today": "Due today",
     "reminder_days_remaining": "Due in {days} day | Due in {days} days",
-    "expected_transactions": "Expected transactions"
+    "expected_transactions": "Expected transactions",
+    "common": {
+        "actions": "Actions",
+        "active": "Active",
+        "add": "Add",
+        "all": "All",
+        "apply": "Apply",
+        "back": "Back",
+        "cancel": "Cancel",
+        "clearFilters": "Clear filters",
+        "close": "Close",
+        "confirm": "Confirm",
+        "copied": "Copied!",
+        "copy": "Copy",
+        "create": "Create",
+        "delete": "Delete",
+        "disabled": "Disabled",
+        "done": "Done",
+        "edit": "Edit",
+        "enabled": "Enabled",
+        "error": "Error",
+        "export": "Export",
+        "filters": "Filters",
+        "hide": "Hide",
+        "inactive": "Inactive",
+        "loading": "Loading...",
+        "next": "Next",
+        "noData": "No data",
+        "of": "of",
+        "ok": "OK",
+        "previous": "Previous",
+        "refresh": "Refresh",
+        "reset": "Reset",
+        "results": "results",
+        "retry": "Retry",
+        "save": "Save",
+        "saveChanges": "Save changes",
+        "saving": "Saving...",
+        "search": "Search",
+        "show": "Show",
+        "showDetails": "Show details",
+        "showing": "Showing",
+        "showLess": "Show less",
+        "showMore": "Show more",
+        "status": "Status",
+        "success": "Success",
+        "to": "to",
+        "unknown": "Unknown",
+        "update": "Update",
+        "confirmation": {
+            "title": "Are you sure?",
+            "yesDelete": "Yes, delete it!"
+        },
+        "errors": {
+            "loadFailed": "Unable to load data.",
+            "network": "Network error. Please check your connection.",
+            "sessionExpired": "Your session has expired. Please log in again.",
+            "unknown": "An unexpected error occurred. Please try again."
+        },
+        "validation": {
+            "required": "Please fill in all required fields (*).",
+            "min": "The value must be at least {min}.",
+            "max": "The value must be at most {max}.",
+            "invalid": "Please enter a valid value."
+        }
+    },
+    "enums": {
+        "transactionType": {
+            "income": "Income",
+            "expense": "Expense",
+            "transfer": "Transfer"
+        },
+        "transactionDirection": {
+            "revenue": "Income",
+            "spent": "Expense"
+        },
+        "categoryType": {
+            "income": "Income",
+            "expense": "Expense",
+            "transfer": "Transfer",
+            "fee": "Fee",
+            "other": "Other"
+        },
+        "expectedTransactionStatus": {
+            "pending": "Pending",
+            "confirmed": "Confirmed",
+            "cancelled": "Cancelled",
+            "completed": "Completed",
+            "overdue": "Overdue"
+        },
+        "recurrenceFrequency": {
+            "daily": "Daily",
+            "weekly": "Weekly",
+            "biweekly": "Every two weeks",
+            "monthly": "Monthly",
+            "quarterly": "Quarterly",
+            "semiAnnually": "Every six months",
+            "annually": "Annually",
+            "custom": "Custom"
+        },
+        "apiKeyStatus": {
+            "active": "Active",
+            "revoked": "Revoked",
+            "expired": "Expired"
+        },
+        "accountType": {
+            "bank": "Bank Account",
+            "wallet": "Digital Wallet",
+            "creditCard": "Credit Card",
+            "debitCard": "Debit Card",
+            "cash": "Cash"
+        }
+    },
+    "shell": {
+        "nav": {
+            "accounts": "Accounts",
+            "transactions": "Transactions",
+            "recurringTransactions": "Recurring Transactions"
+        },
+        "header": {
+            "home": "Home"
+        },
+        "search": {
+            "placeholder": "Search..."
+        },
+        "language": {
+            "switcher": "Change language"
+        },
+        "userMenu": {
+            "defaultName": "User",
+            "proBadge": "Pro",
+            "profile": "Profile",
+            "inbox": "Inbox",
+            "lockScreen": "Lock Screen",
+            "signOut": "Sign Out",
+            "signingOut": "Signing out..."
+        },
+        "footer": {
+            "copyright": "© {year}. Vristo All rights reserved."
+        },
+        "breadcrumb": {
+            "ariaLabel": "Breadcrumb navigation",
+            "dashboard": "Dashboard"
+        }
+    },
+    "apiKey": {
+        "page": {
+            "metaTitle": "API Key Management - TiHoMo",
+            "metaDescription": "Manage your API keys for third-party integrations with TiHoMo services",
+            "description": "Create and manage API keys to access TiHoMo services",
+            "yourKeys": "Your API Keys ({count})",
+            "totalKeys": "Total API Keys",
+            "activeKeys": "Active Keys",
+            "loadingKeys": "Loading API keys..."
+        },
+        "actions": {
+            "analytics": "Analytics",
+            "copyKey": "Copy Key",
+            "copyPrefix": "Copy API Key Prefix",
+            "create": "Create API Key",
+            "regenerate": "Regenerate API Key",
+            "revoke": "Revoke API Key",
+            "viewUsage": "View Usage"
+        },
+        "messages": {
+            "prefixCopied": "API key prefix \"{prefix}\" copied to clipboard!",
+            "revoked": "API key revoked successfully",
+            "regenerated": "API key regenerated successfully"
+        },
+        "confirm": {
+            "revoke": "Are you sure you want to revoke this API key? This action cannot be undone.",
+            "regenerate": "Are you sure you want to regenerate this API key? The old key will stop working immediately."
+        },
+        "errors": {
+            "fetchFailed": "Failed to load API keys.",
+            "fetchOneFailed": "Failed to load the API key.",
+            "createFailed": "Failed to create the API key.",
+            "updateFailed": "Failed to update the API key.",
+            "revokeFailed": "Failed to revoke the API key.",
+            "rotateFailed": "Failed to regenerate the API key.",
+            "verifyFailed": "Failed to verify the API key.",
+            "usageFailed": "Failed to load API key usage.",
+            "validationFailed": "Please correct the invalid fields."
+        },
+        "card": {
+            "apiKey": "API Key",
+            "created": "Created",
+            "expires": "Expires",
+            "keyId": "Key ID",
+            "keyNotAvailable": "Full key not available",
+            "keyNotAvailableDescription": "The full API key is shown only once, right after it is created.",
+            "lastUsed": "Last used",
+            "perMinute": "req/min",
+            "permissions": "Permissions",
+            "rateLimit": "Rate limit",
+            "requests": "requests",
+            "scopes": "scopes",
+            "security": "Security",
+            "todayUsage": "Today's usage",
+            "totalUsage": "Total usage"
+        },
+        "empty": {
+            "createFirst": "Create your first API key to get started.",
+            "noKeys": "No API keys yet",
+            "noResults": "No API keys match your filters",
+            "tryDifferentFilter": "Try a different search or filter."
+        },
+        "form": {
+            "advancedSecurity": "Advanced security",
+            "advancedSecurityDescription": "Restrict where and how this API key can be used.",
+            "basicDescription": "Give the API key a name, a description and an optional expiration date.",
+            "basicInformation": "Basic information",
+            "creating": "Creating...",
+            "customScopes": "Custom scopes",
+            "dailyQuotaHint": "Maximum number of requests per day, at least 100.",
+            "dailyUsageQuota": "Daily usage quota",
+            "description": "Description",
+            "descriptionPlaceholder": "What is this API key used for?",
+            "enableIpValidation": "Enable IP validation",
+            "enableIpValidationDescription": "Accept requests only from IP addresses in the whitelist.",
+            "enableRateLimiting": "Enable rate limiting",
+            "enableRateLimitingDescription": "Limit the number of requests per minute and per day.",
+            "enableUsageAnalytics": "Enable usage analytics",
+            "enableUsageAnalyticsDescription": "Record usage so you can monitor this API key.",
+            "expiresAt": "Expiration date",
+            "expiresAtHint": "Leave empty for a key that never expires.",
+            "ipWhitelist": "IP whitelist",
+            "ipWhitelistHint": "One IP address or CIDR range per line.",
+            "ipWhitelistPlaceholder": "e.g., 192.168.1.100 or 10.0.0.0/24",
+            "name": "API Key Name",
+            "nameHint": "Choose a name that helps you identify what this API key is used for.",
+            "namePlaceholder": "Enter a descriptive name for your API key",
+            "perDay": "req/day",
+            "permissions": "Permissions",
+            "permissionsDescription": "Choose what this API key is allowed to access.",
+            "rateLimitHint": "Between 1 and 1.000 requests per minute.",
+            "rateLimitPerMinute": "Rate limit per minute",
+            "rateLimitSuggestion": "Recommended rate limit",
+            "rateLimitSuggestionText": "Based on your selected scopes, we recommend {count} requests per minute",
+            "rateLimiting": "Rate limiting",
+            "rateLimitingDescription": "Control how many requests this API key can make.",
+            "requireHttps": "Require HTTPS",
+            "requireHttpsDescription": "Reject requests that are not sent over HTTPS.",
+            "scopeTemplates": "Scope templates",
+            "securityOptions": "Security options",
+            "securityScore": "Security score",
+            "securityScoreDescription": "How well this API key is protected with the current settings.",
+            "selectedScopes": "Selected scopes",
+            "updating": "Updating..."
+        },
+        "templates": {
+            "readOnly": {
+                "name": "Read Only",
+                "description": "View data only, no modifications"
+            },
+            "fullAccess": {
+                "name": "Full Access",
+                "description": "Complete access to all resources"
+            },
+            "transactionsOnly": {
+                "name": "Transactions Only",
+                "description": "Access to transaction data only"
+            },
+            "accountsOnly": {
+                "name": "Accounts Only",
+                "description": "Access to account data only"
+            }
+        },
+        "validation": {
+            "nameRequired": "API key name is required",
+            "nameMinLength": "API key name must be at least 3 characters",
+            "nameMaxLength": "API key name must not exceed 100 characters",
+            "descriptionMaxLength": "Description must be less than 500 characters",
+            "scopesRequired": "At least one scope must be selected",
+            "rateLimitRange": "Rate limit must be between 1 and 1.000 requests per minute",
+            "dailyQuotaMin": "Daily quota must be at least 100 requests",
+            "invalidIps": "Invalid IP addresses: {ips}",
+            "expiryInFuture": "Expiration date must be in the future"
+        },
+        "management": {
+            "keys": "keys"
+        },
+        "table": {
+            "actions": "Actions",
+            "created": "Created",
+            "expires": "Expires",
+            "keyPrefix": "Key Prefix",
+            "name": "Name",
+            "scopes": "Scopes",
+            "status": "Status",
+            "usage": "Usage"
+        },
+        "scope": {
+            "read": "Read",
+            "write": "Write",
+            "delete": "Delete",
+            "admin": "Admin",
+            "transactionsRead": "Txn Read",
+            "transactionsWrite": "Txn Write",
+            "accountsRead": "Acc Read",
+            "accountsWrite": "Acc Write"
+        },
+        "scopeDescription": {
+            "read": "View data only",
+            "write": "Create and modify data",
+            "delete": "Delete data",
+            "admin": "Full administrative access",
+            "transactionsRead": "View transaction data",
+            "transactionsWrite": "Create and modify transactions",
+            "accountsRead": "View account data",
+            "accountsWrite": "Create and modify accounts",
+            "custom": "Custom scope"
+        },
+        "statusDescription": {
+            "active": "API key is active and working",
+            "revoked": "API key has been revoked and cannot be used",
+            "expired": "API key has expired and needs renewal",
+            "unknown": "Unknown status",
+            "expiresSoon": "expires soon: {date}"
+        },
+        "security": {
+            "breakdown": "Score breakdown",
+            "expirationSet": "Expiration set",
+            "httpsRequired": "HTTPS required",
+            "improvements": "Suggested improvements",
+            "ipValidation": "IP validation",
+            "limitedScopes": "Limited scopes",
+            "rateLimiting": "Rate limiting",
+            "securityScore": "Security score",
+            "securityWarnings": "Security warnings",
+            "usageAnalytics": "Usage analytics",
+            "levels": {
+                "excellent": "Excellent",
+                "veryGood": "Very good",
+                "good": "Good",
+                "fair": "Fair",
+                "poor": "Poor",
+                "veryPoor": "Very poor"
+            },
+            "suggestions": {
+                "enableHttps": "Enable HTTPS requirement for better security",
+                "addIpWhitelist": "Add IP whitelist to restrict access",
+                "enableRateLimiting": "Enable rate limiting to prevent abuse",
+                "setExpiration": "Set an expiration date for the API key",
+                "enableUsageAnalytics": "Enable usage analytics to monitor key activity",
+                "reviewAdminScope": "Review if admin scope is really necessary"
+            },
+            "warnings": {
+                "httpsNotRequired": "HTTPS not required - consider enabling for better security",
+                "noIpRestrictions": "No IP restrictions - consider adding IP whitelist",
+                "rateLimitingDisabled": "Rate limiting disabled - this could allow abuse",
+                "noExpiration": "No expiration date - consider setting an expiry for better security",
+                "adminScope": "Admin scope granted - ensure this is necessary",
+                "usageAnalyticsDisabled": "Usage analytics disabled - you won't be able to monitor key usage"
+            }
+        },
+        "successModal": {
+            "title": "API Key Created Successfully!",
+            "subtitle": "Your API key has been generated and is ready to use.",
+            "copyNowNotice": "(Copy now - shown only once!)",
+            "noticeTitle": "Important Security Notice",
+            "noticeCopyNow": "Copy this API key now",
+            "noticeCopyNowReason": "- it will not be shown again for security reasons",
+            "noticeStoreSecurely": "Store it securely in your application or password manager",
+            "noticeNeverShare": "Never share your API key or commit it to version control",
+            "noticeIfLost": "If you lose it, you'll need to generate a new one",
+            "manageHint": "You can manage this API key in your dashboard"
+        },
+        "simpleForm": {
+            "description": "Create an API key to access TiHoMo services programmatically.",
+            "advancedLater": "Advanced settings can be configured later if needed.",
+            "defaults": {
+                "title": "Default Settings",
+                "intro": "Your API key will be created with these default settings:",
+                "accessLabel": "Access:",
+                "access": "Full read and write permissions",
+                "rateLimitLabel": "Rate Limit:",
+                "rateLimit": "50 requests per minute",
+                "dailyQuotaLabel": "Daily Quota:",
+                "dailyQuota": "500 requests per day",
+                "securityLabel": "Security:",
+                "security": "HTTPS required, usage analytics enabled",
+                "expirationLabel": "Expiration:",
+                "expiration": "Never expires"
+            }
+        },
+        "usage": {
+            "apiUsage": "API Usage",
+            "currentPeriod": "Current period",
+            "currentUsage": "Current Usage",
+            "limit": "Limit",
+            "percentUsed": "{percent}% used",
+            "rateLimitPerMinute": "Rate limit: {value} requests/minute",
+            "rateLimitShort": "Rate limit: {value}/min",
+            "statistics": "Usage Statistics",
+            "used": "Used",
+            "level": {
+                "over": "Over Limit",
+                "warning": "Near Limit",
+                "moderate": "Moderate",
+                "low": "Low Usage",
+                "normal": "Normal"
+            }
+        },
+        "ipManagement": {
+            "title": "IP Whitelist Management",
+            "description": "Manage allowed IP addresses and CIDR ranges for enhanced security",
+            "validationOn": "IP Validation ON",
+            "validationOff": "IP Validation OFF",
+            "enableDescription": "Restrict API key usage to specific IP addresses or ranges",
+            "addTitle": "Add IP Address or CIDR Range",
+            "addressLabel": "IP Address or CIDR Range",
+            "addressHint": "Supports IPv4, IPv6, and CIDR notation (e.g., 192.168.1.0/24)",
+            "descriptionLabel": "Description (Optional)",
+            "descriptionPlaceholder": "e.g., Office network",
+            "addAddress": "Add IP Address",
+            "detecting": "Detecting...",
+            "addCurrentIp": "Add Current IP",
+            "commonRanges": "Common Ranges",
+            "commonRangesTitle": "Common IP Ranges",
+            "invalidAddress": "Please enter a valid IP address or CIDR range",
+            "currentWhitelist": "Current Whitelist ({count})",
+            "deleteSelected": "Delete Selected ({count})",
+            "bulkDeleteConfirm": "Are you sure you want to delete {count} IP addresses?",
+            "singleIp": "Single IP",
+            "cidrRange": "CIDR Range",
+            "currentIp": "Current IP",
+            "currentIpDescription": "Current IP (auto-detected)",
+            "added": "Added {date}",
+            "lastUsed": "Last used {date}",
+            "emptyTitle": "No IP addresses in whitelist",
+            "emptyDescription": "Add IP addresses to restrict access",
+            "disabledTitle": "IP Validation is disabled",
+            "disabledDescription": "Enable IP validation to restrict access to specific addresses",
+            "recentActivity": "Recent IP Activity",
+            "noRecentActivity": "No recent IP activity",
+            "activityStatus": {
+                "allowed": "Allowed",
+                "blocked": "Blocked"
+            },
+            "ranges": {
+                "classA": "Private network (Class A)",
+                "classB": "Private network (Class B)",
+                "classC": "Private network (Class C)",
+                "loopback": "Loopback addresses",
+                "allIpv4": "All IPv4 addresses (not recommended)"
+            }
+        },
+        "detail": {
+            "loadFailedTitle": "Failed to load analytics",
+            "requests": "Requests",
+            "responseTime": "Response Time",
+            "timeRange": {
+                "hours24": "24H",
+                "day1": "1D",
+                "days7": "7D",
+                "days30": "30D",
+                "days90": "90D"
+            }
+        },
+        "usagePage": {
+            "metaTitle": "API Key Usage Analytics - TiHoMo",
+            "title": "API Key Usage Analytics",
+            "subtitle": "Detailed usage statistics for:",
+            "usageAnalytics": "Usage Analytics",
+            "loading": "Loading usage analytics...",
+            "totalRequests": "Total Requests",
+            "todayRequests": "Today's Requests",
+            "successRate": "Success Rate",
+            "avgResponseTime": "Avg Response Time",
+            "requestsOverTime": "Requests Over Time",
+            "statusDistribution": "Response Status Distribution",
+            "status2xx": "2xx Success",
+            "status3xx": "3xx Redirect",
+            "status4xx": "4xx Client Error",
+            "status5xx": "5xx Server Error",
+            "rateLimitingStatus": "Rate Limiting Status",
+            "rateLimitingDescription": "Current usage against configured rate limits",
+            "perMinuteLimit": "Per Minute Limit",
+            "perDayLimit": "Per Day Limit",
+            "recentRequests": "Recent Requests",
+            "autoRefreshOn": "Auto Refresh ON",
+            "autoRefreshOff": "Auto Refresh OFF",
+            "timestamp": "Timestamp",
+            "method": "Method",
+            "endpoint": "Endpoint",
+            "ipAddress": "IP Address",
+            "noRecentRequests": "No recent requests"
+        },
+        "analyticsPage": {
+            "metaTitle": "Advanced Analytics Dashboard - TiHoMo",
+            "title": "Advanced Analytics Dashboard",
+            "subtitle": "Comprehensive analytics and security insights for:",
+            "dashboard": "Analytics Dashboard",
+            "loading": "Loading analytics dashboard...",
+            "uniqueIps": "Unique IPs",
+            "countries": "Countries",
+            "userAgents": "User Agents",
+            "peakHour": "Peak Hour",
+            "blocked": "Blocked",
+            "endpoints": "Endpoints",
+            "updating": "Updating data...",
+            "requestVolumeByHour": "Request Volume by Hour",
+            "viewOptions": "View Options",
+            "geographicDistribution": "Geographic Distribution",
+            "responseTimeDistribution": "Response Time Distribution",
+            "responseTimeAxis": "Response Time (ms)",
+            "requestCountAxis": "Request Count",
+            "popularEndpoints": "Most Popular Endpoints",
+            "ipAnalysis": "IP Address Analysis",
+            "manageIps": "Manage IPs",
+            "topSources": "Top Request Sources",
+            "suspiciousActivity": "Suspicious Activity",
+            "securityScoreAnalysis": "Security Score Analysis",
+            "securityFactors": "Security Factors",
+            "securityRecommendations": "Security Recommendations",
+            "rateLimitingAnalytics": "Rate Limiting Analytics",
+            "rateLimitingDescription": "Detailed analysis of rate limiting effectiveness and patterns",
+            "rateLimitHits": "Rate Limit Hits",
+            "currentUsageStatus": "Current Usage Status",
+            "perMinute": "Per Minute ({value})",
+            "perDay": "Per Day ({value})",
+            "ipManagementTitle": "IP Address Management"
+        }
+    },
+    "accounts": {
+        "list": {
+            "title": "Account Management",
+            "addNew": "Add a new account"
+        },
+        "actions": {
+            "add": "Add Account",
+            "create": "Create Account",
+            "update": "Update Account",
+            "edit": "Edit Account",
+            "delete": "Delete account",
+            "viewTransactions": "View transactions",
+            "viewAllTransactions": "View All Transactions",
+            "backToList": "Back to Accounts"
+        },
+        "filters": {
+            "searchPlaceholder": "Search accounts...",
+            "allTypes": "All Types",
+            "allCurrencies": "All Currencies"
+        },
+        "fields": {
+            "name": "Account Name",
+            "type": "Account Type",
+            "currency": "Currency",
+            "currentBalance": "Current Balance",
+            "initialBalance": "Initial Balance",
+            "availableLimit": "Available Limit",
+            "cardNumber": "Card Number",
+            "createdDate": "Created Date",
+            "updatedDate": "Last Updated",
+            "createdBy": "Created By"
+        },
+        "empty": {
+            "title": "No accounts yet",
+            "description": "Create your first account to start managing your finances",
+            "createFirst": "Create your first account"
+        },
+        "detail": {
+            "title": "Account Details",
+            "pageTitleFallback": "Account",
+            "notFound": "Account Not Found",
+            "notFoundDescription": "The account you're looking for doesn't exist or has been deleted.",
+            "createdOn": "Created {date}",
+            "information": "Account Information",
+            "balanceHistory": "Balance History",
+            "period": {
+                "last7Days": "Last 7 Days",
+                "last30Days": "Last 30 Days",
+                "last90Days": "Last 90 Days",
+                "lastYear": "Last Year"
+            },
+            "noChartData": "No chart data available",
+            "recentTransactions": "Recent Transactions",
+            "date": "Date",
+            "description": "Description",
+            "amount": "Amount",
+            "balance": "Balance",
+            "noTransactions": "No transactions found"
+        },
+        "modal": {
+            "createTitle": "Create New Account",
+            "namePlaceholder": "Enter account name",
+            "selectType": "Select account type",
+            "selectCurrency": "Select currency",
+            "cardNumberPlaceholder": "Enter card number",
+            "cardNumberHint": "Card number will be masked for security",
+            "availableLimitHint": "Credit limit for credit cards or spending limit for other accounts"
+        },
+        "currencyNames": {
+            "vnd": "Vietnamese Dong",
+            "usd": "US Dollar",
+            "eur": "Euro",
+            "jpy": "Japanese Yen",
+            "gbp": "British Pound"
+        },
+        "dropdown": {
+            "allAccounts": "All accounts",
+            "loading": "Loading accounts..."
+        },
+        "confirm": {
+            "delete": "Delete account \"{name}\"?",
+            "deleteIrreversible": "Delete account \"{name}\"? This action cannot be undone."
+        },
+        "messages": {
+            "created": "Account created successfully",
+            "updated": "Account updated successfully",
+            "deleted": "Account deleted successfully"
+        },
+        "errors": {
+            "loadFailed": "Failed to fetch accounts",
+            "loadFailedDetail": "Failed to fetch accounts: {error}",
+            "deleteFailed": "Failed to delete account",
+            "saveFailed": "Failed to save account"
+        },
+        "validation": {
+            "nameRequired": "Account name is required",
+            "nameMinLength": "Account name must be at least 2 characters",
+            "typeRequired": "Account type is required",
+            "currencyRequired": "Currency is required",
+            "cardNumberLength": "Card number must be between 13-19 digits",
+            "initialBalanceNegative": "Initial balance cannot be negative",
+            "availableLimitNegative": "Available limit cannot be negative"
+        }
+    },
+    "transactions": {
+        "list": {
+            "title": "Transaction Management",
+            "titleForAccount": "Transactions - {name}",
+            "description": "Track and manage income and expense transactions",
+            "descriptionForAccount": "Track the transactions of account {name}",
+            "heading": "Transaction list",
+            "total": "Total transactions: {count}",
+            "detailedView": "Detailed view",
+            "compactView": "Compact view"
+        },
+        "filters": {
+            "fromDate": "From date",
+            "toDate": "To date"
+        },
+        "columns": {
+            "button": "Columns",
+            "title": "Choose columns to display",
+            "simple": "Simple",
+            "advanced": "Advanced"
+        },
+        "fields": {
+            "date": "Date",
+            "dateTime": "Date & time",
+            "account": "Account",
+            "description": "Description",
+            "category": "Category",
+            "type": "Type",
+            "amount": "Amount",
+            "balance": "Balance",
+            "note": "Note",
+            "direction": "Transaction type",
+            "transactionDateTime": "Transaction date and time",
+            "transactionDate": "Transaction date",
+            "balanceAfter": "Balance after transaction",
+            "balanceCompare": "Balance comparison",
+            "availableLimitCompare": "Limit comparison",
+            "increaseCreditLimit": "Credit limit increase",
+            "usedPercent": "Usage percentage",
+            "categorySummary": "Category summary",
+            "group": "Group",
+            "importFrom": "Import source",
+            "transactionCode": "Transaction code",
+            "syncMisa": "Sync MISA",
+            "syncSms": "Sync SMS",
+            "vnCurrency": "VN currency"
+        },
+        "placeholders": {
+            "amount": "Enter amount",
+            "description": "Enter transaction description",
+            "selectAccount": "Select account",
+            "balance": "Enter balance",
+            "previousBalance": "Previous balance",
+            "limit": "Limit",
+            "previousLimit": "Previous limit",
+            "increaseAmount": "Increase amount",
+            "note": "Detailed note",
+            "group": "Transaction group",
+            "importFrom": "Data source"
+        },
+        "form": {
+            "createTitle": "Add transaction",
+            "editTitle": "Edit transaction",
+            "viewTitle": "Transaction details",
+            "closeHint": "Close (Esc)",
+            "processing": "Processing...",
+            "showAdvanced": "Show advanced information",
+            "hideAdvanced": "Hide advanced information",
+            "financialInfo": "Extended financial information",
+            "classificationNotes": "Classification & notes",
+            "syncMetadata": "Sync & metadata"
+        },
+        "actions": {
+            "addIncome": "Add income transaction",
+            "addExpense": "Add expense transaction",
+            "create": "Create transaction"
+        },
+        "empty": {
+            "title": "No transactions yet",
+            "description": "No transactions in this period"
+        },
+        "pagination": {
+            "summary": "Showing {from}-{to} of {total} transactions",
+            "page": "Page {current} / {total}"
+        },
+        "confirm": {
+            "delete": "Delete transaction \"{description}\"?",
+            "noDescription": "No description"
+        },
+        "errors": {
+            "loadFailed": "Failed to fetch transactions",
+            "loadOneFailed": "Failed to fetch transaction",
+            "createFailed": "Failed to create transaction",
+            "updateFailed": "Failed to update transaction",
+            "deleteFailed": "Failed to delete transaction"
+        }
+    },
+    "recurring": {
+        "list": {
+            "title": "Recurring Transaction Management",
+            "addNew": "Add new template",
+            "saved": "Recurring transaction template saved.",
+            "loadFailed": "Unable to load recurring transaction templates: {error}",
+            "empty": "No recurring transaction templates"
+        },
+        "filters": {
+            "allFrequencies": "All frequencies"
+        },
+        "fields": {
+            "name": "Template name",
+            "frequency": "Frequency",
+            "nextExecutionDate": "Next date",
+            "repeatFrequency": "Repeat frequency",
+            "customIntervalDays": "Custom interval (days)",
+            "startDate": "Start date",
+            "endDate": "End date",
+            "daysInAdvance": "Days in advance",
+            "daysInAdvanceHint": "How many days ahead expected transactions are generated",
+            "isActive": "Activate template",
+            "autoGenerate": "Generate expected transactions automatically"
+        },
+        "placeholders": {
+            "name": "e.g. Monthly electricity bill",
+            "description": "Details about this recurring transaction",
+            "category": "e.g. Bills, Entertainment, Salary",
+            "days": "Number of days",
+            "notes": "Additional notes about this template"
+        },
+        "modal": {
+            "createTitle": "New recurring transaction template",
+            "editTitle": "Edit recurring transaction template",
+            "noAccounts": "No account available to create a template.",
+            "frequencySection": "Frequency settings",
+            "advancedSection": "Advanced settings",
+            "create": "Create template"
+        },
+        "actions": {
+            "pause": "Pause",
+            "activate": "Activate"
+        },
+        "pagination": {
+            "summary": "Showing {from} - {to} of {total} templates"
+        },
+        "confirm": {
+            "delete": "Delete template \"{name}\"?"
+        },
+        "errors": {
+            "invalidData": "Invalid recurring transaction template data ({field}: {value})",
+            "loadFailed": "Failed to load recurring transaction templates",
+            "createFailed": "Failed to create recurring transaction template",
+            "updateFailed": "Failed to update recurring transaction template",
+            "saveFailed": "Unable to save the recurring transaction template. Please try again.",
+            "deleteFailed": "Failed to delete recurring transaction template",
+            "toggleFailed": "Failed to change recurring transaction template status"
+        }
+    },
+    "expected": {
+        "description": "Track each period, record a payment or link an existing transaction.",
+        "manageTemplates": "Manage recurring templates",
+        "target": {
+            "loading": "Loading the period selected from the reminder...",
+            "loadFailed": "Unable to select the period: {error}",
+            "retry": "Reload the selected period",
+            "processed": "The selected period has been processed and cannot be changed."
+        },
+        "filters": {
+            "allStatuses": "All statuses",
+            "template": "Recurring template",
+            "allTemplates": "All templates",
+            "templatesLoading": "Loading recurring templates...",
+            "noTemplates": "No recurring templates yet.",
+            "templatesLoadFailed": "Unable to load recurring templates: {error}",
+            "retryTemplates": "Reload templates",
+            "dateRangeInvalid": "The start date must not be after the end date."
+        },
+        "list": {
+            "heading": "Periods",
+            "reload": "Reload list",
+            "notice": "Recording does not update account balances and does not make payments for you. If you close the dialog while a request is being sent, the request may still be saved; reload the list before acting again.",
+            "loading": "Loading expected transactions...",
+            "loadFailed": "Unable to load expected transactions: {error}",
+            "reloadAfterCommitFailed": "The action succeeded, but the list could not be reloaded: {error}",
+            "retry": "Reload the list",
+            "signInRequired": "Please sign in to view expected transactions.",
+            "invalidDateRange": "Invalid date range. Fix the date filter to see the list.",
+            "empty": "No expected transactions match the filters.",
+            "processed": "This period has been processed and cannot be changed."
+        },
+        "columns": {
+            "periodTemplate": "Period / Recurring template",
+            "accountType": "Account / Type",
+            "processing": "Processing details"
+        },
+        "fields": {
+            "periodId": "Period ID",
+            "expectedDate": "Expected date",
+            "currentAmount": "Current amount",
+            "originalAmount": "Original amount",
+            "adjusted": "Adjusted",
+            "generatedAt": "Generated",
+            "processedAt": "Processed",
+            "processedTime": "Processed at",
+            "actualTransaction": "Actual transaction",
+            "linkedActualTransaction": "Linked actual transaction",
+            "reason": "Reason",
+            "savedReason": "Saved reason"
+        },
+        "template": {
+            "none": "No template",
+            "unavailable": "Template no longer available",
+            "unnamed": "Unnamed template"
+        },
+        "account": {
+            "none": "No account linked",
+            "unavailable": "Account unavailable",
+            "unnamed": "Unnamed account"
+        },
+        "due": {
+            "overdue": "{days} day overdue | {days} days overdue",
+            "today": "Due today",
+            "remaining": "Due in {days} day | Due in {days} days"
+        },
+        "actions": {
+            "payment": "Record payment",
+            "link": "Link existing transaction",
+            "adjust": "Adjust amount",
+            "cancel": "Cancel period"
+        },
+        "pagination": {
+            "summary": "Showing {from}–{to} of {total} periods"
+        },
+        "summary": {
+            "adjustedNote": "Adjusted; the original amount is always the amount before the first adjustment."
+        },
+        "success": {
+            "payment": "Payment recorded and the actual transaction saved.",
+            "link": "The existing transaction was linked to the period.",
+            "cancel": "The period was cancelled.",
+            "adjust": "The period amount was adjusted.",
+            "savedActualTransactionId": "Saved actual transaction ID",
+            "incomeAmount": "Income amount",
+            "expenseAmount": "Expense amount",
+            "balanceNote": "Recording does not update account balances.",
+            "savedNote": "The result has been saved. Reloading the list does not change it.",
+            "dismiss": "Dismiss"
+        },
+        "payment": {
+            "amount": "Payment amount (fixed)",
+            "date": "Transaction date (fixed)",
+            "fixedNote": "The amount and date come from the period. To change the amount, close this dialog and choose “Adjust amount” first.",
+            "boundAccount": "Account linked to the period (cannot be changed)",
+            "account": "Account for the transaction",
+            "selectAccount": "Select your account",
+            "accountHint": "This choice only applies to the actual transaction; it does not change the account of the period.",
+            "retryAccounts": "Reload accounts",
+            "noAccounts": "You have no account to record with. Create an account before continuing.",
+            "boundAccountUnavailable": "The linked account is no longer available. It cannot be replaced with another account when recording.",
+            "notice": "Recording does not update account balances and does not make payments for you. The actual transaction is saved and the period confirmed in a single request."
+        },
+        "link": {
+            "search": "Find an existing transaction",
+            "searchPlaceholder": "Search by description or category",
+            "hint": "Choose one of your transactions. Linking does not create a new transaction; the server checks that the transaction is not linked to another period.",
+            "loading": "Loading existing transactions...",
+            "loadFailed": "Unable to load transactions: {error}",
+            "retry": "Reload transactions",
+            "empty": "No matching transactions to choose from.",
+            "select": "Select",
+            "descriptionId": "Description / ID",
+            "selectTransaction": "Select transaction {id}",
+            "selected": "Selected transaction"
+        },
+        "modal": {
+            "closeWhileSaving": "Close (does not cancel the request)",
+            "saveFailed": "Unable to complete the action: {error}",
+            "paymentNoAutoRetry": "The payment request is not resent automatically. If the result is unclear, close the dialog and reload the list before acting again.",
+            "paymentUnknown": "It is unclear whether the payment request was saved. Recording is locked for this dialog to avoid a duplicate actual transaction.",
+            "paymentUnknownHint": "Close the dialog and reload the list before acting again. Reloading the period state only checks the result; it does not unlock the action.",
+            "reloadState": "Reload period state",
+            "reloadingLocked": "Reloading the latest period state; the action stays locked.",
+            "reloadingChanged": "The period has changed. Reloading the latest state; the action cannot be resent yet.",
+            "reloadFailed": "Unable to reload the latest state: {error}",
+            "stillLocked": "The action stays locked. Your input and the original error are kept.",
+            "retryReloadState": "Retry reloading the period state",
+            "reloaded": "The latest state has been reloaded. Review the period details; your input is kept. The action is not resent automatically.",
+            "changed": "The period has changed. Reload the latest state before acting.",
+            "notAllowed": "This period no longer allows this action. A processed period cannot be changed; a transfer can only be linked to an existing transaction or cancelled.",
+            "newAmount": "New amount",
+            "newAmountHint": "The amount must be greater than 0. Later adjustments keep the original amount from before the first adjustment.",
+            "cancelReason": "Cancellation reason",
+            "adjustReason": "Adjustment reason",
+            "reasonHint": "A reason is required and is saved with the period.",
+            "cancelHint": "Cancelling a period does not create an actual transaction. A cancelled period cannot be recorded or adjusted afterwards.",
+            "savingNotice": "Sending the request. Closing the dialog does not cancel the request and does not mean the action was undone. If you close it now, reload the list to see the result before acting again.",
+            "sessionChanged": "Your sign-in session has changed. Close the dialog and reload the list."
+        },
+        "errors": {
+            "unsupportedStatus": "The API returned an unsupported period status: {value}.",
+            "unsupportedType": "The API returned an unsupported period transaction type: {value}.",
+            "invalidPaging": "Page index and page size must be positive integers.",
+            "retryList": "Please try reloading the list.",
+            "retryTemplates": "Please try reloading the recurring templates.",
+            "retryTarget": "Please try reloading the selected period.",
+            "retryState": "Please try reloading the period state.",
+            "retryTransactions": "Please try reloading the transactions.",
+            "checkAndRetry": "Please check the details and try again."
+        }
+    },
+    "auth": {
+        "login": {
+            "metaTitle": "Login with Google - Cover",
+            "signIn": "Sign in",
+            "subtitle": "Enter your email and password to login",
+            "email": "Email",
+            "emailPlaceholder": "Enter Email",
+            "password": "Password",
+            "passwordPlaceholder": "Enter Password",
+            "rememberMe": "Remember me",
+            "signingIn": "Signing in...",
+            "failedTitle": "Login Failed",
+            "or": "or",
+            "continueWith": "Continue with {provider}",
+            "signingInWith": "Signing in with {provider}...",
+            "socialFailedTitle": "Social Login Failed",
+            "noAccount": "Don't have an account ?",
+            "signUp": "Sign up",
+            "imageAlt": "image",
+            "logoAlt": "Logo",
+            "coverImageAlt": "Cover Image"
+        },
+        "validation": {
+            "emailRequired": "Email is required",
+            "emailInvalid": "Please enter a valid email address",
+            "passwordRequired": "Password is required",
+            "passwordMinLength": "Password must be at least 6 characters"
+        },
+        "errors": {
+            "loginFailed": "Login failed. Please try again.",
+            "initFailed": "Failed to initialize authentication.",
+            "socialLoginFailed": "Social login failed.",
+            "providerFailed": "{provider} sign-in failed.",
+            "providerNotConfigured": "{provider} sign-in is not configured.",
+            "sdkLoadFailed": "Failed to load the {provider} SDK.",
+            "sdkNotLoaded": "The {provider} SDK is not loaded.",
+            "noCredential": "No credential received from {provider}.",
+            "cancelled": "{provider} sign-in was cancelled or failed.",
+            "emptyResponse": "The sign-in response is empty.",
+            "missingAccessToken": "The sign-in response has no access token.",
+            "unsupportedProvider": "Unsupported sign-in provider: {provider}"
+        }
+    }
 }

@@ -53,7 +53,9 @@
     import { useAppStore } from '@/stores/index';
     const store = useAppStore();
     const showTopButton = ref(false);
-    const { setLocale } = useI18n();
+    const { setLocale, locale } = useI18n();
+    // <html lang> follows the active locale on SSR and on every switch, so screen readers use the right language.
+    useHead({ htmlAttrs: { lang: locale } });
     onMounted(() => {
         appSetting.init(setLocale);
 

@@ -160,7 +160,7 @@
             {{ $t('apiKey.card.lastUsed') }}
           </div>
           <div class="stat-value">
-            {{ apiKey.lastUsedAt ? formatRelativeTime(apiKey.lastUsedAt) : $t('common.never') }}
+            {{ formatDateTime(apiKey.lastUsedAt) }}
           </div>
         </div>
       </div>
@@ -283,8 +283,8 @@
         <div class="metadata-grid">
           <div class="metadata-item">
             <span class="metadata-label">{{ $t('apiKey.card.created') }}</span>
-            <span class="metadata-value" :title="formatFullDate(apiKey.createdAt)">
-              {{ formatRelativeTime(apiKey.createdAt) }}
+            <span class="metadata-value">
+              {{ formatDateTime(apiKey.createdAt) }}
             </span>
           </div>
           
@@ -293,9 +293,8 @@
             <span 
               class="metadata-value"
               :class="getExpiryStatusClasses(apiKey.expiresAt)"
-              :title="formatFullDate(apiKey.expiresAt)"
             >
-              {{ formatRelativeTime(apiKey.expiresAt) }}
+              {{ formatDateTime(apiKey.expiresAt) }}
             </span>
           </div>
           
@@ -348,6 +347,7 @@
 
 <script setup lang="ts">
 import { logger } from '~/utils/logger'
+import { formatDateTime, formatNumber } from '~/utils/display-format'
 
 import type { ApiKey } from '~/types/api-key'
 
@@ -474,27 +474,6 @@ const copyToClipboard = async (text: string): Promise<void> => {
   } catch (error) {
     logger.error('Failed to copy to clipboard:', error)
   }
-}
-
-const formatNumber = (num: number): string => {
-  return num.toLocaleString()
-}
-
-const formatRelativeTime = (date: string): string => {
-  const now = new Date()
-  const target = new Date(date)
-  const diffInSeconds = Math.floor((now.getTime() - target.getTime()) / 1000)
-  
-  if (Math.abs(diffInSeconds) < 60) return 'Just now'
-  if (Math.abs(diffInSeconds) < 3600) return `${Math.floor(Math.abs(diffInSeconds) / 60)}m ${diffInSeconds < 0 ? 'from now' : 'ago'}`
-  if (Math.abs(diffInSeconds) < 86400) return `${Math.floor(Math.abs(diffInSeconds) / 3600)}h ${diffInSeconds < 0 ? 'from now' : 'ago'}`
-  if (Math.abs(diffInSeconds) < 2592000) return `${Math.floor(Math.abs(diffInSeconds) / 86400)}d ${diffInSeconds < 0 ? 'from now' : 'ago'}`
-  
-  return target.toLocaleDateString()
-}
-
-const formatFullDate = (date: string): string => {
-  return new Date(date).toLocaleString()
 }
 
 const getUsagePercentage = (current: number, limit: number): number => {

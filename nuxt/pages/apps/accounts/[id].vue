@@ -3,13 +3,13 @@
     <!-- Breadcrumb -->
     <ul class="flex space-x-2 rtl:space-x-reverse">
       <li>
-        <NuxtLink to="/" class="text-primary hover:underline">Dashboard</NuxtLink>
+        <NuxtLink to="/" class="text-primary hover:underline">{{ t('shell.breadcrumb.dashboard') }}</NuxtLink>
       </li>
       <li class="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-        <NuxtLink to="/apps/accounts" class="text-primary hover:underline">Accounts</NuxtLink>
+        <NuxtLink to="/apps/accounts" class="text-primary hover:underline">{{ t('shell.nav.accounts') }}</NuxtLink>
       </li>
       <li class="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-        <span>{{ account?.name || 'Account Details' }}</span>
+        <span>{{ account?.name || t('accounts.detail.title') }}</span>
       </li>
     </ul>
 
@@ -22,10 +22,10 @@
       <!-- Account Not Found -->
       <div v-else-if="!account" class="panel">
         <div class="text-center py-20">
-          <h3 class="text-2xl font-semibold text-gray-500 mb-4">Account Not Found</h3>
-          <p class="text-gray-400 mb-6">The account you're looking for doesn't exist or has been deleted.</p>
+          <h3 class="text-2xl font-semibold text-gray-500 mb-4">{{ t('accounts.detail.notFound') }}</h3>
+          <p class="text-gray-400 mb-6">{{ t('accounts.detail.notFoundDescription') }}</p>
           <NuxtLink to="/apps/accounts" class="btn btn-primary">
-            Back to Accounts
+            {{ t('accounts.actions.backToList') }}
           </NuxtLink>
         </div>
       </div>
@@ -34,26 +34,26 @@
       <div v-else>
         <!-- Header with Account Info -->
         <div class="mb-6">
-          <div class="flex items-center justify-between mb-4">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
             <div>
               <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ account.name }}</h2>
-              <div class="flex items-center gap-3 mt-2">
-                <span class="badge" :class="getAccountTypeBadgeClass(account.type)">
-                  {{ formatAccountType(account.type) }}
+              <div class="flex flex-wrap items-center gap-3 mt-2">
+                <span class="badge whitespace-nowrap" :class="getAccountTypeBadgeClass(account.type)">
+                  {{ accountTypeLabel(account.type) }}
                 </span>
                 <span class="text-sm text-gray-500">
-                  Created {{ formatDate(account.createAt) }}
+                  {{ t('accounts.detail.createdOn', { date: formatDateTime(account.createAt) }) }}
                 </span>
               </div>
             </div>
             <div class="flex gap-3">
-              <button type="button" class="btn btn-outline-primary" @click="openEditModal">
+              <button type="button" class="btn btn-outline-primary whitespace-nowrap" @click="openEditModal">
                 <icon-edit class="h-4 w-4 ltr:mr-2 rtl:ml-2" />
-                Edit Account
+                {{ t('accounts.actions.edit') }}
               </button>
-              <button type="button" class="btn btn-outline-danger" @click="confirmDelete">
+              <button type="button" class="btn btn-outline-danger whitespace-nowrap" @click="confirmDelete">
                 <icon-trash class="h-4 w-4 ltr:mr-2 rtl:ml-2" />
-                Delete
+                {{ t('common.delete') }}
               </button>
             </div>
           </div>
@@ -65,9 +65,9 @@
           <div class="panel">
             <div class="flex items-center justify-between">
               <div>
-                <div class="text-sm text-gray-500 mb-1">Current Balance</div>
+                <div class="text-sm text-gray-500 mb-1">{{ t('accounts.fields.currentBalance') }}</div>
                 <div class="text-2xl font-bold" :class="getBalanceClass(account.currentBalance)">
-                  {{ formatCurrency(account.currentBalance, account.currency) }}
+                  {{ formatCurrency(account.currentBalance) }}
                 </div>
               </div>
               <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
@@ -80,9 +80,9 @@
           <div class="panel">
             <div class="flex items-center justify-between">
               <div>
-                <div class="text-sm text-gray-500 mb-1">Initial Balance</div>
+                <div class="text-sm text-gray-500 mb-1">{{ t('accounts.fields.initialBalance') }}</div>
                 <div class="text-2xl font-bold text-gray-700 dark:text-gray-300">
-                  {{ formatCurrency(account.initialBalance, account.currency) }}
+                  {{ formatCurrency(account.initialBalance) }}
                 </div>
               </div>
               <div class="w-12 h-12 bg-success/10 rounded-full flex items-center justify-center">
@@ -95,9 +95,9 @@
           <div v-if="account.availableLimit" class="panel">
             <div class="flex items-center justify-between">
               <div>
-                <div class="text-sm text-gray-500 mb-1">Available Limit</div>
+                <div class="text-sm text-gray-500 mb-1">{{ t('accounts.fields.availableLimit') }}</div>
                 <div class="text-2xl font-bold text-blue-600">
-                  {{ formatCurrency(account.availableLimit, account.currency) }}
+                  {{ formatCurrency(account.availableLimit) }}
                 </div>
               </div>
               <div class="w-12 h-12 bg-info/10 rounded-full flex items-center justify-center">
@@ -110,7 +110,7 @@
           <div v-if="account.cardNumber" class="panel">
             <div class="flex items-center justify-between">
               <div>
-                <div class="text-sm text-gray-500 mb-1">Card Number</div>
+                <div class="text-sm text-gray-500 mb-1">{{ t('accounts.fields.cardNumber') }}</div>
                 <div class="text-lg font-mono text-gray-700 dark:text-gray-300">
                   {{ maskCardNumber(account.cardNumber) }}
                 </div>
@@ -125,31 +125,31 @@
         <!-- Account Details Panel -->
         <div class="panel mb-6">
           <div class="mb-5">
-            <h6 class="text-lg font-semibold">Account Information</h6>
+            <h6 class="text-lg font-semibold">{{ t('accounts.detail.information') }}</h6>
           </div>
           <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <div>
-              <label class="text-sm text-gray-500">Account Name</label>
+              <label class="text-sm text-gray-500">{{ t('accounts.fields.name') }}</label>
               <div class="text-base font-medium">{{ account.name }}</div>
             </div>
             <div>
-              <label class="text-sm text-gray-500">Account Type</label>
-              <div class="text-base font-medium">{{ formatAccountType(account.type) }}</div>
+              <label class="text-sm text-gray-500">{{ t('accounts.fields.type') }}</label>
+              <div class="text-base font-medium">{{ accountTypeLabel(account.type) }}</div>
             </div>
             <div>
-              <label class="text-sm text-gray-500">Currency</label>
+              <label class="text-sm text-gray-500">{{ t('accounts.fields.currency') }}</label>
               <div class="text-base font-medium">{{ account.currency }}</div>
             </div>
             <div>
-              <label class="text-sm text-gray-500">Created Date</label>
-              <div class="text-base font-medium">{{ formatDate(account.createAt) }}</div>
+              <label class="text-sm text-gray-500">{{ t('accounts.fields.createdDate') }}</label>
+              <div class="text-base font-medium">{{ formatDateTime(account.createAt) }}</div>
             </div>
             <div>
-              <label class="text-sm text-gray-500">Last Updated</label>
-              <div class="text-base font-medium">{{ formatDate(account.updateAt) }}</div>
+              <label class="text-sm text-gray-500">{{ t('accounts.fields.updatedDate') }}</label>
+              <div class="text-base font-medium">{{ formatDateTime(account.updateAt) }}</div>
             </div>
             <div v-if="account.createBy">
-              <label class="text-sm text-gray-500">Created By</label>
+              <label class="text-sm text-gray-500">{{ t('accounts.fields.createdBy') }}</label>
               <div class="text-base font-medium">{{ account.createBy }}</div>
             </div>
           </div>
@@ -158,7 +158,7 @@
         <!-- Balance Chart -->
         <div class="panel mb-6">
           <div class="mb-5 flex items-center justify-between">
-            <h6 class="text-lg font-semibold">Balance History</h6>
+            <h6 class="text-lg font-semibold">{{ t('accounts.detail.balanceHistory') }}</h6>
             <div class="dropdown">
               <client-only>
                 <Popper :placement="store.rtlClass === 'rtl' ? 'bottom-start' : 'bottom-end'">
@@ -167,10 +167,10 @@
                   </button>
                   <template #content="{ close }">
                     <ul @click="close()">
-                      <li><a href="#" @click="changeChartPeriod('7d')">Last 7 Days</a></li>
-                      <li><a href="#" @click="changeChartPeriod('30d')">Last 30 Days</a></li>
-                      <li><a href="#" @click="changeChartPeriod('90d')">Last 90 Days</a></li>
-                      <li><a href="#" @click="changeChartPeriod('1y')">Last Year</a></li>
+                      <li><a href="#" @click="changeChartPeriod('7d')">{{ t('accounts.detail.period.last7Days') }}</a></li>
+                      <li><a href="#" @click="changeChartPeriod('30d')">{{ t('accounts.detail.period.last30Days') }}</a></li>
+                      <li><a href="#" @click="changeChartPeriod('90d')">{{ t('accounts.detail.period.last90Days') }}</a></li>
+                      <li><a href="#" @click="changeChartPeriod('1y')">{{ t('accounts.detail.period.lastYear') }}</a></li>
                     </ul>
                   </template>
                 </Popper>
@@ -181,17 +181,17 @@
           <client-only>
             <apexchart v-if="chartOptions && chartSeries" height="300" :options="chartOptions" :series="chartSeries" />
             <div v-else class="flex justify-center py-20">
-              <div class="text-gray-500">No chart data available</div>
+              <div class="text-gray-500">{{ t('accounts.detail.noChartData') }}</div>
             </div>
           </client-only>
         </div>
 
         <!-- Recent Transactions -->
         <div class="panel">
-          <div class="mb-5 flex items-center justify-between">
-            <h6 class="text-lg font-semibold">Recent Transactions</h6>
-            <NuxtLink to="/apps/transactions" class="btn btn-outline-primary btn-sm">
-              View All Transactions
+          <div class="mb-5 flex flex-wrap items-center justify-between gap-2">
+            <h6 class="text-lg font-semibold">{{ t('accounts.detail.recentTransactions') }}</h6>
+            <NuxtLink to="/apps/transactions" class="btn btn-outline-primary btn-sm whitespace-nowrap">
+              {{ t('accounts.actions.viewAllTransactions') }}
             </NuxtLink>
           </div>
 
@@ -199,10 +199,10 @@
             <table class="table-auto">
               <thead>
                 <tr>
-                  <th>Date</th>
-                  <th>Description</th>
-                  <th>Amount</th>
-                  <th>Balance</th>
+                  <th>{{ t('accounts.detail.date') }}</th>
+                  <th>{{ t('accounts.detail.description') }}</th>
+                  <th>{{ t('accounts.detail.amount') }}</th>
+                  <th>{{ t('accounts.detail.balance') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -211,18 +211,18 @@
                   <td>{{ transaction.description }}</td>
                   <td>
                     <span class="font-semibold" :class="transaction.amount >= 0 ? 'text-green-600' : 'text-red-600'">
-                      {{ formatCurrency(transaction.amount, account.currency) }}
+                      {{ formatCurrency(transaction.amount) }}
                     </span>
                   </td>
                   <td>
                     <span class="font-semibold">
-                      {{ formatCurrency(transaction.balance, account.currency) }}
+                      {{ formatCurrency(transaction.balance) }}
                     </span>
                   </td>
                 </tr>
                 <tr v-if="!recentTransactions.length">
                   <td colspan="4" class="text-center py-10 text-gray-500">
-                    No transactions found
+                    {{ t('accounts.detail.noTransactions') }}
                   </td>
                 </tr>
               </tbody>
@@ -239,12 +239,15 @@
 
 <script setup lang="ts">
 import { logger } from '~/utils/logger'
+import { formatDateTime } from '~/utils/display-format'
 
 import { useAppStore } from '@/stores/index'
 import { useAccounts } from '@/composables/useAccounts'
-import type { Account } from '~/types'
+import type { Account, AccountType } from '~/types'
+import type { ApiError } from '~/types/api'
 import Swal from 'sweetalert2'
 
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const store = useAppStore()
@@ -252,13 +255,19 @@ const store = useAppStore()
 const {
   getAccountById,
   deleteAccount,
-  formatAccountType,
+  getAccountTypeLabelKey,
   getAccountTypeBadgeClass,
   maskCardNumber,
   formatCurrency,
   getBalanceClass,
   formatDate
 } = useAccounts()
+
+// An empty or unknown type is shown as the backend sent it.
+const accountTypeLabel = (type: AccountType): string => {
+  const key = getAccountTypeLabelKey(type)
+  return key ? t(key) : String(type ?? '')
+}
 
 // Reactive data
 const account = ref<Account | null>(null)
@@ -339,12 +348,12 @@ const chartOptions = computed(() => {
     },
     yaxis: {
       labels: {
-        formatter: (value: number) => formatCurrency(value, account.value?.currency)
+        formatter: (value: number) => formatCurrency(value)
       }
     },
     tooltip: {
       y: {
-        formatter: (value: number) => formatCurrency(value, account.value?.currency)
+        formatter: (value: number) => formatCurrency(value)
       }
     }
   }
@@ -355,7 +364,7 @@ const chartSeries = computed(() => {
 
   // Mock balance history data
   return [{
-    name: 'Balance',
+    name: t('accounts.detail.balance'),
     data: [2000, 2500, 2200, 2800, 2600, 2900, account.value.currentBalance]
   }]
 })
@@ -381,30 +390,35 @@ const openEditModal = () => {
 const handleAccountUpdated = () => {
   isEditModalOpen.value = false
   fetchAccount()
-  showSuccessMessage('Account updated successfully')
+  showSuccessMessage(t('accounts.messages.updated'))
 }
 
 const confirmDelete = async () => {
   if (!account.value) return
 
   const result = await Swal.fire({
-    title: 'Are you sure?',
-    text: `Delete account "${account.value.name}"? This action cannot be undone.`,
+    title: t('common.confirmation.title'),
+    text: t('accounts.confirm.deleteIrreversible', { name: account.value.name ?? '' }),
     icon: 'warning',
     showCancelButton: true,
     confirmButtonColor: '#d33',
     cancelButtonColor: '#3085d6',
-    confirmButtonText: 'Yes, delete it!'
+    confirmButtonText: t('common.confirmation.yesDelete'),
+    cancelButtonText: t('common.cancel')
   })
 
   if (result.isConfirmed) {
     try {
       await deleteAccount(account.value.id)
-      showSuccessMessage('Account deleted successfully')
+      showSuccessMessage(t('accounts.messages.deleted'))
       router.push('/apps/accounts')
     } catch (error) {
       logger.error('Error deleting account:', error)
-      showErrorMessage('Failed to delete account')
+      // A frontend message carries messageKey; a backend message is shown verbatim.
+      const apiError = error as Partial<ApiError> | null
+      showErrorMessage(apiError?.messageKey
+        ? t(apiError.messageKey, apiError.messageParams ?? {})
+        : apiError?.message || t('accounts.errors.deleteFailed'))
     }
   }
 }
@@ -417,7 +431,7 @@ const changeChartPeriod = (period: string) => {
 const showSuccessMessage = (message: string) => {
   Swal.fire({
     icon: 'success',
-    title: 'Success',
+    title: t('common.success'),
     text: message,
     timer: 2000,
     showConfirmButton: false
@@ -427,8 +441,9 @@ const showSuccessMessage = (message: string) => {
 const showErrorMessage = (message: string) => {
   Swal.fire({
     icon: 'error',
-    title: 'Error',
-    text: message
+    title: t('common.error'),
+    text: message,
+    confirmButtonText: t('common.ok')
   })
 }
 
@@ -439,6 +454,6 @@ onMounted(() => {
 
 // SEO
 useHead({
-  title: computed(() => `${account.value?.name || 'Account'} - CoreFinance`)
+  title: computed(() => `${account.value?.name || t('accounts.detail.pageTitleFallback')} - CoreFinance`)
 })
 </script>

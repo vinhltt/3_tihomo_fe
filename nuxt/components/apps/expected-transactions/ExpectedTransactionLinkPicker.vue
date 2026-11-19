@@ -1,20 +1,20 @@
 <template>
     <div>
-        <label for="actual-search" class="mb-1 block text-sm font-medium">Tìm giao dịch có sẵn</label>
-        <input id="actual-search" v-model="search" type="search" class="form-input" placeholder="Tìm theo mô tả hoặc danh mục" :disabled="saving" />
-        <p class="mt-1 text-sm text-gray-500">Chọn một giao dịch của bạn. Liên kết không tạo thêm giao dịch; máy chủ kiểm tra giao dịch chưa gắn với kỳ khác.</p>
+        <label for="actual-search" class="mb-1 block text-sm font-medium">{{ t('expected.link.search') }}</label>
+        <input id="actual-search" v-model="search" type="search" class="form-input" :placeholder="t('expected.link.searchPlaceholder')" :disabled="saving" />
+        <p class="mt-1 text-sm text-gray-500">{{ t('expected.link.hint') }}</p>
     </div>
     <div :aria-busy="loading">
-        <p v-if="loading" role="status" class="py-6 text-center text-gray-500">Đang tải giao dịch có sẵn...</p>
+        <p v-if="loading" role="status" class="py-6 text-center text-gray-500">{{ t('expected.link.loading') }}</p>
         <div v-else-if="error" role="alert" class="rounded-lg bg-danger/10 p-3 text-danger">
-            <p>Không thể tải giao dịch: {{ error }}</p>
-            <button type="button" class="btn btn-sm btn-outline-primary mt-2" :disabled="saving" @click="load()">Thử tải lại giao dịch</button>
+            <p>{{ t('expected.link.loadFailed', { error: errorText }) }}</p>
+            <button type="button" class="btn btn-sm btn-outline-primary mt-2" :disabled="saving" @click="load()">{{ t('expected.link.retry') }}</button>
         </div>
-        <p v-else-if="rows.length === 0" class="py-6 text-center text-gray-500">Không có giao dịch phù hợp để lựa chọn.</p>
+        <p v-else-if="rows.length === 0" class="py-6 text-center text-gray-500">{{ t('expected.link.empty') }}</p>
         <div v-else class="table-responsive">
             <table class="table-hover">
                 <thead>
-                    <tr><th>Chọn</th><th>Ngày</th><th>Mô tả / Mã</th><th>Thu</th><th>Chi</th></tr>
+                    <tr><th>{{ t('expected.link.select') }}</th><th>{{ t('transactions.fields.date') }}</th><th>{{ t('expected.link.descriptionId') }}</th><th>{{ t('enums.transactionDirection.revenue') }}</th><th>{{ t('enums.transactionDirection.spent') }}</th></tr>
                 </thead>
                 <tbody>
                     <tr v-for="actual in rows" :key="actual.id" :class="selected?.id === actual.id ? 'bg-primary/10' : ''">
@@ -24,14 +24,14 @@
                                 name="actual-transaction"
                                 class="form-radio"
                                 :checked="selected?.id === actual.id"
-                                :aria-label="`Chọn giao dịch ${actual.id}`"
+                                :aria-label="t('expected.link.selectTransaction', { id: actual.id })"
                                 :disabled="saving || conflictBlocked"
                                 @change="emit('selected', actual)"
                             />
                         </td>
                         <td class="whitespace-nowrap">{{ formatDate(actual.transactionDate) }}</td>
                         <td class="max-w-xs">
-                            <p>{{ actual.description || 'Không có mô tả' }}</p>
+                            <p>{{ actual.description || t('transactions.confirm.noDescription') }}</p>
                             <p v-if="actual.categorySummary" class="mt-1 text-xs text-gray-500">{{ actual.categorySummary }}</p>
                             <p class="mt-1 break-all text-xs text-gray-500">{{ actual.id }}</p>
                         </td>
@@ -42,25 +42,25 @@
             </table>
         </div>
         <div v-if="!loading && !error && pagination.totalRow > 0" class="mt-3 flex flex-wrap items-center justify-between gap-3 text-sm">
-            <p>Hiển thị {{ firstRow }}–{{ lastRow }} trong {{ pagination.totalRow }} giao dịch</p>
+            <p>{{ t('transactions.pagination.summary', { from: firstRow, to: lastRow, total: pagination.totalRow }) }}</p>
             <div class="flex items-center gap-2">
-                <button type="button" class="btn btn-sm btn-outline-primary" :disabled="saving || pagination.pageIndex <= 1" @click="load(pagination.pageIndex - 1)">Trước</button>
-                <span>Trang {{ pagination.pageIndex }} / {{ pagination.pageCount }}</span>
-                <button type="button" class="btn btn-sm btn-outline-primary" :disabled="saving || pagination.pageIndex >= pagination.pageCount" @click="load(pagination.pageIndex + 1)">Sau</button>
+                <button type="button" class="btn btn-sm btn-outline-primary" :disabled="saving || pagination.pageIndex <= 1" @click="load(pagination.pageIndex - 1)">{{ t('common.previous') }}</button>
+                <span>{{ t('transactions.pagination.page', { current: pagination.pageIndex, total: pagination.pageCount }) }}</span>
+                <button type="button" class="btn btn-sm btn-outline-primary" :disabled="saving || pagination.pageIndex >= pagination.pageCount" @click="load(pagination.pageIndex + 1)">{{ t('common.next') }}</button>
             </div>
         </div>
     </div>
     <div v-if="selected" class="rounded-lg border border-primary/30 bg-primary/10 p-3 text-sm">
-        <p class="break-all font-semibold">Giao dịch đã chọn: {{ selected.id }}</p>
-        <p class="mt-1">Ngày: {{ formatDate(selected.transactionDate) }}</p>
-        <p class="mt-1">Thu: {{ formatCurrency(selected.revenueAmount) }} · Chi: {{ formatCurrency(selected.spentAmount) }}</p>
+        <p class="break-all font-semibold">{{ t('expected.link.selected') }}: {{ selected.id }}</p>
+        <p class="mt-1">{{ t('transactions.fields.date') }}: {{ formatDate(selected.transactionDate) }}</p>
+        <p class="mt-1">{{ t('enums.transactionDirection.revenue') }}: {{ formatCurrency(selected.revenueAmount) }} · {{ t('enums.transactionDirection.spent') }}: {{ formatCurrency(selected.spentAmount) }}</p>
     </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useTransactions } from '~/composables/useTransactions'
-import type { Pagination } from '~/types/api'
+import type { ApiError, Pagination } from '~/types/api'
 import type { TransactionViewModel } from '~/types/transaction'
 import { errorMessage, formatCurrency, formatDate } from '~/utils/expected-transaction-formatters'
 
@@ -77,13 +77,20 @@ const emptyPagination = (): Pagination => ({ pageIndex: 1, pageSize: 10, totalRo
 const search = ref('')
 const rows = ref<TransactionViewModel[]>([])
 const loading = ref(true)
-const error = ref<string | null>(null)
+const error = ref<Pick<ApiError, 'messageKey' | 'messageParams' | 'message'> | null>(null)
 const pagination = ref<Pagination>(emptyPagination())
 let disposed = false
 let sequence = 0
 let controller: AbortController | null = null
 let searchTimer: ReturnType<typeof setTimeout> | null = null
 
+const { t } = useI18n()
+
+// A frontend message carries messageKey; a backend message is shown verbatim.
+const errorText = computed(() => {
+    const apiError = error.value
+    return apiError?.messageKey ? t(apiError.messageKey, apiError.messageParams ?? {}) : apiError?.message || t('expected.errors.retryTransactions')
+})
 const firstRow = computed(() => (pagination.value.pageIndex - 1) * pagination.value.pageSize + 1)
 const lastRow = computed(() => Math.min(pagination.value.pageIndex * pagination.value.pageSize, pagination.value.totalRow))
 
@@ -113,7 +120,7 @@ const load = async (page = pagination.value.pageIndex): Promise<void> => {
         rows.value = response.data
         pagination.value = response.pagination
     } catch (err) {
-        if (isCurrent()) error.value = errorMessage(err, 'Vui lòng thử tải lại giao dịch.')
+        if (isCurrent()) error.value = errorMessage(err, 'expected.errors.retryTransactions')
     } finally {
         if (isCurrent()) {
             loading.value = false

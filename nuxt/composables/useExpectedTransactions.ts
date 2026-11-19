@@ -39,7 +39,9 @@ const normalizeStatus = (value: number | string): ExpectedTransactionStatus => {
       return ExpectedTransactionStatus.Completed
     default:
       throw {
-        message: `API trả về trạng thái kỳ không được hỗ trợ: ${String(value)}.`,
+        message: `API returned an unsupported period status: ${String(value)}.`,
+        messageKey: 'expected.errors.unsupportedStatus',
+        messageParams: { value: String(value) },
         statusCode: 500
       } satisfies ApiError
   }
@@ -62,7 +64,9 @@ const normalizeTransactionType = (value: number | string): RecurringTransactionT
       return RecurringTransactionType.Transfer
     default:
       throw {
-        message: `API trả về loại giao dịch kỳ không được hỗ trợ: ${String(value)}.`,
+        message: `API returned an unsupported period transaction type: ${String(value)}.`,
+        messageKey: 'expected.errors.unsupportedType',
+        messageParams: { value: String(value) },
         statusCode: 500
       } satisfies ApiError
   }
@@ -92,7 +96,8 @@ const buildExpectedFilterBody = (
 ): FilterBodyRequest => {
   if (!Number.isInteger(pageIndex) || pageIndex < 1 || !Number.isInteger(pageSize) || pageSize < 1) {
     throw {
-      message: 'Chỉ số trang và số dòng mỗi trang phải là số nguyên dương.',
+      message: 'Page index and page size must be positive integers.',
+      messageKey: 'expected.errors.invalidPaging',
       statusCode: 400
     } satisfies ApiError
   }

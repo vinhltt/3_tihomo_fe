@@ -4,9 +4,9 @@
     <div>
       <div class="flex items-center justify-between mb-4">
         <div>
-          <h4 class="text-lg font-medium text-gray-900 dark:text-white">IP Whitelist Management</h4>
+          <h4 class="text-lg font-medium text-gray-900 dark:text-white">{{ t('apiKey.ipManagement.title') }}</h4>
           <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Manage allowed IP addresses and CIDR ranges for enhanced security
+            {{ t('apiKey.ipManagement.description') }}
           </p>
         </div>
         <div class="flex items-center space-x-2">
@@ -16,7 +16,7 @@
               ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
               : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300'
           ]">
-            {{ apiKey?.securitySettings?.enableIpValidation ? 'IP Validation ON' : 'IP Validation OFF' }}
+            {{ apiKey?.securitySettings?.enableIpValidation ? t('apiKey.ipManagement.validationOn') : t('apiKey.ipManagement.validationOff') }}
           </span>
         </div>
       </div>
@@ -25,9 +25,9 @@
       <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
         <div class="flex items-center justify-between">
           <div>
-            <h5 class="font-medium text-blue-900 dark:text-blue-100">Enable IP Validation</h5>
+            <h5 class="font-medium text-blue-900 dark:text-blue-100">{{ t('apiKey.form.enableIpValidation') }}</h5>
             <p class="text-sm text-blue-700 dark:text-blue-300 mt-1">
-              Restrict API key usage to specific IP addresses or ranges
+              {{ t('apiKey.ipManagement.enableDescription') }}
             </p>
           </div>
           <label class="switch">
@@ -43,32 +43,32 @@
 
       <!-- Add New IP -->
       <div v-if="ipValidationEnabled" class="mb-6">
-        <h5 class="font-medium text-gray-900 dark:text-white mb-3">Add IP Address or CIDR Range</h5>
+        <h5 class="font-medium text-gray-900 dark:text-white mb-3">{{ t('apiKey.ipManagement.addTitle') }}</h5>
         <div class="space-y-4">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="md:col-span-2">
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                IP Address or CIDR Range
+                {{ t('apiKey.ipManagement.addressLabel') }}
               </label>
               <input
                 v-model="newIpInput"
                 type="text"
-                placeholder="e.g., 192.168.1.100 or 10.0.0.0/24"
+                :placeholder="t('apiKey.form.ipWhitelistPlaceholder')"
                 class="form-input"
                 @keyup.enter="addIpAddress"
               />
               <p class="text-xs text-gray-500 mt-1">
-                Supports IPv4, IPv6, and CIDR notation (e.g., 192.168.1.0/24)
+                {{ t('apiKey.ipManagement.addressHint') }}
               </p>
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Description (Optional)
+                {{ t('apiKey.ipManagement.descriptionLabel') }}
               </label>
               <input
                 v-model="newIpDescription"
                 type="text"
-                placeholder="e.g., Office network"
+                :placeholder="t('apiKey.ipManagement.descriptionPlaceholder')"
                 class="form-input"
                 @keyup.enter="addIpAddress"
               />
@@ -82,7 +82,7 @@
               class="btn btn-primary btn-sm"
             >
               <icon-plus class="h-4 w-4 mr-2" />
-              Add IP Address
+              {{ t('apiKey.ipManagement.addAddress') }}
             </button>
             
             <!-- Quick Add Buttons -->
@@ -93,7 +93,7 @@
                 :disabled="addingCurrentIp"
               >
                 <icon-globe-alt class="h-4 w-4 mr-2" />
-                {{ addingCurrentIp ? 'Detecting...' : 'Add Current IP' }}
+                {{ addingCurrentIp ? t('apiKey.ipManagement.detecting') : t('apiKey.ipManagement.addCurrentIp') }}
               </button>
               
               <button
@@ -101,7 +101,7 @@
                 class="btn btn-outline-info btn-sm"
               >
                 <icon-list-bullet class="h-4 w-4 mr-2" />
-                Common Ranges
+                {{ t('apiKey.ipManagement.commonRanges') }}
               </button>
             </div>
           </div>
@@ -109,7 +109,7 @@
           <!-- Validation Error -->
           <div v-if="newIpInput && !isValidIpOrCidr(newIpInput)" class="text-sm text-red-600 dark:text-red-400">
             <icon-exclamation-triangle class="h-4 w-4 inline mr-1" />
-            Please enter a valid IP address or CIDR range
+            {{ t('apiKey.ipManagement.invalidAddress') }}
           </div>
         </div>
       </div>
@@ -118,7 +118,7 @@
       <div v-if="ipValidationEnabled">
         <div class="flex items-center justify-between mb-3">
           <h5 class="font-medium text-gray-900 dark:text-white">
-            Current Whitelist ({{ ipWhitelist.length }})
+            {{ t('apiKey.ipManagement.currentWhitelist', { count: ipWhitelist.length }) }}
           </h5>
           <div class="flex items-center space-x-2">
             <!-- Bulk Actions -->
@@ -128,7 +128,7 @@
               class="btn btn-outline-danger btn-sm"
             >
               <icon-trash class="h-4 w-4 mr-2" />
-              Delete Selected ({{ selectedIps.length }})
+              {{ t('apiKey.ipManagement.deleteSelected', { count: selectedIps.length }) }}
             </button>
             
             <button
@@ -136,7 +136,7 @@
               class="btn btn-outline-secondary btn-sm"
             >
               <icon-arrow-down-tray class="h-4 w-4 mr-2" />
-              Export
+              {{ t('common.export') }}
             </button>
           </div>
         </div>
@@ -163,10 +163,10 @@
                     ip.type === 'single' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' :
                     'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300'
                   ]">
-                    {{ ip.type === 'single' ? 'Single IP' : 'CIDR Range' }}
+                    {{ ip.type === 'single' ? t('apiKey.ipManagement.singleIp') : t('apiKey.ipManagement.cidrRange') }}
                   </span>
                   <span v-if="ip.isCurrentIp" class="px-2 py-1 text-xs rounded-full font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
-                    Current IP
+                    {{ t('apiKey.ipManagement.currentIp') }}
                   </span>
                 </div>
                 <div class="flex items-center space-x-4 mt-1">
@@ -174,10 +174,10 @@
                     {{ ip.description }}
                   </span>
                   <span class="text-xs text-gray-500">
-                    Added {{ formatDate(ip.createdAt) }}
+                    {{ t('apiKey.ipManagement.added', { date: formatDateTime(ip.createdAt) }) }}
                   </span>
                   <span v-if="ip.lastUsed" class="text-xs text-gray-500">
-                    Last used {{ formatDate(ip.lastUsed) }}
+                    {{ t('apiKey.ipManagement.lastUsed', { date: formatDateTime(ip.lastUsed) }) }}
                   </span>
                 </div>
               </div>
@@ -187,9 +187,9 @@
               <!-- Usage Stats -->
               <div v-if="ip.usageCount > 0" class="text-right">
                 <span class="text-sm font-medium text-gray-900 dark:text-white">
-                  {{ ip.usageCount.toLocaleString() }}
+                  {{ formatNumber(ip.usageCount) }}
                 </span>
-                <span class="text-xs text-gray-500 block">requests</span>
+                <span class="text-xs text-gray-500 block">{{ t('apiKey.card.requests') }}</span>
               </div>
               
               <!-- Actions -->
@@ -214,22 +214,22 @@
         <!-- Empty State -->
         <div v-else class="text-center py-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg">
           <icon-shield-exclamation class="h-12 w-12 text-gray-400 mx-auto mb-2" />
-          <p class="text-gray-500">No IP addresses in whitelist</p>
-          <p class="text-sm text-gray-400 mt-1">Add IP addresses to restrict access</p>
+          <p class="text-gray-500">{{ t('apiKey.ipManagement.emptyTitle') }}</p>
+          <p class="text-sm text-gray-400 mt-1">{{ t('apiKey.ipManagement.emptyDescription') }}</p>
         </div>
       </div>
 
       <!-- IP Validation Disabled Message -->
       <div v-else class="text-center py-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg">
         <icon-globe-alt class="h-12 w-12 text-gray-400 mx-auto mb-2" />
-        <p class="text-gray-500">IP Validation is disabled</p>
-        <p class="text-sm text-gray-400 mt-1">Enable IP validation to restrict access to specific addresses</p>
+        <p class="text-gray-500">{{ t('apiKey.ipManagement.disabledTitle') }}</p>
+        <p class="text-sm text-gray-400 mt-1">{{ t('apiKey.ipManagement.disabledDescription') }}</p>
       </div>
     </div>
 
     <!-- Recent IP Activity -->
     <div v-if="ipValidationEnabled">
-      <h5 class="font-medium text-gray-900 dark:text-white mb-3">Recent IP Activity</h5>
+      <h5 class="font-medium text-gray-900 dark:text-white mb-3">{{ t('apiKey.ipManagement.recentActivity') }}</h5>
       <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
         <div class="space-y-2">
           <div v-for="activity in recentIpActivity" :key="activity.id" class="flex items-center justify-between">
@@ -246,19 +246,19 @@
                 activity.status === 'blocked' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' :
                 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
               ]">
-                {{ activity.status }}
+                {{ activityStatusLabels[activity.status] ? t(activityStatusLabels[activity.status]) : String(activity.status ?? '') }}
               </span>
             </div>
             <div class="text-right">
               <span class="text-sm text-gray-600 dark:text-gray-400">
-                {{ formatDate(activity.timestamp) }}
+                {{ formatDateTime(activity.timestamp) }}
               </span>
             </div>
           </div>
         </div>
         
         <div v-if="recentIpActivity.length === 0" class="text-center py-4">
-          <p class="text-sm text-gray-500">No recent IP activity</p>
+          <p class="text-sm text-gray-500">{{ t('apiKey.ipManagement.noRecentActivity') }}</p>
         </div>
       </div>
     </div>
@@ -269,7 +269,7 @@
         @click="$emit('cancel')"
         class="btn btn-outline-secondary"
       >
-        Cancel
+        {{ t('common.cancel') }}
       </button>
       <button
         @click="saveChanges"
@@ -277,7 +277,7 @@
         class="btn btn-primary"
       >
         <icon-check class="h-4 w-4 mr-2" />
-        {{ saving ? 'Saving...' : 'Save Changes' }}
+        {{ saving ? t('common.saving') : t('common.saveChanges') }}
       </button>
     </div>
 
@@ -288,7 +288,7 @@
         
         <div class="bg-white dark:bg-gray-900 rounded-lg p-6 max-w-md w-full relative">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Common IP Ranges</h3>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ t('apiKey.ipManagement.commonRangesTitle') }}</h3>
             <button @click="showCommonRanges = false" class="text-gray-400 hover:text-gray-600">
               <icon-x-mark class="h-5 w-5" />
             </button>
@@ -302,7 +302,7 @@
               class="w-full text-left p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800"
             >
               <div class="font-mono text-sm">{{ range.cidr }}</div>
-              <div class="text-xs text-gray-500">{{ range.description }}</div>
+              <div class="text-xs text-gray-500">{{ t(range.descriptionKey) }}</div>
             </button>
           </div>
         </div>
@@ -312,7 +312,9 @@
 </template>
 
 <script setup lang="ts">
+import Swal from 'sweetalert2'
 import { logger } from '~/utils/logger'
+import { formatDateTime, formatNumber } from '~/utils/display-format'
 
 import type { ApiKey } from '~/types/api-key'
 
@@ -330,6 +332,13 @@ interface Emits {
 }
 
 const emit = defineEmits<Emits>()
+const { t } = useI18n()
+
+// Activity status → translation key; a status missing from the map is shown verbatim
+const activityStatusLabels: Record<string, string> = {
+  allowed: 'apiKey.ipManagement.activityStatus.allowed',
+  blocked: 'apiKey.ipManagement.activityStatus.blocked'
+}
 
 // Reactive state
 const ipValidationEnabled = ref(props.apiKey?.securitySettings?.enableIpValidation || false)
@@ -397,11 +406,11 @@ const recentIpActivity = ref([
 ])
 
 const commonIpRanges = ref([
-  { cidr: '10.0.0.0/8', description: 'Private network (Class A)' },
-  { cidr: '172.16.0.0/12', description: 'Private network (Class B)' },
-  { cidr: '192.168.0.0/16', description: 'Private network (Class C)' },
-  { cidr: '127.0.0.0/8', description: 'Loopback addresses' },
-  { cidr: '0.0.0.0/0', description: 'All IPv4 addresses (not recommended)' }
+  { cidr: '10.0.0.0/8', descriptionKey: 'apiKey.ipManagement.ranges.classA' },
+  { cidr: '172.16.0.0/12', descriptionKey: 'apiKey.ipManagement.ranges.classB' },
+  { cidr: '192.168.0.0/16', descriptionKey: 'apiKey.ipManagement.ranges.classC' },
+  { cidr: '127.0.0.0/8', descriptionKey: 'apiKey.ipManagement.ranges.loopback' },
+  { cidr: '0.0.0.0/0', descriptionKey: 'apiKey.ipManagement.ranges.allIpv4' }
 ])
 
 /**
@@ -456,7 +465,7 @@ const addCurrentIp = async (): Promise<void> => {
     const currentIp = '203.162.4.191' // Mock current IP
     
     newIpInput.value = currentIp
-    newIpDescription.value = 'Current IP (auto-detected)'
+    newIpDescription.value = t('apiKey.ipManagement.currentIpDescription')
     addIpAddress()
   } catch (error) {
     logger.error('Failed to detect current IP:', error)
@@ -467,7 +476,7 @@ const addCurrentIp = async (): Promise<void> => {
 
 const selectCommonRange = (range: typeof commonIpRanges.value[0]): void => {
   newIpInput.value = range.cidr
-  newIpDescription.value = range.description
+  newIpDescription.value = t(range.descriptionKey)
   showCommonRanges.value = false
 }
 
@@ -482,8 +491,20 @@ const deleteIp = (ipId: string): void => {
   hasChanges.value = true
 }
 
-const bulkDeleteIps = (): void => {
-  if (confirm(`Are you sure you want to delete ${selectedIps.value.length} IP addresses?`)) {
+const bulkDeleteIps = async (): Promise<void> => {
+  const result = await Swal.fire({
+    title: t('common.confirmation.title'),
+    text: t('apiKey.ipManagement.bulkDeleteConfirm', { count: selectedIps.value.length }),
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: t('common.confirmation.yesDelete'),
+    cancelButtonText: t('common.cancel'),
+    // The host page shows this component inside a z-[9999] modal; keep the dialog above it.
+    customClass: { container: '!z-[10001]' }
+  })
+  if (result.isConfirmed) {
     ipWhitelist.value = ipWhitelist.value.filter(ip => !selectedIps.value.includes(ip.id))
     selectedIps.value = []
     hasChanges.value = true
@@ -531,22 +552,6 @@ const saveChanges = async (): Promise<void> => {
   } finally {
     saving.value = false
   }
-}
-
-const formatDate = (dateString: string): string => {
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffMins = Math.floor(diffMs / 60000)
-  const diffHours = Math.floor(diffMins / 60)
-  const diffDays = Math.floor(diffHours / 24)
-  
-  if (diffMins < 1) return 'just now'
-  if (diffMins < 60) return `${diffMins} minutes ago`
-  if (diffHours < 24) return `${diffHours} hours ago`
-  if (diffDays < 7) return `${diffDays} days ago`
-  
-  return date.toLocaleDateString('vi-VN')
 }
 
 /**

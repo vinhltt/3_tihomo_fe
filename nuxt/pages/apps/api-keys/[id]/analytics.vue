@@ -9,12 +9,12 @@
             class="btn btn-outline-secondary btn-sm"
           >
             <icon-arrow-left class="h-4 w-4 mr-2" />
-            Back
+            {{ $t('common.back') }}
           </button>
-          <h5 class="font-semibold text-lg dark:text-white-light">Advanced Analytics Dashboard</h5>
+          <h5 class="font-semibold text-lg dark:text-white-light">{{ $t('apiKey.analyticsPage.title') }}</h5>
         </div>
         <p class="text-sm text-gray-500 dark:text-gray-400">
-          Comprehensive analytics and security insights for: <span class="font-medium text-primary">{{ apiKey?.name || keyId }}</span>
+          {{ $t('apiKey.analyticsPage.subtitle') }} <span class="font-medium text-primary">{{ apiKey?.name || keyId }}</span>
         </p>
       </div>
 
@@ -26,20 +26,20 @@
     <div v-if="loading" class="flex items-center justify-center py-20">
       <div class="text-center">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-        <p class="text-gray-500">Loading analytics dashboard...</p>
+        <p class="text-gray-500">{{ $t('apiKey.analyticsPage.loading') }}</p>
       </div>
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="panel !p-8 text-center">
+    <div v-else-if="loadError" class="panel !p-8 text-center">
       <div class="w-16 h-16 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center mx-auto mb-4">
         <icon-exclamation-triangle class="h-8 w-8 text-red-600" />
       </div>
-      <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">Failed to load analytics</h3>
-      <p class="text-gray-500 mb-4">{{ error }}</p>
+      <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">{{ $t('apiKey.detail.loadFailedTitle') }}</h3>
+      <p class="text-gray-500 mb-4">{{ errorText }}</p>
       <button @click="refreshData" class="btn btn-primary">
         <icon-arrow-path class="h-4 w-4 mr-2" />
-        Retry
+        {{ $t('common.retry') }}
       </button>
     </div>
 
@@ -50,9 +50,9 @@
         <div class="panel !p-4">
           <div class="text-center">
             <icon-users class="h-8 w-8 text-primary mx-auto mb-2" />
-            <p class="text-xs text-gray-500 dark:text-gray-400">Unique IPs</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">{{ $t('apiKey.analyticsPage.uniqueIps') }}</p>
             <p class="text-lg font-semibold text-gray-900 dark:text-white">
-              {{ analyticsData?.uniqueIps || '0' }}
+              {{ formatNumber(analyticsData?.uniqueIps ?? 0) }}
             </p>
           </div>
         </div>
@@ -60,9 +60,9 @@
         <div class="panel !p-4">
           <div class="text-center">
             <icon-globe-alt class="h-8 w-8 text-success mx-auto mb-2" />
-            <p class="text-xs text-gray-500 dark:text-gray-400">Countries</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">{{ $t('apiKey.analyticsPage.countries') }}</p>
             <p class="text-lg font-semibold text-success">
-              {{ analyticsData?.countriesCount || '0' }}
+              {{ formatNumber(analyticsData?.countriesCount ?? 0) }}
             </p>
           </div>
         </div>
@@ -70,9 +70,9 @@
         <div class="panel !p-4">
           <div class="text-center">
             <icon-device-phone-mobile class="h-8 w-8 text-info mx-auto mb-2" />
-            <p class="text-xs text-gray-500 dark:text-gray-400">User Agents</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">{{ $t('apiKey.analyticsPage.userAgents') }}</p>
             <p class="text-lg font-semibold text-info">
-              {{ analyticsData?.userAgentsCount || '0' }}
+              {{ formatNumber(analyticsData?.userAgentsCount ?? 0) }}
             </p>
           </div>
         </div>
@@ -80,9 +80,9 @@
         <div class="panel !p-4">
           <div class="text-center">
             <icon-clock class="h-8 w-8 text-warning mx-auto mb-2" />
-            <p class="text-xs text-gray-500 dark:text-gray-400">Peak Hour</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">{{ $t('apiKey.analyticsPage.peakHour') }}</p>
             <p class="text-lg font-semibold text-warning">
-              {{ analyticsData?.peakHour || '--' }}
+              {{ analyticsData?.peakHour || '-' }}
             </p>
           </div>
         </div>
@@ -90,9 +90,9 @@
         <div class="panel !p-4">
           <div class="text-center">
             <icon-shield-exclamation class="h-8 w-8 text-danger mx-auto mb-2" />
-            <p class="text-xs text-gray-500 dark:text-gray-400">Blocked</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">{{ $t('apiKey.analyticsPage.blocked') }}</p>
             <p class="text-lg font-semibold text-danger">
-              {{ analyticsData?.blockedRequests || '0' }}
+              {{ formatNumber(analyticsData?.blockedRequests ?? 0) }}
             </p>
           </div>
         </div>
@@ -100,9 +100,9 @@
         <div class="panel !p-4">
           <div class="text-center">
             <icon-cpu-chip class="h-8 w-8 text-secondary mx-auto mb-2" />
-            <p class="text-xs text-gray-500 dark:text-gray-400">Endpoints</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">{{ $t('apiKey.analyticsPage.endpoints') }}</p>
             <p class="text-lg font-semibold text-secondary">
-              {{ analyticsData?.endpointsCount || '0' }}
+              {{ formatNumber(analyticsData?.endpointsCount ?? 0) }}
             </p>
           </div>
         </div>
@@ -112,10 +112,10 @@
       <div class="panel !p-4">
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div class="flex items-center space-x-4">
-            <h6 class="font-medium text-gray-900 dark:text-white">Analytics Dashboard</h6>
+            <h6 class="font-medium text-gray-900 dark:text-white">{{ $t('apiKey.analyticsPage.dashboard') }}</h6>
             <div v-if="refreshing" class="flex items-center space-x-2 text-sm text-gray-500">
               <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-              <span>Updating data...</span>
+              <span>{{ $t('apiKey.analyticsPage.updating') }}</span>
             </div>
           </div>
           
@@ -131,14 +131,14 @@
                   selectedTimeRange === range.value ? 'btn-primary' : 'btn-outline-primary'
                 ]"
               >
-                {{ range.label }}
+                {{ $t(range.labelKey) }}
               </button>
             </div>
             
             <!-- Export Button -->
             <button class="btn btn-outline-info btn-sm">
               <icon-arrow-down-tray class="h-4 w-4 mr-2" />
-              Export
+              {{ $t('common.export') }}
             </button>
             
             <!-- Refresh Button -->
@@ -157,17 +157,18 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Request Volume Chart -->
         <div class="panel">
-          <div class="mb-5 flex items-center justify-between">
-            <h5 class="text-lg font-semibold dark:text-white-light">Request Volume by Hour</h5>
+          <div class="mb-5 flex flex-wrap items-center justify-between gap-2">
+            <h5 class="text-lg font-semibold dark:text-white-light">{{ $t('apiKey.analyticsPage.requestVolumeByHour') }}</h5>
             <div class="dropdown">
-              <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle">
-                View Options
+              <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle whitespace-nowrap">
+                {{ $t('apiKey.analyticsPage.viewOptions') }}
               </button>
             </div>
           </div>
           
           <client-only>
             <apexchart
+              :key="`volume-chart-${locale}`"
               height="350"
               type="area"
               :options="volumeChartOptions"
@@ -179,7 +180,7 @@
         <!-- Geographic Distribution -->
         <div class="panel">
           <div class="mb-5 flex items-center justify-between">
-            <h5 class="text-lg font-semibold dark:text-white-light">Geographic Distribution</h5>
+            <h5 class="text-lg font-semibold dark:text-white-light">{{ $t('apiKey.analyticsPage.geographicDistribution') }}</h5>
           </div>
           
           <div class="space-y-3">
@@ -197,7 +198,7 @@
                     :style="{ width: `${country.percentage}%` }"
                   ></div>
                 </div>
-                <span class="text-sm text-gray-500 w-12 text-right">{{ country.requests }}</span>
+                <span class="text-sm text-gray-500 w-12 text-right">{{ formatNumber(country.requests) }}</span>
               </div>
             </div>
           </div>
@@ -206,11 +207,12 @@
         <!-- Response Time Analysis -->
         <div class="panel">
           <div class="mb-5 flex items-center justify-between">
-            <h5 class="text-lg font-semibold dark:text-white-light">Response Time Distribution</h5>
+            <h5 class="text-lg font-semibold dark:text-white-light">{{ $t('apiKey.analyticsPage.responseTimeDistribution') }}</h5>
           </div>
           
           <client-only>
             <apexchart
+              :key="`response-time-chart-${locale}`"
               height="350"
               type="histogram"
               :options="responseTimeChartOptions"
@@ -222,7 +224,7 @@
         <!-- Top Endpoints -->
         <div class="panel">
           <div class="mb-5 flex items-center justify-between">
-            <h5 class="text-lg font-semibold dark:text-white-light">Most Popular Endpoints</h5>
+            <h5 class="text-lg font-semibold dark:text-white-light">{{ $t('apiKey.analyticsPage.popularEndpoints') }}</h5>
           </div>
           
           <div class="space-y-3">
@@ -245,7 +247,7 @@
                     :style="{ width: `${endpoint.percentage}%` }"
                   ></div>
                 </div>
-                <span class="text-sm text-gray-500 w-16 text-right">{{ endpoint.requests }}</span>
+                <span class="text-sm text-gray-500 w-16 text-right">{{ formatNumber(endpoint.requests) }}</span>
               </div>
             </div>
           </div>
@@ -256,21 +258,21 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- IP Address Analysis -->
         <div class="panel">
-          <div class="mb-5 flex items-center justify-between">
-            <h5 class="text-lg font-semibold dark:text-white-light">IP Address Analysis</h5>
+          <div class="mb-5 flex flex-wrap items-center justify-between gap-2">
+            <h5 class="text-lg font-semibold dark:text-white-light">{{ $t('apiKey.analyticsPage.ipAnalysis') }}</h5>
             <button
               @click="showIpManagement = true"
-              class="btn btn-outline-primary btn-sm"
+              class="btn btn-outline-primary btn-sm whitespace-nowrap"
             >
               <icon-cog-6-tooth class="h-4 w-4 mr-2" />
-              Manage IPs
+              {{ $t('apiKey.analyticsPage.manageIps') }}
             </button>
           </div>
           
           <div class="space-y-4">
             <!-- Top IPs -->
             <div>
-              <h6 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Top Request Sources</h6>
+              <h6 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">{{ $t('apiKey.analyticsPage.topSources') }}</h6>
               <div class="space-y-2">
                 <div v-for="ip in topIPs" :key="ip.address" class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                   <div class="flex items-center space-x-3">
@@ -285,7 +287,7 @@
                     </span>
                   </div>
                   <div class="text-right">
-                    <span class="text-sm font-medium">{{ ip.requests }}</span>
+                    <span class="text-sm font-medium">{{ formatNumber(ip.requests) }}</span>
                     <span class="text-xs text-gray-500 block">{{ ip.country }}</span>
                   </div>
                 </div>
@@ -296,7 +298,7 @@
             <div v-if="suspiciousActivity.length > 0">
               <h6 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                 <icon-exclamation-triangle class="h-4 w-4 inline mr-1 text-warning" />
-                Suspicious Activity
+                {{ $t('apiKey.analyticsPage.suspiciousActivity') }}
               </h6>
               <div class="space-y-2">
                 <div v-for="activity in suspiciousActivity" :key="activity.id" class="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
@@ -306,7 +308,7 @@
                       <p class="text-xs text-red-600 dark:text-red-400">{{ activity.reason }}</p>
                     </div>
                     <div class="text-right">
-                      <span class="text-sm font-medium text-red-600">{{ activity.requests }}</span>
+                      <span class="text-sm font-medium text-red-600">{{ formatNumber(activity.requests) }}</span>
                       <span class="text-xs text-gray-500 block">{{ activity.timeAgo }}</span>
                     </div>
                   </div>
@@ -319,14 +321,14 @@
         <!-- Security Score Breakdown -->
         <div class="panel">
           <div class="mb-5 flex items-center justify-between">
-            <h5 class="text-lg font-semibold dark:text-white-light">Security Score Analysis</h5>
+            <h5 class="text-lg font-semibold dark:text-white-light">{{ $t('apiKey.analyticsPage.securityScoreAnalysis') }}</h5>
             <SecurityScore :api-key="apiKey" variant="compact" />
           </div>
           
           <div class="space-y-4">
             <!-- Security Factors -->
             <div>
-              <h6 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Security Factors</h6>
+              <h6 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">{{ $t('apiKey.analyticsPage.securityFactors') }}</h6>
               <div class="space-y-3">
                 <div v-for="factor in securityFactors" :key="factor.name" class="flex items-center justify-between">
                   <div class="flex items-center space-x-2">
@@ -344,7 +346,7 @@
                     />
                     <span class="text-sm">{{ factor.name }}</span>
                   </div>
-                  <span class="text-sm font-medium">{{ factor.score }}/{{ factor.maxScore }}</span>
+                  <span class="text-sm font-medium">{{ formatNumber(factor.score) }}/{{ formatNumber(factor.maxScore) }}</span>
                 </div>
               </div>
             </div>
@@ -353,7 +355,7 @@
             <div v-if="securityRecommendations.length > 0">
               <h6 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                 <icon-light-bulb class="h-4 w-4 inline mr-1 text-warning" />
-                Security Recommendations
+                {{ $t('apiKey.analyticsPage.securityRecommendations') }}
               </h6>
               <div class="space-y-2">
                 <div v-for="recommendation in securityRecommendations" :key="recommendation.id" class="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
@@ -374,18 +376,19 @@
       <!-- Rate Limiting Analytics -->
       <div class="panel" v-if="apiKey?.securitySettings?.enableRateLimiting">
         <div class="mb-5">
-          <h5 class="text-lg font-semibold dark:text-white-light mb-2">Rate Limiting Analytics</h5>
+          <h5 class="text-lg font-semibold dark:text-white-light mb-2">{{ $t('apiKey.analyticsPage.rateLimitingAnalytics') }}</h5>
           <p class="text-sm text-gray-500 dark:text-gray-400">
-            Detailed analysis of rate limiting effectiveness and patterns
+            {{ $t('apiKey.analyticsPage.rateLimitingDescription') }}
           </p>
         </div>
         
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <!-- Rate Limit Hits Over Time -->
           <div>
-            <h6 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Rate Limit Hits</h6>
+            <h6 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">{{ $t('apiKey.analyticsPage.rateLimitHits') }}</h6>
             <client-only>
               <apexchart
+                :key="`rate-limit-chart-${locale}`"
                 height="250"
                 type="bar"
                 :options="rateLimitChartOptions"
@@ -396,12 +399,12 @@
 
           <!-- Current Usage Status -->
           <div>
-            <h6 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Current Usage Status</h6>
+            <h6 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">{{ $t('apiKey.analyticsPage.currentUsageStatus') }}</h6>
             <div class="space-y-4">
               <div v-if="apiKey.rateLimitPerMinute">
                 <div class="flex items-center justify-between mb-2">
-                  <span class="text-sm">Per Minute ({{ apiKey.rateLimitPerMinute }})</span>
-                  <span class="text-sm font-medium">{{ rateLimitStatus.currentMinute }}/{{ apiKey.rateLimitPerMinute }}</span>
+                  <span class="text-sm">{{ $t('apiKey.analyticsPage.perMinute', { value: formatNumber(apiKey.rateLimitPerMinute) }) }}</span>
+                  <span class="text-sm font-medium">{{ formatNumber(rateLimitStatus.currentMinute) }}/{{ formatNumber(apiKey.rateLimitPerMinute) }}</span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
                   <div
@@ -417,8 +420,8 @@
 
               <div v-if="apiKey.rateLimitPerDay">
                 <div class="flex items-center justify-between mb-2">
-                  <span class="text-sm">Per Day ({{ apiKey.rateLimitPerDay }})</span>
-                  <span class="text-sm font-medium">{{ rateLimitStatus.currentDay }}/{{ apiKey.rateLimitPerDay }}</span>
+                  <span class="text-sm">{{ $t('apiKey.analyticsPage.perDay', { value: formatNumber(apiKey.rateLimitPerDay) }) }}</span>
+                  <span class="text-sm font-medium">{{ formatNumber(rateLimitStatus.currentDay) }}/{{ formatNumber(apiKey.rateLimitPerDay) }}</span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
                   <div
@@ -451,7 +454,7 @@
           <!-- Modal header -->
           <div class="flex items-center justify-between mb-6">
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-              IP Address Management
+              {{ $t('apiKey.analyticsPage.ipManagementTitle') }}
             </h3>
             <button
               @click="showIpManagement = false"
@@ -474,12 +477,17 @@
 
 <script setup lang="ts">
 import { logger } from '~/utils/logger'
+import { formatNumber } from '~/utils/display-format'
 
 import type { ApiKey } from '~/types/api-key'
+import type { ApiError } from '~/types/api'
+
+// Charts are keyed by locale: vue3-apexcharts does not redraw labels and legends when only the options change.
+const { t, locale } = useI18n()
 
 // Meta tags
 useHead({
-  title: 'Advanced Analytics Dashboard - TiHoMo'
+  title: computed(() => t('apiKey.analyticsPage.metaTitle'))
 })
 
 // Route parameters
@@ -492,17 +500,23 @@ const { getApiKey } = useApiKeys()
 // Reactive state
 const loading = ref(true)
 const refreshing = ref(false)
-const error = ref<string>('')
+const loadError = ref<Pick<ApiError, 'messageKey' | 'messageParams' | 'message'> | null>(null)
 const apiKey = ref<ApiKey | null>(null)
 const showIpManagement = ref(false)
+
+// A frontend message carries messageKey; a backend message is shown verbatim.
+const errorText = computed(() => {
+  const apiError = loadError.value as Partial<ApiError> | null
+  return apiError?.messageKey ? t(apiError.messageKey, apiError.messageParams ?? {}) : apiError?.message || t('apiKey.errors.fetchOneFailed')
+})
 
 // Time range selection
 const selectedTimeRange = ref('7d')
 const timeRanges = [
-  { label: '24H', value: '1d' },
-  { label: '7D', value: '7d' },
-  { label: '30D', value: '30d' },
-  { label: '90D', value: '90d' }
+  { labelKey: 'apiKey.detail.timeRange.hours24', value: '1d' },
+  { labelKey: 'apiKey.detail.timeRange.days7', value: '7d' },
+  { labelKey: 'apiKey.detail.timeRange.days30', value: '30d' },
+  { labelKey: 'apiKey.detail.timeRange.days90', value: '90d' }
 ]
 
 // Mock analytics data
@@ -589,14 +603,14 @@ const rateLimitStatus = ref({
 
 // Breadcrumb
 const breadcrumbs = computed(() => [
-  { name: 'Apps', href: '/apps' },
-  { name: 'API Keys', href: '/apps/api-keys' },
-  { name: 'Analytics Dashboard', href: '#' }
+  { name: '', labelKey: 'apps', href: '/apps' },
+  { name: '', labelKey: 'api_keys', href: '/apps/api-keys' },
+  { name: '', labelKey: 'apiKey.analyticsPage.dashboard', href: '#' }
 ])
 
 // Chart configurations
 const volumeChartData = computed(() => [{
-  name: 'Requests',
+  name: t('apiKey.detail.requests'),
   data: [44, 55, 57, 56, 61, 58, 63, 60, 66, 78, 84, 92, 95, 88, 82, 75, 69, 65, 58, 52, 48, 46, 45, 44]
 }])
 
@@ -616,14 +630,14 @@ const volumeChartOptions = computed(() => ({
     }
   },
   xaxis: {
-    categories: Array.from({ length: 24 }, (_, i) => `${i}:00`)
+    categories: Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, '0')}:00`)
   },
   grid: { borderColor: '#e0e6ed' },
   theme: { mode: 'light' }
 }))
 
 const responseTimeChartData = computed(() => [{
-  name: 'Response Time',
+  name: t('apiKey.detail.responseTime'),
   data: [23, 45, 67, 89, 123, 145, 167, 189, 234, 278, 312, 345]
 }])
 
@@ -631,15 +645,15 @@ const responseTimeChartOptions = computed(() => ({
   chart: { toolbar: { show: false } },
   colors: ['#e2a03f'],
   xaxis: {
-    title: { text: 'Response Time (ms)' }
+    title: { text: t('apiKey.analyticsPage.responseTimeAxis') }
   },
   yaxis: {
-    title: { text: 'Request Count' }
+    title: { text: t('apiKey.analyticsPage.requestCountAxis') }
   }
 }))
 
 const rateLimitChartData = computed(() => [{
-  name: 'Rate Limit Hits',
+  name: t('apiKey.analyticsPage.rateLimitHits'),
   data: [12, 8, 15, 23, 18, 7, 11]
 }])
 
@@ -681,7 +695,7 @@ const loadApiKey = async (): Promise<void> => {
       }
     } as ApiKey
   } catch (err) {
-    error.value = 'Failed to load API key data'
+    loadError.value = { messageKey: 'apiKey.errors.fetchOneFailed', message: 'Failed to load API key data' }
     logger.error('Error loading API key:', err)
   } finally {
     loading.value = false

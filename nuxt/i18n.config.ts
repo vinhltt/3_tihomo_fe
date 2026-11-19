@@ -1,3 +1,4 @@
 export default defineI18nConfig(() => ({
-    fallbackLocale: 'en',
+    // No language fallback: a key missing in the active locale renders as the raw key.
+    fallbackLocale: false,
 }));

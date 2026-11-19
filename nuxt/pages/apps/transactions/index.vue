@@ -3,11 +3,11 @@
     <div>
       <ul class="flex space-x-2 rtl:space-x-reverse">
         <li>
-          <NuxtLink to="/apps" class="text-primary hover:underline">Apps</NuxtLink>
+          <NuxtLink to="/apps" class="text-primary hover:underline">{{ t('apps') }}</NuxtLink>
         </li>
         <li v-if="route.query.accountId && route.query.accountName"
           class="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-          <NuxtLink to="/apps/accounts" class="text-primary hover:underline">Accounts</NuxtLink>
+          <NuxtLink to="/apps/accounts" class="text-primary hover:underline">{{ t('shell.nav.accounts') }}</NuxtLink>
         </li>
         <li v-if="route.query.accountId && route.query.accountName"
           class="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
@@ -16,18 +16,18 @@
           </NuxtLink>
         </li>
         <li class="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-          <span>Transactions</span>
+          <span>{{ t('shell.nav.transactions') }}</span>
         </li>
       </ul>
       <div class="pt-5">
         <h1 class="text-2xl font-semibold">
-          {{ route.query.accountName ? `Giao dịch - ${route.query.accountName}` : 'Quản lý Giao dịch' }}
+          {{ route.query.accountName ? t('transactions.list.titleForAccount', { name: String(route.query.accountName) }) : t('transactions.list.title') }}
         </h1>
         <p class="text-gray-600 dark:text-white-light">
           {{
             route.query.accountName
-              ? `Theo dõi giao dịch của tài khoản ${route.query.accountName}`
-              : 'Theo dõi và quản lý các giao dịch thu chi'
+              ? t('transactions.list.descriptionForAccount', { name: String(route.query.accountName) })
+              : t('transactions.list.description')
           }}
         </p>
       </div>
@@ -37,10 +37,10 @@
     <div class="panel">
       <div class="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-6"> <!-- Account Filter -->
         <div class="flex-1">
-          <label class="text-sm font-medium">Tài khoản</label>
+          <label class="text-sm font-medium">{{ t('transactions.fields.account') }}</label>
           <div class="relative">
             <select v-model="selectedAccountId" @change="handleAccountChange" class="form-select" :disabled="isLoading">
-              <option value="">Tất cả tài khoản</option>
+              <option value="">{{ t('accounts.dropdown.allAccounts') }}</option>
               <option v-for="account in accounts" :key="account.id" :value="account.id">
                 {{ account.name }}
               </option>
@@ -53,11 +53,11 @@
 
         <!-- Date Range -->
         <div class="flex-1">
-          <label class="text-sm font-medium">Từ ngày</label>
+          <label class="text-sm font-medium">{{ t('transactions.filters.fromDate') }}</label>
           <input v-model="dateRange.startDate" @change="handleDateRangeChange" type="date" class="form-input" />
         </div>
         <div class="flex-1">
-          <label class="text-sm font-medium">Đến ngày</label>
+          <label class="text-sm font-medium">{{ t('transactions.filters.toDate') }}</label>
           <input v-model="dateRange.endDate" @change="handleDateRangeChange" type="date" class="form-input" />
         </div>
 
@@ -65,11 +65,11 @@
         <div class="flex gap-2">
           <button @click="() => openCreateModal(TransactionDirectionConst.Revenue)" class="btn btn-outline-success">
             <icon-plus class="w-4 h-4" />
-            Thu
+            {{ t('enums.transactionDirection.revenue') }}
           </button>
           <button @click="() => openCreateModal(TransactionDirectionConst.Spent)" class="btn btn-outline-danger">
             <icon-plus class="w-4 h-4" />
-            Chi
+            {{ t('enums.transactionDirection.spent') }}
           </button>
         </div>
       </div>
@@ -83,11 +83,11 @@
           <!-- Table Header với Column Selector -->
           <div class="mb-5 flex items-center justify-between">
             <h5 class="text-lg font-semibold dark:text-white-light">
-              Danh sách giao dịch
+              {{ t('transactions.list.heading') }}
             </h5>
             <div class="flex items-center gap-4">
               <div class="text-sm text-gray-500">
-                Tổng: {{ pagination.totalRow }} giao dịch
+                {{ t('transactions.list.total', { count: pagination.totalRow }) }}
               </div>
 
               <!-- Columns Selector -->
@@ -95,49 +95,49 @@
                 <Popper placement="bottom-end">
                   <button class="btn btn-outline-primary btn-sm">
                     <icon-settings class="w-4 h-4" />
-                    Cột
+                    {{ t('transactions.columns.button') }}
                   </button>
                   <template #content="{ close }">
                     <div
                       class="bg-white dark:bg-[#0e1726] border border-gray-200 dark:border-[#1b2e4b] rounded-lg shadow-lg p-4 min-w-[200px]">
-                      <h6 class="font-semibold mb-3">Chọn cột hiển thị</h6>
+                      <h6 class="font-semibold mb-3">{{ t('transactions.columns.title') }}</h6>
                       <div class="space-y-2">
                         <label class="flex items-center">
                           <input type="checkbox" v-model="visibleColumns.date" class="form-checkbox" />
-                          <span class="ml-2">Ngày</span>
+                          <span class="ml-2">{{ t('transactions.fields.date') }}</span>
                         </label>
                         <label class="flex items-center">
                           <input type="checkbox" v-model="visibleColumns.description" class="form-checkbox" />
-                          <span class="ml-2">Mô tả</span>
+                          <span class="ml-2">{{ t('transactions.fields.description') }}</span>
                         </label>
                         <label class="flex items-center">
                           <input type="checkbox" v-model="visibleColumns.amount" class="form-checkbox" />
-                          <span class="ml-2">Số tiền</span>
+                          <span class="ml-2">{{ t('transactions.fields.amount') }}</span>
                         </label>
                         <hr class="border-gray-200 dark:border-[#1b2e4b]" />
                         <label class="flex items-center">
                           <input type="checkbox" v-model="visibleColumns.account" class="form-checkbox" />
-                          <span class="ml-2">Tài khoản</span>
+                          <span class="ml-2">{{ t('transactions.fields.account') }}</span>
                         </label>
                         <label class="flex items-center">
                           <input type="checkbox" v-model="visibleColumns.category" class="form-checkbox" />
-                          <span class="ml-2">Danh mục</span>
+                          <span class="ml-2">{{ t('transactions.fields.category') }}</span>
                         </label>
                         <label class="flex items-center">
                           <input type="checkbox" v-model="visibleColumns.balance" class="form-checkbox" />
-                          <span class="ml-2">Số dư</span>
+                          <span class="ml-2">{{ t('transactions.fields.balance') }}</span>
                         </label>
                         <label class="flex items-center">
                           <input type="checkbox" v-model="visibleColumns.actions" class="form-checkbox" />
-                          <span class="ml-2">Thao tác</span>
+                          <span class="ml-2">{{ t('common.actions') }}</span>
                         </label>
                       </div>
                       <div class="flex gap-2 mt-4">
                         <button @click="setSimpleMode()" class="btn btn-outline-primary btn-sm flex-1">
-                          Đơn giản
+                          {{ t('transactions.columns.simple') }}
                         </button>
                         <button @click="setAdvancedMode()" class="btn btn-outline-primary btn-sm flex-1">
-                          Nâng cao
+                          {{ t('transactions.columns.advanced') }}
                         </button>
                       </div>
                     </div>
@@ -150,27 +150,27 @@
           <!-- Loading State -->
           <div v-if="isLoading" class="text-center py-8">
             <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <p class="mt-2 text-gray-500">Đang tải...</p>
+            <p class="mt-2 text-gray-500">{{ t('common.loading') }}</p>
           </div>
 
           <!-- Error State -->
           <div v-else-if="error" class="text-center py-8 text-danger">
-            <p>{{ error }}</p>
+            <p>{{ errorText }}</p>
             <button @click="getTransactions()" class="btn btn-primary mt-2">
-              Thử lại
+              {{ t('common.retry') }}
             </button>
           </div>
 
           <!-- Empty State -->
           <div v-else-if="!transactions.length" class="text-center py-8">
             <icon-folder class="w-16 h-16 mx-auto text-gray-400 mb-4" />
-            <p class="text-gray-500">Chưa có giao dịch nào</p>
-            <div class="flex gap-2 justify-center mt-4">
-              <button @click="() => openCreateModal(TransactionDirectionConst.Revenue)" class="btn btn-success btn-sm">
-                Thêm giao dịch Thu
+            <p class="text-gray-500">{{ t('transactions.empty.title') }}</p>
+            <div class="flex flex-wrap gap-2 justify-center mt-4">
+              <button @click="() => openCreateModal(TransactionDirectionConst.Revenue)" class="btn btn-success btn-sm whitespace-nowrap">
+                {{ t('transactions.actions.addIncome') }}
               </button>
-              <button @click="() => openCreateModal(TransactionDirectionConst.Spent)" class="btn btn-danger btn-sm">
-                Thêm giao dịch Chi
+              <button @click="() => openCreateModal(TransactionDirectionConst.Spent)" class="btn btn-danger btn-sm whitespace-nowrap">
+                {{ t('transactions.actions.addExpense') }}
               </button>
             </div>
           </div>
@@ -180,13 +180,13 @@
             <table class="table-hover">
               <thead>
                 <tr>
-                  <th v-if="visibleColumns.date">Ngày</th>
-                  <th v-if="visibleColumns.account">Tài khoản</th>
-                  <th v-if="visibleColumns.description">Mô tả</th>
-                  <th v-if="visibleColumns.category">Danh mục</th>
-                  <th v-if="visibleColumns.amount" class="text-right">Số tiền</th>
-                  <th v-if="visibleColumns.balance" class="text-right">Số dư</th>
-                  <th v-if="visibleColumns.actions" class="text-center">Thao tác</th>
+                  <th v-if="visibleColumns.date">{{ t('transactions.fields.date') }}</th>
+                  <th v-if="visibleColumns.account">{{ t('transactions.fields.account') }}</th>
+                  <th v-if="visibleColumns.description">{{ t('transactions.fields.description') }}</th>
+                  <th v-if="visibleColumns.category">{{ t('transactions.fields.category') }}</th>
+                  <th v-if="visibleColumns.amount" class="text-right">{{ t('transactions.fields.amount') }}</th>
+                  <th v-if="visibleColumns.balance" class="text-right">{{ t('transactions.fields.balance') }}</th>
+                  <th v-if="visibleColumns.actions" class="text-center">{{ t('common.actions') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -197,12 +197,12 @@
                   ]">
                   <td v-if="visibleColumns.date">
                     <div class="text-sm font-medium">
-                      {{ formatDate(transaction.transactionDate) }}
+                      {{ formatDateTime(transaction.transactionDate) }}
                     </div>
                   </td>
                   <td v-if="visibleColumns.account">
                     <div class="font-medium">
-                      {{ getAccountNameFromComposable(transaction.accountId) }}
+                      {{ getAccountById(transaction.accountId)?.name || t('common.unknown') }}
                     </div>
                   </td>
                   <td v-if="visibleColumns.description">
@@ -212,7 +212,7 @@
                   </td>
                   <td v-if="visibleColumns.category">
                     <span class="badge badge-outline-info">
-                      {{ getCategoryTypeName(transaction.categoryType) }}
+                      {{ categoryTypeLabel(transaction.categoryType) }}
                     </span>
                   </td>
                   <td v-if="visibleColumns.amount" class="text-right">
@@ -222,21 +222,21 @@
                   </td>
                   <td v-if="visibleColumns.balance" class="text-right">
                     <span class="font-medium">
-                      {{ formatCurrency(transaction.balance) }}
+                      {{ formatMoney(transaction.balance) }}
                     </span>
                   </td>
                   <td v-if="visibleColumns.actions" class="text-center">
                     <div class="flex items-center justify-center gap-2">
                       <button @click.stop="() => selectTransaction(transaction)" class="btn btn-sm btn-outline-primary"
-                        title="Xem chi tiết">
+                        :title="t('common.showDetails')">
                         <icon-eye class="w-4 h-4" />
                       </button>
                       <button @click.stop="() => editTransaction(transaction)" class="btn btn-sm btn-outline-warning"
-                        title="Chỉnh sửa">
+                        :title="t('common.edit')">
                         <icon-edit class="w-4 h-4" />
                       </button>
                       <button @click.stop="() => confirmDelete(transaction)" class="btn btn-sm btn-outline-danger"
-                        title="Xóa">
+                        :title="t('common.delete')">
                         <icon-trash class="w-4 h-4" />
                       </button>
                     </div>
@@ -249,18 +249,22 @@
           <!-- Pagination -->
           <div v-if="pagination.pageCount > 1" class="mt-5 flex items-center justify-between">
             <div class="text-sm text-gray-500">
-              Hiển thị {{ ((pagination.pageIndex - 1) * pagination.pageSize) + 1 }}-{{ Math.min(pagination.pageIndex *
-                pagination.pageSize, pagination.totalRow) }}
-              trong tổng số {{ pagination.totalRow }} giao dịch
+              {{
+                t('transactions.pagination.summary', {
+                  from: (pagination.pageIndex - 1) * pagination.pageSize + 1,
+                  to: Math.min(pagination.pageIndex * pagination.pageSize, pagination.totalRow),
+                  total: pagination.totalRow
+                })
+              }}
             </div>
             <div class="flex gap-1">
               <button @click="changePage(pagination.pageIndex - 1)" :disabled="pagination.pageIndex <= 1"
                 class="btn btn-sm btn-outline-primary">
-                Trước
+                {{ t('common.previous') }}
               </button>
               <button @click="changePage(pagination.pageIndex + 1)"
                 :disabled="pagination.pageIndex >= pagination.pageCount" class="btn btn-sm btn-outline-primary">
-                Sau
+                {{ t('common.next') }}
               </button>
             </div>
           </div>
@@ -288,13 +292,17 @@
 
 <script setup lang="ts">
 import { logger } from '~/utils/logger'
+import { formatDateTime, formatMoney } from '~/utils/display-format'
+import Swal from 'sweetalert2'
 
-import type { TransactionViewModel, TransactionFilter, TransactionDirectionType } from '~/types/transaction'
+import type { TransactionViewModel, TransactionFilter, TransactionDirectionType, CategoryType } from '~/types/transaction'
 import type { AccountViewModel } from '~/types/account'
-import { CategoryTypeConst, TransactionDirectionConst, formatDisplayAmount, getAmountClass } from '~/types/transaction'
+import { TransactionDirectionConst, getAmountClass } from '~/types/transaction'
+import { getCategoryTypeLabelKey } from '~/composables/useTransactions'
 import TransactionDetailPanel from '~/components/apps/transactions/TransactionDetailPanel.vue'
 
 // Composables
+const { t } = useI18n()
 const route = useRoute()
 const {
   transactions,
@@ -306,10 +314,19 @@ const {
   deleteTransaction,
   filterByAccount,
   filterByDateRange,
-  setSelectedTransaction
+  setSelectedTransaction,
+  getDisplayAmount
 } = useTransactions()
 
-const { accounts, getAccounts, getAccountName: getAccountNameFromComposable } = useAccountsSimple()
+const { accounts, getAccounts, getAccountById } = useAccountsSimple()
+
+// A frontend message carries messageKey; a backend message is shown verbatim.
+const errorText = computed(() => {
+  const apiError = error.value
+  return apiError?.messageKey
+    ? t(apiError.messageKey, apiError.messageParams ?? {})
+    : apiError?.message || t('transactions.errors.loadFailed')
+})
 
 // Page State
 const selectedAccountId = ref('')
@@ -335,7 +352,12 @@ const visibleColumns = ref({
 
 // SEO
 useHead({
-  title: 'Quản lý Giao dịch'
+  title: computed(() => {
+    const { accountId, accountName } = route.query
+    return accountId && accountName
+      ? `${t('transactions.list.titleForAccount', { name: String(accountName) })} | ${t('transactions.list.title')}`
+      : t('transactions.list.title')
+  })
 })
 
 // Keyboard event handler
@@ -363,11 +385,6 @@ const handleNavigationContext = async () => {
   if (accountId && accountName) {
     // Set the selected account based on navigation context
     selectedAccountId.value = accountId as string
-
-    // Update page title to include account name
-    useHead({
-      title: `Giao dịch - ${accountName} | Quản lý Giao dịch`
-    })
 
     // Filter transactions by the selected account
     await getTransactions({ accountId: accountId as string })
@@ -427,7 +444,18 @@ const closeDetailPanel = () => {
 }
 
 const confirmDelete = async (transaction: TransactionViewModel) => {
-  if (confirm(`Bạn có chắc muốn xóa giao dịch "${transaction.description || 'Không có mô tả'}"?`)) {
+  const result = await Swal.fire({
+    title: t('common.confirmation.title'),
+    text: t('transactions.confirm.delete', { description: transaction.description || t('transactions.confirm.noDescription') }),
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: t('common.confirmation.yesDelete'),
+    cancelButtonText: t('common.cancel')
+  })
+
+  if (result.isConfirmed) {
     try {
       await deleteTransaction(transaction.id)
       await getTransactions()
@@ -489,38 +517,13 @@ const handleEdit = () => {
 }
 
 // Helper functions
-const getCategoryTypeName = (categoryType: number) => {
-  const names: Record<number, string> = {
-    [CategoryTypeConst.Income]: 'Thu nhập',
-    [CategoryTypeConst.Expense]: 'Chi tiêu',
-    [CategoryTypeConst.Transfer]: 'Chuyển khoản',
-    [CategoryTypeConst.Fee]: 'Phí',
-    [CategoryTypeConst.Other]: 'Khác'
-  }
-  return names[categoryType] || 'Khác'
-}
-
-const getDisplayAmount = (transaction: TransactionViewModel) => {
-  return formatDisplayAmount(transaction)
+// An empty or unmapped category type is shown as the backend sent it.
+const categoryTypeLabel = (categoryType: CategoryType | string | null | undefined): string => {
+  const key = getCategoryTypeLabelKey(categoryType)
+  return key ? t(key) : String(categoryType ?? '')
 }
 
 const getDisplayClass = (transaction: TransactionViewModel) => {
   return getAmountClass(transaction)
-}
-
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('vi-VN', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false
-  })
-}
-
-const formatCurrency = (amount: number) => {
-  return amount.toLocaleString('vi-VN') + ' ₫'
 }
 </script>

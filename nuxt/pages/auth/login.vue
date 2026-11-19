@@ -3,22 +3,13 @@
 </template>
 
 <script setup lang="ts">
-// Automatically redirect to cover-login page
-const route = useRoute()
-const router = useRouter()
-
-// Preserve returnUrl if exists
-const redirectPath = route.query.returnUrl 
-    ? `/auth/cover-login?returnUrl=${encodeURIComponent(route.query.returnUrl as string)}`
-    : '/auth/cover-login'
-
-// Redirect immediately
-await router.replace(redirectPath)
-
-// Page metadata
+// Redirect in a route middleware, before this page is set up, so cover-login owns the head and its translated title.
+// The router encodes returnUrl once from the query object.
 definePageMeta({
     layout: 'auth-layout',
-    title: 'Redirecting to Login',
-    auth: false // Disable auth middleware for this page
+    auth: false, // Disable auth middleware for this page
+    middleware: [
+        (to) => navigateTo({ path: '/auth/cover-login', query: to.query.returnUrl ? { returnUrl: to.query.returnUrl } : {} }, { replace: true }),
+    ],
 })
 </script>

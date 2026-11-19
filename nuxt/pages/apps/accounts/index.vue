@@ -3,49 +3,49 @@
     <!-- Breadcrumb -->
     <ul class="flex space-x-2 rtl:space-x-reverse">
       <li>
-        <NuxtLink to="/" class="text-primary hover:underline">Dashboard</NuxtLink>
+        <NuxtLink to="/" class="text-primary hover:underline">{{ t('shell.breadcrumb.dashboard') }}</NuxtLink>
       </li>
       <li class="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-        <span>Accounts</span>
+        <span>{{ t('shell.nav.accounts') }}</span>
       </li>
     </ul>
 
     <div class="pt-5">
       <!-- Header -->
-      <div class="mb-5 flex items-center justify-between">
-        <h5 class="text-lg font-semibold dark:text-white-light">Account Management</h5>
-        <button type="button" class="btn btn-primary" @click="openCreateModal">
+      <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <h5 class="text-lg font-semibold dark:text-white-light">{{ t('accounts.list.title') }}</h5>
+        <button type="button" class="btn btn-primary whitespace-nowrap" @click="openCreateModal">
           <icon-plus class="h-5 w-5 ltr:mr-2 rtl:ml-2" />
-          Add Account
+          {{ t('accounts.actions.add') }}
         </button>
       </div>
 
       <!-- Filters -->
       <div class="panel mb-5">
         <div class="mb-5">
-          <h6 class="text-lg font-semibold">Filters</h6>
+          <h6 class="text-lg font-semibold">{{ t('common.filters') }}</h6>
         </div>
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
           <div>
-            <label class="form-label">Search</label>
-            <input v-model="filters.search" type="text" class="form-input" placeholder="Search accounts..."
+            <label class="form-label">{{ t('common.search') }}</label>
+            <input v-model="filters.search" type="text" class="form-input" :placeholder="t('accounts.filters.searchPlaceholder')"
               @input="debounceSearch" />
           </div>
           <div>
-            <label class="form-label">Account Type</label>
+            <label class="form-label">{{ t('accounts.fields.type') }}</label>
             <select v-model="filters.type" class="form-select" @change="applyFilters">
-              <option value="">All Types</option>
-              <option value="Bank">Bank</option>
-              <option value="Wallet">Wallet</option>
-              <option value="CreditCard">Credit Card</option>
-              <option value="DebitCard">Debit Card</option>
-              <option value="Cash">Cash</option>
+              <option value="">{{ t('accounts.filters.allTypes') }}</option>
+              <option value="Bank">{{ t('enums.accountType.bank') }}</option>
+              <option value="Wallet">{{ t('enums.accountType.wallet') }}</option>
+              <option value="CreditCard">{{ t('enums.accountType.creditCard') }}</option>
+              <option value="DebitCard">{{ t('enums.accountType.debitCard') }}</option>
+              <option value="Cash">{{ t('enums.accountType.cash') }}</option>
             </select>
           </div>
           <div>
-            <label class="form-label">Currency</label>
+            <label class="form-label">{{ t('accounts.fields.currency') }}</label>
             <select v-model="filters.currency" class="form-select" @change="applyFilters">
-              <option value="">All Currencies</option>
+              <option value="">{{ t('accounts.filters.allCurrencies') }}</option>
               <option value="VND">VND</option>
               <option value="USD">USD</option>
               <option value="EUR">EUR</option>
@@ -53,7 +53,7 @@
           </div>
           <div class="flex items-end">
             <button type="button" class="btn btn-secondary w-full" @click="clearFilters">
-              Clear Filters
+              {{ t('common.clearFilters') }}
             </button>
           </div>
         </div>
@@ -79,7 +79,7 @@
               </div>
               <div>
                 <h6 class="font-semibold text-base">{{ account.name }}</h6>
-                <p class="text-sm text-gray-500">{{ formatAccountType(account.type) }}</p>
+                <p class="text-sm text-gray-500">{{ accountTypeLabel(account.type) }}</p>
               </div>
             </div>
 
@@ -94,26 +94,26 @@
           <div class="space-y-3">
             <!-- Current Balance -->
             <div class="flex justify-between items-center">
-              <span class="text-sm text-gray-600">Số dư hiện tại:</span>
+              <span class="text-sm text-gray-600">{{ t('accounts.fields.currentBalance') }}:</span>
               <span :class="[
                 'font-semibold',
                 getBalanceClass(account.currentBalance)
               ]">
-                {{ formatCurrency(account.currentBalance, account.currency) }}
+                {{ formatCurrency(account.currentBalance) }}
               </span>
             </div>
 
             <!-- Available Limit (if applicable) -->
             <div v-if="account.availableLimit" class="flex justify-between items-center">
-              <span class="text-sm text-gray-600">Hạn mức khả dụng:</span>
+              <span class="text-sm text-gray-600">{{ t('accounts.fields.availableLimit') }}:</span>
               <span class="font-medium text-blue-600">
-                {{ formatCurrency(account.availableLimit, account.currency) }}
+                {{ formatCurrency(account.availableLimit) }}
               </span>
             </div>
 
             <!-- Card Number (if applicable) -->
             <div v-if="account.cardNumber" class="flex justify-between items-center">
-              <span class="text-sm text-gray-600">Số thẻ:</span>
+              <span class="text-sm text-gray-600">{{ t('accounts.fields.cardNumber') }}:</span>
               <span class="font-mono text-sm">
                 {{ maskCardNumber(account.cardNumber) }}
               </span>
@@ -121,9 +121,9 @@
 
             <!-- Created Date -->
             <div class="flex justify-between items-center">
-              <span class="text-sm text-gray-600">Ngày tạo:</span>
+              <span class="text-sm text-gray-600">{{ t('accounts.fields.createdDate') }}:</span>
               <span class="text-sm text-gray-500">
-                {{ formatDate(account.createAt) }}
+                {{ formatDateTime(account.createAt) }}
               </span>
             </div>
           </div>
@@ -131,14 +131,14 @@
           <!-- Quick Actions -->
           <div class="flex gap-2 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <button @click.stop="navigateToTransactions(account)" class="flex-1 btn btn-sm btn-outline-primary"
-              title="Xem giao dịch">
+              :title="t('accounts.actions.viewTransactions')">
               <icon-eye class="h-4 w-4 mr-1" />
-              Giao dịch
+              {{ t('shell.nav.transactions') }}
             </button>
-            <button @click.stop="openEditModal(account)" class="btn btn-sm btn-outline-secondary" title="Chỉnh sửa">
+            <button @click.stop="openEditModal(account)" class="btn btn-sm btn-outline-secondary" :title="t('common.edit')">
               <icon-edit class="h-4 w-4" />
             </button>
-            <button @click.stop="confirmDelete(account)" class="btn btn-sm btn-outline-danger" title="Xóa tài khoản">
+            <button @click.stop="confirmDelete(account)" class="btn btn-sm btn-outline-danger" :title="t('accounts.actions.delete')">
               <icon-trash class="h-4 w-4" />
             </button>
           </div>
@@ -152,9 +152,9 @@
               class="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3">
               <icon-plus class="h-6 w-6 text-gray-400" />
             </div>
-            <p class="text-gray-500 mb-2">Thêm tài khoản mới</p>
+            <p class="text-gray-500 mb-2">{{ t('accounts.list.addNew') }}</p>
             <button @click="openCreateModal" class="btn btn-sm btn-primary">
-              Tạo tài khoản
+              {{ t('accounts.actions.create') }}
             </button>
           </div>
         </div>
@@ -165,10 +165,10 @@
             class="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
             <span class="text-3xl">🏦</span>
           </div>
-          <h3 class="text-lg font-semibold mb-2">Chưa có tài khoản nào</h3>
-          <p class="text-gray-500 mb-6">Tạo tài khoản đầu tiên để bắt đầu quản lý tài chính</p>
+          <h3 class="text-lg font-semibold mb-2">{{ t('accounts.empty.title') }}</h3>
+          <p class="text-gray-500 mb-6">{{ t('accounts.empty.description') }}</p>
           <button @click="openCreateModal" class="btn btn-primary"> <icon-plus class="h-5 w-5 mr-2" />
-            Tạo tài khoản đầu tiên
+            {{ t('accounts.empty.createFirst') }}
           </button>
         </div>
       </div>
@@ -176,14 +176,14 @@
       <!-- Pagination -->
       <div v-if="pagination.pageCount > 1" class="mt-5 flex items-center justify-between">
         <div class="text-sm text-gray-500">
-          Showing {{ (pagination.pageIndex - 1) * pagination.pageSize + 1 }} to
+          {{ t('common.showing') }} {{ (pagination.pageIndex - 1) * pagination.pageSize + 1 }} {{ t('common.to') }}
           {{ Math.min(pagination.pageIndex * pagination.pageSize, pagination.totalRow) }}
-          of {{ pagination.totalRow }} results
+          {{ t('common.of') }} {{ pagination.totalRow }} {{ t('common.results') }}
         </div>
         <div class="flex items-center gap-2">
           <button type="button" class="btn btn-sm btn-outline-primary" :disabled="pagination.pageIndex <= 1"
             @click="changePage(pagination.pageIndex - 1)">
-            Previous
+            {{ t('common.previous') }}
           </button>
           <template v-for="page in visiblePages" :key="page">
             <button v-if="page !== '...'" type="button" class="btn btn-sm"
@@ -195,7 +195,7 @@
           </template>
           <button type="button" class="btn btn-sm btn-outline-primary"
             :disabled="pagination.pageIndex >= pagination.pageCount" @click="changePage(pagination.pageIndex + 1)">
-            Next
+            {{ t('common.next') }}
           </button>
         </div>
       </div>
@@ -208,25 +208,33 @@
 
 <script setup lang="ts">
 import { logger } from '~/utils/logger'
+import { formatDateTime } from '~/utils/display-format'
 
 import { useAppStore } from '@/stores/index'
 import { useAccounts } from '@/composables/useAccounts'
-import type { Account, AccountFilters, Pagination, FilterBodyRequest, ApiResponse, FilterRequest, FilterDetailsRequest } from '~/types'
+import type { Account, AccountFilters, AccountType, Pagination, FilterBodyRequest, ApiResponse, FilterRequest, FilterDetailsRequest } from '~/types'
 import { FilterLogicalOperator, FilterType } from '~/types'
 import { SortDirection } from '~/types/api'
+import type { ApiError } from '~/types/api'
 import Swal from 'sweetalert2'
 
+const { t } = useI18n()
 const store = useAppStore()
 const {
   getAccounts,
   deleteAccount,
-  formatAccountType,
+  getAccountTypeLabelKey,
   getAccountTypeBadgeClass,
   maskCardNumber,
   formatCurrency,
-  getBalanceClass,
-  formatDate
+  getBalanceClass
 } = useAccounts()
+
+// An empty or unknown type is shown as the backend sent it.
+const accountTypeLabel = (type: AccountType): string => {
+  const key = getAccountTypeLabelKey(type)
+  return key ? t(key) : String(type ?? '')
+}
 
 // Reactive data
 const accounts = ref<Account[]>([])
@@ -328,7 +336,11 @@ const fetchAccounts = async () => {
     }
   } catch (error) {
     logger.error('Error fetching accounts:', error)
-    showErrorMessage('Failed to fetch accounts')
+    // A frontend message carries messageKey; a backend message is shown verbatim.
+    const apiError = error as Partial<ApiError> | null
+    showErrorMessage(apiError?.messageKey
+      ? t(apiError.messageKey, apiError.messageParams ?? {})
+      : apiError?.message || t('accounts.errors.loadFailed'))
   } finally {
     isLoading.value = false
   }
@@ -386,28 +398,33 @@ const openEditModal = (account: Account) => {
 const handleAccountSaved = () => {
   isModalOpen.value = false
   fetchAccounts()
-  showSuccessMessage(isEditMode.value ? 'Account updated successfully' : 'Account created successfully')
+  showSuccessMessage(isEditMode.value ? t('accounts.messages.updated') : t('accounts.messages.created'))
 }
 
 const confirmDelete = async (account: Account) => {
   const result = await Swal.fire({
-    title: 'Are you sure?',
-    text: `Delete account "${account.name}"?`,
+    title: t('common.confirmation.title'),
+    text: t('accounts.confirm.delete', { name: account.name ?? '' }),
     icon: 'warning',
     showCancelButton: true,
     confirmButtonColor: '#d33',
     cancelButtonColor: '#3085d6',
-    confirmButtonText: 'Yes, delete it!'
+    confirmButtonText: t('common.confirmation.yesDelete'),
+    cancelButtonText: t('common.cancel')
   })
 
   if (result.isConfirmed) {
     try {
       await deleteAccount(account.id)
       fetchAccounts()
-      showSuccessMessage('Account deleted successfully')
+      showSuccessMessage(t('accounts.messages.deleted'))
     } catch (error) {
       logger.error('Error deleting account:', error)
-      showErrorMessage('Failed to delete account')
+      // A frontend message carries messageKey; a backend message is shown verbatim.
+      const apiError = error as Partial<ApiError> | null
+      showErrorMessage(apiError?.messageKey
+        ? t(apiError.messageKey, apiError.messageParams ?? {})
+        : apiError?.message || t('accounts.errors.deleteFailed'))
     }
   }
 }
@@ -426,7 +443,7 @@ const getAccountInitials = (name: string): string => {
 const showSuccessMessage = (message: string) => {
   Swal.fire({
     icon: 'success',
-    title: 'Success',
+    title: t('common.success'),
     text: message,
     timer: 2000,
     showConfirmButton: false
@@ -436,8 +453,9 @@ const showSuccessMessage = (message: string) => {
 const showErrorMessage = (message: string) => {
   Swal.fire({
     icon: 'error',
-    title: 'Error',
-    text: message
+    title: t('common.error'),
+    text: message,
+    confirmButtonText: t('common.ok')
   })
 }
 
@@ -448,7 +466,7 @@ onMounted(() => {
 
 // SEO
 useHead({
-  title: 'Account Management - CoreFinance'
+  title: computed(() => `${t('accounts.list.title')} - CoreFinance`)
 })
 </script>
 

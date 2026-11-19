@@ -3,7 +3,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                    {{ isEditMode ? 'Chỉnh sửa mẫu giao dịch định kỳ' : 'Tạo mẫu giao dịch định kỳ mới' }}
+                    {{ isEditMode ? t('recurring.modal.editTitle') : t('recurring.modal.createTitle') }}
                 </h3>
                 <button 
                     type="button" 
@@ -16,7 +16,7 @@
 
             <form @submit.prevent="handleSubmit" class="p-6 space-y-6">
                 <div v-if="saveError" role="alert" class="rounded-lg border border-danger/20 bg-danger/10 p-3 text-danger">
-                    <p>{{ saveError }}</p>
+                    <p>{{ saveErrorText }}</p>
                     <ul v-if="validationErrors.length" class="mt-2 list-disc pl-5">
                         <li v-for="(message, index) in validationErrors" :key="index">{{ message }}</li>
                     </ul>
@@ -24,53 +24,53 @@
                 <!-- Basic Information -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="form-label">Tên mẫu *</label>
+                        <label class="form-label">{{ t('recurring.fields.name') }} *</label>
                         <input 
                             v-model="form.name" 
                             type="text" 
                             class="form-input" 
-                            placeholder="Ví dụ: Tiền điện hàng tháng"
+                            :placeholder="t('recurring.placeholders.name')"
                             required
                         />
                     </div>
                     <div>
-                        <label class="form-label">Tài khoản *</label>
+                        <label class="form-label">{{ t('transactions.fields.account') }} *</label>
                         <select v-model="form.accountId" class="form-select" :disabled="accountLoading || !!accountError || loading" required>
-                            <option value="">Chọn tài khoản</option>
+                            <option value="">{{ t('transactions.placeholders.selectAccount') }}</option>
                             <option v-for="account in accounts" :key="account.id" :value="account.id">
                                 {{ account.name }}
                             </option>
                         </select>
-                        <p v-if="accountLoading" class="mt-1 text-sm text-gray-500">Đang tải tài khoản...</p>
+                        <p v-if="accountLoading" class="mt-1 text-sm text-gray-500">{{ t('accounts.dropdown.loading') }}</p>
                         <div v-else-if="accountError" role="alert" class="mt-1 text-sm text-danger">
-                            <p>Không thể tải tài khoản: {{ accountError }}</p>
-                            <button type="button" class="mt-2 btn btn-sm btn-outline-primary" @click="$emit('retry-accounts')">Thử lại</button>
+                            <p>{{ t('accounts.errors.loadFailedDetail', { error: accountErrorText }) }}</p>
+                            <button type="button" class="mt-2 btn btn-sm btn-outline-primary" @click="$emit('retry-accounts')">{{ t('common.retry') }}</button>
                         </div>
-                        <p v-else-if="accounts.length === 0" class="mt-1 text-sm text-warning">Chưa có tài khoản để tạo mẫu.</p>
+                        <p v-else-if="accounts.length === 0" class="mt-1 text-sm text-warning">{{ t('recurring.modal.noAccounts') }}</p>
                     </div>
                 </div>
 
                 <div>
-                    <label class="form-label">Mô tả</label>
+                    <label class="form-label">{{ t('transactions.fields.description') }}</label>
                     <textarea 
                         v-model="form.description" 
                         class="form-textarea" 
                         rows="3"
-                        placeholder="Mô tả chi tiết về giao dịch định kỳ này"
+                        :placeholder="t('recurring.placeholders.description')"
                     ></textarea>
                 </div>
 
                 <!-- Transaction Details -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="form-label">Loại giao dịch *</label>
+                        <label class="form-label">{{ t('transactions.fields.direction') }} *</label>
                         <select v-model="form.transactionType" class="form-select" required>
-                            <option :value="0">Thu nhập</option>
-                            <option :value="1">Chi phí</option>
+                            <option :value="0">{{ t('enums.transactionType.income') }}</option>
+                            <option :value="1">{{ t('enums.transactionType.expense') }}</option>
                         </select>
                     </div>
                     <div>
-                        <label class="form-label">Số tiền *</label>
+                        <label class="form-label">{{ t('transactions.fields.amount') }} *</label>
                         <input 
                             v-model.number="form.amount" 
                             type="number" 
@@ -84,41 +84,41 @@
                 </div>
 
                 <div>
-                    <label class="form-label">Danh mục</label>
+                    <label class="form-label">{{ t('transactions.fields.category') }}</label>
                     <input 
                         v-model="form.category" 
                         type="text" 
                         class="form-input" 
-                        placeholder="Ví dụ: Hóa đơn, Giải trí, Lương"
+                        :placeholder="t('recurring.placeholders.category')"
                     />
                 </div>
 
                 <!-- Frequency Settings -->
                 <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-                    <h4 class="text-md font-medium text-gray-900 dark:text-white mb-4">Cài đặt tần suất</h4>
+                    <h4 class="text-md font-medium text-gray-900 dark:text-white mb-4">{{ t('recurring.modal.frequencySection') }}</h4>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="form-label">Tần suất lặp lại *</label>
+                            <label class="form-label">{{ t('recurring.fields.repeatFrequency') }} *</label>
                             <select v-model="form.frequency" class="form-select" required @change="handleFrequencyChange">
-                                <option :value="RecurrenceFrequency.Daily">Hàng ngày</option>
-                                <option :value="RecurrenceFrequency.Weekly">Hàng tuần</option>
-                                <option :value="RecurrenceFrequency.Biweekly">Hai tuần một lần</option>
-                                <option :value="RecurrenceFrequency.Monthly">Hàng tháng</option>
-                                <option :value="RecurrenceFrequency.Quarterly">Hàng quý</option>
-                                <option :value="RecurrenceFrequency.SemiAnnually">Nửa năm</option>
-                                <option :value="RecurrenceFrequency.Annually">Hàng năm</option>
-                                <option :value="RecurrenceFrequency.Custom">Tùy chỉnh</option>
+                                <option :value="RecurrenceFrequency.Daily">{{ t('enums.recurrenceFrequency.daily') }}</option>
+                                <option :value="RecurrenceFrequency.Weekly">{{ t('enums.recurrenceFrequency.weekly') }}</option>
+                                <option :value="RecurrenceFrequency.Biweekly">{{ t('enums.recurrenceFrequency.biweekly') }}</option>
+                                <option :value="RecurrenceFrequency.Monthly">{{ t('enums.recurrenceFrequency.monthly') }}</option>
+                                <option :value="RecurrenceFrequency.Quarterly">{{ t('enums.recurrenceFrequency.quarterly') }}</option>
+                                <option :value="RecurrenceFrequency.SemiAnnually">{{ t('enums.recurrenceFrequency.semiAnnually') }}</option>
+                                <option :value="RecurrenceFrequency.Annually">{{ t('enums.recurrenceFrequency.annually') }}</option>
+                                <option :value="RecurrenceFrequency.Custom">{{ t('enums.recurrenceFrequency.custom') }}</option>
                             </select>
                         </div>
                         <div v-if="form.frequency === RecurrenceFrequency.Custom">
-                            <label class="form-label">Số ngày tùy chỉnh *</label>
+                            <label class="form-label">{{ t('recurring.fields.customIntervalDays') }} *</label>
                             <input 
                                 v-model.number="form.customIntervalDays" 
                                 type="number" 
                                 min="1"
                                 class="form-input" 
-                                placeholder="Số ngày"
+                                :placeholder="t('recurring.placeholders.days')"
                                 required
                             />
                         </div>
@@ -126,7 +126,7 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                         <div>
-                            <label class="form-label">Ngày bắt đầu *</label>
+                            <label class="form-label">{{ t('recurring.fields.startDate') }} *</label>
                             <input 
                                 v-model="form.startDate" 
                                 type="date" 
@@ -135,7 +135,7 @@
                             />
                         </div>
                         <div>
-                            <label class="form-label">Ngày kết thúc</label>
+                            <label class="form-label">{{ t('recurring.fields.endDate') }}</label>
                             <input 
                                 v-model="form.endDate" 
                                 type="date" 
@@ -147,11 +147,11 @@
 
                 <!-- Advanced Settings -->
                 <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-                    <h4 class="text-md font-medium text-gray-900 dark:text-white mb-4">Cài đặt nâng cao</h4>
+                    <h4 class="text-md font-medium text-gray-900 dark:text-white mb-4">{{ t('recurring.modal.advancedSection') }}</h4>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="form-label">Số ngày tạo trước</label>
+                            <label class="form-label">{{ t('recurring.fields.daysInAdvance') }}</label>
                             <input 
                                 v-model.number="form.daysInAdvance" 
                                 type="number" 
@@ -160,7 +160,7 @@
                                 class="form-input" 
                                 placeholder="30"
                             />
-                            <p class="text-xs text-gray-500 mt-1">Số ngày trước để tạo giao dịch dự kiến</p>
+                            <p class="text-xs text-gray-500 mt-1">{{ t('recurring.fields.daysInAdvanceHint') }}</p>
                         </div>
                         <div class="space-y-3">
                             <label class="flex items-center">
@@ -169,7 +169,7 @@
                                     type="checkbox" 
                                     class="form-checkbox"
                                 />
-                                <span class="ml-2 text-sm">Kích hoạt mẫu</span>
+                                <span class="ml-2 text-sm">{{ t('recurring.fields.isActive') }}</span>
                             </label>
                             <label class="flex items-center">
                                 <input 
@@ -177,18 +177,18 @@
                                     type="checkbox" 
                                     class="form-checkbox"
                                 />
-                                <span class="ml-2 text-sm">Tự động tạo giao dịch dự kiến</span>
+                                <span class="ml-2 text-sm">{{ t('recurring.fields.autoGenerate') }}</span>
                             </label>
                         </div>
                     </div>
 
                     <div class="mt-4">
-                        <label class="form-label">Ghi chú</label>
+                        <label class="form-label">{{ t('transactions.fields.note') }}</label>
                         <textarea 
                             v-model="form.notes" 
                             class="form-textarea" 
                             rows="3"
-                            placeholder="Ghi chú bổ sung về mẫu giao dịch này"
+                            :placeholder="t('recurring.placeholders.notes')"
                         ></textarea>
                     </div>
                 </div>
@@ -200,7 +200,7 @@
                         class="btn btn-outline-secondary"
                         @click="$emit('close')"
                     >
-                        Hủy
+                        {{ t('common.cancel') }}
                     </button>
                     <button 
                         type="submit" 
@@ -208,7 +208,7 @@
                         :disabled="loading || accountLoading || !!accountError || !accounts.some(account => account.id === form.accountId)"
                     >
                         <div v-if="loading" class="inline-block animate-spin border-2 border-transparent border-l-white rounded-full w-4 h-4 mr-2"></div>
-                        {{ isEditMode ? 'Cập nhật' : 'Tạo mẫu' }}
+                        {{ isEditMode ? t('common.update') : t('recurring.modal.create') }}
                     </button>
                 </div>
             </form>
@@ -225,13 +225,14 @@ import IconX from '~/components/icon/icon-x.vue'
 import type { AccountSelection } from '~/types/account'
 import type { ApiError } from '~/types/api'
 import { useAuthStore } from '~/stores/auth'
+import { errorMessage } from '~/utils/expected-transaction-formatters'
 
 // Props
 interface Props {
     template?: RecurringTransactionTemplateViewModel | null
     accounts: readonly AccountSelection[]
     accountLoading?: boolean
-    accountError?: string | null
+    accountError?: Pick<ApiError, 'messageKey' | 'messageParams' | 'message'> | null
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -250,11 +251,12 @@ const emit = defineEmits<{
 // Composables
 const { createTemplate, updateTemplate } = useRecurringTransactions()
 const auth = useAuthStore()
+const { t } = useI18n()
 let disposed = false
 
 // Reactive data
 const loading = ref(false)
-const saveError = ref<string | null>(null)
+const saveError = ref<Pick<ApiError, 'messageKey' | 'messageParams' | 'message'> | null>(null)
 const validationErrors = ref<string[]>([])
 const form = ref({
     accountId: '',
@@ -276,6 +278,15 @@ const form = ref({
 
 // Computed
 const isEditMode = computed(() => !!props.template)
+// A frontend message carries messageKey; a backend message is shown verbatim.
+const saveErrorText = computed(() => {
+    const apiError = saveError.value
+    return apiError?.messageKey ? t(apiError.messageKey, apiError.messageParams ?? {}) : apiError?.message || t('recurring.errors.saveFailed')
+})
+const accountErrorText = computed(() => {
+    const apiError = props.accountError
+    return apiError?.messageKey ? t(apiError.messageKey, apiError.messageParams ?? {}) : apiError?.message || t('accounts.errors.loadFailed')
+})
 
 // Methods
 const handleFrequencyChange = () => {
@@ -363,7 +374,7 @@ const handleSubmit = async () => {
     } catch (error) {
         if (disposed || !auth.isAuthenticated || auth.token !== token) return
         const apiError = error as Partial<ApiError>
-        saveError.value = apiError.message || 'Không thể lưu mẫu giao dịch định kỳ. Vui lòng thử lại.'
+        saveError.value = errorMessage(error, 'recurring.errors.saveFailed')
         validationErrors.value = Object.values(apiError.errors || {}).flat()
     } finally {
         if (!disposed && auth.token === token) loading.value = false
