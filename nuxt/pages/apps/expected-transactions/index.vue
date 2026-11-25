@@ -20,11 +20,20 @@
             @retry-templates="loadTemplateOptions"
         />
 
-        <section v-if="(targetLoading && !queryTarget) || targetError || (queryTarget && !isPending(queryTarget))" class="panel">
+        <section v-if="(targetLoading && !queryTarget) || targetError || (queryTarget && (isDebtLinked(queryTarget) || !isPending(queryTarget)))" class="panel">
             <p v-if="targetLoading && !queryTarget" role="status" class="text-gray-500">{{ t('expected.target.loading') }}</p>
             <div v-else-if="targetError" role="alert" class="text-danger">
                 <p>{{ t('expected.target.loadFailed', { error: errorText(targetError) }) }}</p>
                 <button type="button" class="btn btn-sm btn-outline-primary mt-2" @click="loadQueryTarget()">{{ t('expected.target.retry') }}</button>
+            </div>
+            <div v-else-if="queryTarget && isDebtLinked(queryTarget)" class="space-y-2 text-sm">
+                <p class="font-semibold">{{ isPending(queryTarget) ? t('expected.target.handledAtDebt') : t('expected.target.processed') }}</p>
+                <p class="break-words">
+                    <NuxtLink :to="`/apps/debts/${encodeURIComponent(queryTarget.debtId)}`" class="text-primary hover:underline">{{ queryTarget.debtName || t('debts.detail.title') }}</NuxtLink>
+                    · {{ formatDate(queryTarget.expectedDate) }} · {{ formatDebtAmount(queryTarget.expectedAmount) }}
+                </p>
+                <p v-if="queryTarget.debtCounterparty" class="break-words">{{ t('debts.fields.counterparty') }}: {{ queryTarget.debtCounterparty }}</p>
+                <p class="break-all">{{ t('expected.fields.periodId') }}: {{ queryTarget.id }}</p>
             </div>
             <div v-else-if="queryTarget" class="space-y-2 text-sm">
                 <p class="font-semibold">{{ t('expected.target.processed') }}</p>
@@ -79,7 +88,8 @@ import type {
     ExpectedTransactionViewModel,
     RecurringTransactionTemplateViewModel
 } from '~/types/recurring-transaction'
-import { errorMessage, formatCurrency, formatDate, isIncomeExpense, isPending } from '~/utils/expected-transaction-formatters'
+import { formatDebtAmount } from '~/utils/debt-formatters'
+import { errorMessage, formatCurrency, formatDate, isDebtLinked, isIncomeExpense, isPending } from '~/utils/expected-transaction-formatters'
 
 const auth = useAuthStore()
 const route = useRoute()
@@ -208,7 +218,7 @@ const closeAction = (): void => {
     selectedTransaction.value = null
 }
 const openAction = (transaction: ExpectedTransactionViewModel, mode: ActionMode): void => {
-    if (!auth.isAuthenticated || !auth.token || !isPending(transaction)) return
+    if (!auth.isAuthenticated || !auth.token || !isPending(transaction) || isDebtLinked(transaction)) return
     if ((mode === 'payment' || mode === 'adjust') && !isIncomeExpense(transaction)) return
     selectedTransaction.value = transaction
     actionMode.value = mode
@@ -235,7 +245,7 @@ const loadQueryTarget = async (openDialog = true): Promise<void> => {
         const transaction = await getExpectedTransaction(id, controller.signal)
         if (!isCurrent()) return
         queryTarget.value = transaction
-        if (openDialog && isPending(transaction)) openAction(transaction, isIncomeExpense(transaction) ? 'payment' : 'link')
+        if (openDialog && isPending(transaction) && !isDebtLinked(transaction)) openAction(transaction, isIncomeExpense(transaction) ? 'payment' : 'link')
     } catch (error) {
         if (isCurrent()) targetError.value = errorMessage(error, 'expected.errors.retryTarget')
     } finally {

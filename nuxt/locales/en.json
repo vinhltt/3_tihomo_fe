@@ -126,6 +126,235 @@
     "contact_us_boxed": "Contact Us Boxed",
     "contact_us_cover": "Contact Us Cover",
     "api_keys": "API Keys",
+    "debts": {
+        "title": "Borrowing and lending",
+        "description": "Track the money you borrowed and lent, the balances and the repayment progress.",
+        "columns": {
+            "nameCounterparty": "Name / Counterparty",
+            "directionType": "Direction / Type",
+            "transaction": "Transaction",
+            "installmentNo": "No.",
+            "dueDate": "Due date",
+            "plannedPrincipal": "Expected principal (VND)",
+            "plannedInterest": "Expected interest (VND)",
+            "plannedTotal": "Expected total (VND)",
+            "actualPrincipal": "Actual principal (VND)",
+            "actualInterest": "Actual interest (VND)"
+        },
+        "fields": {
+            "direction": "Direction",
+            "type": "Type",
+            "name": "Name",
+            "counterparty": "Counterparty",
+            "originalAmount": "Original amount (VND)",
+            "initialBalance": "Initial balance (VND)",
+            "currentBalance": "Balance (VND)",
+            "progress": "Progress",
+            "startDate": "Start date",
+            "interestRate": "Annual interest rate (%)",
+            "description": "Description",
+            "notes": "Notes",
+            "account": "VND account",
+            "paymentDate": "Payment date",
+            "principal": "Principal (VND)",
+            "interest": "Interest (VND)",
+            "transactionAmount": "Amount (VND)",
+            "scheduleMethod": "Calculation method",
+            "firstDueDate": "First due date",
+            "nextDueDate": "Next due date",
+            "installmentCount": "Number of installments"
+        },
+        "direction": {
+            "borrow": "Borrowed",
+            "lend": "Lent"
+        },
+        "status": {
+            "provisioning": "Being completed",
+            "active": "Active",
+            "settled": "Settled",
+            "closed": "Closed"
+        },
+        "type": {
+            "personalLoan": "Personal loan",
+            "mortgage": "Mortgage",
+            "carLoan": "Car loan",
+            "studentLoan": "Student loan",
+            "businessLoan": "Business loan",
+            "creditCard": "Credit card debt",
+            "personalLending": "Lent to a person",
+            "other": "Other"
+        },
+        "operation": {
+            "deleting": "Deletion not finished",
+            "closing": "Closing not finished",
+            "settling": "Settlement not finished",
+            "scheduling": "Installment schedule not finished",
+            "cancelling": "Payment cancellation not finished",
+            "restoring": "Restoring the installments not finished"
+        },
+        "paymentStatus": {
+            "pending": "Waiting to be synced",
+            "applied": "Taken off the balance",
+            "countedInInitialBalance": "Counted in the initial balance",
+            "cancelled": "Cancelled"
+        },
+        "transactionMode": {
+            "create": "Create a new transaction",
+            "link": "Use an existing transaction"
+        },
+        "scheduleMethod": {
+            "equalPrincipal": "Equal principal, interest on the declining balance",
+            "equalPayment": "Equal payments"
+        },
+        "filters": {
+            "allDirections": "All directions",
+            "allStatuses": "All statuses"
+        },
+        "totals": {
+            "borrowed": "I owe (VND)",
+            "lent": "Owed to me (VND)",
+            "note": "Only the outstanding principal of active debts is counted.",
+            "loadFailed": "Unable to load the totals: {error}"
+        },
+        "list": {
+            "heading": "Debts",
+            "reload": "Reload list",
+            "loading": "Loading debts...",
+            "loadFailed": "Unable to load the debts: {error}",
+            "signInRequired": "Please sign in to see your debts.",
+            "empty": "No debts match the filters.",
+            "summary": "Showing {from}–{to} of {total} debts"
+        },
+        "pendingSync": {
+            "payments": "A payment of this debt is waiting to be synced, so the balance is not up to date. Sync that payment again or cancel it.",
+            "busy": "This debt is busy: {operation}. The other actions are off until it is synced again.",
+            "labels": "The new name or counterparty has not reached the installments yet.",
+            "action": "Sync again"
+        },
+        "detail": {
+            "title": "Debt details",
+            "back": "Back to the debts",
+            "loading": "Loading the debt...",
+            "loadFailed": "Unable to load the debt: {error}",
+            "notFound": "This debt was not found. It may have been deleted."
+        },
+        "schedule": {
+            "heading": "Installment schedule",
+            "none": "This debt has no installment schedule yet.",
+            "empty": "The schedule has no installments.",
+            "loading": "Loading the installments...",
+            "loadFailed": "Unable to load the installments: {error}",
+            "create": "Create a schedule",
+            "recalculate": "Recalculate the remaining installments",
+            "record": "Record",
+            "adjust": "Adjust installment",
+            "installment": "Installment {no}, due {date}",
+            "original": "Before the change: {amount}",
+            "countHint": "A whole number from 1 to 2400. There is one installment a month.",
+            "periods_over_600_warning": "More than 600 installments is more than 50 years. Please check the number; you can still continue.",
+            "balance": "Balance to spread over the installments (VND)",
+            "pendingPrincipal": "Principal waiting to be synced, already left out (VND)",
+            "replacedCount": "Pending installments that will be replaced",
+            "adjustedWarning": "Installments adjusted by hand that will be replaced: {count}. Their adjusted amounts will be lost.",
+            "nothingLeft": "Nothing is left to pay. The pending installments will be removed and no new ones created.",
+            "previewLoading": "Checking which installments will be replaced...",
+            "previewFailed": "Unable to check which installments will be replaced: {error}",
+            "saveFailed": "Unable to save the schedule: {error}",
+            "unknown": "It is not clear whether the change was saved. Close this dialog and check the schedule before trying again. If the debt is busy, sync it again."
+        },
+        "history": {
+            "heading": "Payment history",
+            "empty": "No payments yet."
+        },
+        "payment": {
+            "recordBorrow": "Record a repayment",
+            "recordLend": "Record a collection",
+            "interestHint": "All of it is principal by default. If there is interest, split it off the principal; empty means no interest.",
+            "countedHint": "Turn this on when this payment was already taken off the initial balance. The balance then does not change.",
+            "noVndAccounts": "You have no VND account. Create one before recording a payment.",
+            "saveFailed": "Unable to record the payment: {error}",
+            "unknown": "It is not clear whether the payment was saved. Check the payment history of the debt. Save sends this same attempt again and does not create another payment.",
+            "installmentHint": "The principal and the interest are the expected amounts of the installment. Change them to what was really paid."
+        },
+        "picker": {
+            "outgoingHint": "Only expense transactions of your VND accounts are listed. Linking creates no transaction; the server checks that it belongs to no other debt or period.",
+            "incomingHint": "Only income transactions of your VND accounts are listed. Linking creates no transaction; the server checks that it belongs to no other debt or period.",
+            "noVndAccounts": "You have no VND account, so there is no transaction to choose."
+        },
+        "cancelPayment": {
+            "title": "Cancel the payment of {principal} VND principal and {interest} VND interest?",
+            "action": "Cancel payment",
+            "principalReturned": "The transaction is kept and unlocked. The principal of {principal} VND goes back to the balance.",
+            "balanceUnchanged": "The transaction (if any) is kept and unlocked. The balance does not change, because the principal of this payment was never taken off it."
+        },
+        "form": {
+            "createTitle": "New debt",
+            "editTitle": "Edit debt",
+            "directionFixed": "The direction cannot change. To change it, delete the debt and create it again.",
+            "amountHint": "Digits only, with a dot for the decimals. For example: 10000000 or 10.50",
+            "initialBalanceHint": "Balance when tracking starts. Leave it empty when it equals the original amount.",
+            "recordDisbursement": "Record the disbursement of the original amount",
+            "disbursementIncome": "Creates an income transaction of the original amount, on the start date of the debt, in the account chosen below.",
+            "disbursementExpense": "Creates an expense transaction of the original amount, on the start date of the debt, from the account chosen below.",
+            "disbursementLink": "Choose a transaction whose amount equals the original amount.",
+            "noVndAccounts": "You have no VND account. Create one, or clear the disbursement option.",
+            "saveFailed": "Unable to save the debt: {error}",
+            "createUnknown": "It is not clear whether the debt was saved. Close this dialog and check the list before creating it again, to avoid a duplicate.",
+            "editLocked": "This debt cannot be edited right now. Close this dialog, reload the list and open it again."
+        },
+        "validation": {
+            "originalAmount": "The original amount must be at least 0.01, with at most 2 digits after the dot and no thousands separator. Amounts too large to be stored exactly are refused.",
+            "initialBalance": "The initial balance must be at least 0.01, with at most 2 digits after the dot and no thousands separator. Amounts too large to be stored exactly are refused.",
+            "initialBalanceTooLarge": "The initial balance must not exceed the original amount.",
+            "interestRate": "The annual interest rate must be from 0 to 100, with at most 2 digits after the dot.",
+            "startDate": "Please choose the start date.",
+            "account": "Please choose a VND account to record the disbursement.",
+            "transaction": "Please choose an existing transaction.",
+            "disbursementAmount": "The original amount must equal the amount of the chosen transaction.",
+            "principal": "The principal must be at least 0, with at most 2 digits after the dot and no thousands separator. Amounts too large to be stored exactly are refused.",
+            "interest": "The interest must be at least 0, with at most 2 digits after the dot and no thousands separator. Amounts too large to be stored exactly are refused.",
+            "paymentTotal": "The principal and the interest must add up to more than 0.",
+            "paymentAccount": "Please choose a VND account.",
+            "paymentDate": "Please choose the payment date.",
+            "transactionTotal": "The principal and the interest must add up to the amount of the chosen transaction.",
+            "installmentCount": "The number of installments must be a whole number from 1 to 2400.",
+            "dueDate": "Please choose the due date."
+        },
+        "close": {
+            "title": "Close the debt \"{name}\"?",
+            "action": "Close debt",
+            "confirm": "A closed debt cannot be reopened and takes no more payments. Its pending installments will be cancelled.",
+            "confirm_permanent_lock": "This debt still has active payments. Once it is closed, those payments can no longer be cancelled and their transactions are locked permanently. A closed debt cannot be reopened."
+        },
+        "delete": {
+            "title": "Delete the debt \"{name}\"?",
+            "cancelTitle": "Cancel the debt \"{name}\" that is being completed?",
+            "action": "Delete debt",
+            "cancelAction": "Cancel debt",
+            "noTransaction": "This debt has no disbursement transaction. This cannot be undone.",
+            "transactionDeleted": "The disbursement transaction of {date}, account {account}, amount {amount} VND will be deleted with the debt. This cannot be undone.",
+            "transactionKept": "The disbursement transaction of {date}, account {account}, amount {amount} VND will be kept and unlocked. The debt will be deleted and this cannot be undone."
+        },
+        "notice": {
+            "created": "The debt was created.",
+            "provisioning": "The debt was created, but the result of its disbursement is not clear. It is being completed; use Retry or Cancel.",
+            "updated": "The changes to the debt were saved.",
+            "closed": "The debt was closed.",
+            "deleted": "The debt was deleted.",
+            "resynced": "The debt was synced again.",
+            "paymentSaved": "The payment was recorded.",
+            "paymentPending": "The payment was saved but still waits to be synced, so the balance has not changed. Use Sync again in the payment history.",
+            "paymentCancelled": "The payment was cancelled.",
+            "paymentSynced": "The payment was synced again.",
+            "scheduleCreated": "The installment schedule was created.",
+            "scheduleRecalculated": "The remaining installments were recalculated.",
+            "installmentAdjusted": "The installment was adjusted."
+        },
+        "errors": {
+            "actionFailed": "Unable to complete the action: {error}",
+            "checkAndRetry": "Please check the information and try again."
+        }
+    },
     "reminder_bell_label": "Expected transaction reminders: {count}",
     "reminder_title": "Upcoming payments",
     "reminder_loading": "Loading reminders…",
@@ -147,6 +376,9 @@
     "reminder_days_overdue": "{days} day overdue | {days} days overdue",
     "reminder_due_today": "Due today",
     "reminder_days_remaining": "Due in {days} day | Due in {days} days",
+    "reminder_debt_payable": "Payable",
+    "reminder_debt_receivable": "Receivable",
+    "reminder_debt_counterparty": "Counterparty: {counterparty}",
     "expected_transactions": "Expected transactions",
     "common": {
         "actions": "Actions",
@@ -848,6 +1080,12 @@
             "classificationNotes": "Classification & notes",
             "syncMetadata": "Sync & metadata"
         },
+        "debtLock": {
+            "permanent": "This transaction belongs to a closed debt, so its type, amount, date and account stay locked for good.",
+            "disbursement": "This transaction is the disbursement of a debt, so its type, amount, date and account are locked. Delete the debt to unlock them.",
+            "payment": "This transaction is a payment of a debt, so its type, amount, date and account are locked. Cancel the payment at the debt to unlock them.",
+            "linked": "This transaction is linked to a debt."
+        },
         "actions": {
             "addIncome": "Add income transaction",
             "addExpense": "Add expense transaction",
@@ -939,7 +1177,8 @@
             "loading": "Loading the period selected from the reminder...",
             "loadFailed": "Unable to select the period: {error}",
             "retry": "Reload the selected period",
-            "processed": "The selected period has been processed and cannot be changed."
+            "processed": "The selected period has been processed and cannot be changed.",
+            "handledAtDebt": "The selected period is an installment of a debt and is handled at the debt."
         },
         "filters": {
             "allStatuses": "All statuses",
@@ -962,7 +1201,8 @@
             "signInRequired": "Please sign in to view expected transactions.",
             "invalidDateRange": "Invalid date range. Fix the date filter to see the list.",
             "empty": "No expected transactions match the filters.",
-            "processed": "This period has been processed and cannot be changed."
+            "processed": "This period has been processed and cannot be changed.",
+            "handledAtDebt": "Handled at the debt."
         },
         "columns": {
             "periodTemplate": "Period / Recurring template",

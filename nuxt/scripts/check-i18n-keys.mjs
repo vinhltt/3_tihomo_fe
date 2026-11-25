@@ -11,12 +11,13 @@ import { join, relative, sep } from 'node:path';
 
 const ROOT = process.cwd();
 const LOCALES = ['en', 'vi'];
-const NAMESPACES = ['common', 'shell', 'enums', 'accounts', 'transactions', 'recurring', 'expected', 'apiKey', 'auth'];
+const NAMESPACES = ['common', 'shell', 'enums', 'accounts', 'transactions', 'recurring', 'expected', 'debts', 'apiKey', 'auth'];
 const SCAN_SET = [
     'pages/apps/accounts',
     'pages/apps/transactions',
     'pages/apps/recurring-transactions',
     'pages/apps/expected-transactions',
+    'pages/apps/debts',
     'pages/apps/api-keys',
     'pages/auth/cover-login.vue',
     'pages/auth/login.vue',

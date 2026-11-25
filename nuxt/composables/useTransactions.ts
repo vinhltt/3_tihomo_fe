@@ -8,12 +8,13 @@ import type {
   TransactionDirectionType,
   CategoryType
 } from '~/types/transaction'
-import type { FilterBodyRequest, ApiResponse, ApiError } from '~/types/api'
+import type { FilterBodyRequest, FilterRequest, ApiResponse, ApiError } from '~/types/api'
 import type { IBasePaging } from '~/types/recurring-transaction'
 import { FilterLogicalOperator, FilterType, SortDirection } from '~/types/api'
 import { 
   TransactionDirectionConst,
-  convertToBackendRequest, 
+  buildTransactionUpdatePayload,
+  convertToBackendRequest,
   convertToBackendUpdateRequest,
   getAmountClass,
   getTransactionDirection,
@@ -206,12 +207,13 @@ export const useTransactions = () => {
     searchValue: string,
     pageIndex: number,
     pageSize: number,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    filter?: FilterRequest
   ): Promise<IBasePaging<TransactionViewModel>> => {
     const body: FilterBodyRequest = {
       langId: '',
       searchValue,
-      filter: {},
+      filter: filter ?? {},
       orders: [
         { field: 'transactionDate', direction: SortDirection.Descending },
         { field: 'id', direction: SortDirection.Descending }
@@ -267,15 +269,15 @@ export const useTransactions = () => {
     }
   }
 
-  // Update transaction
-  const updateTransaction = async (request: TransactionUpdateRequest) => {
+  // Update transaction. The original is the transaction as the API sent it; without it every field comes from the request.
+  const updateTransaction = async (request: TransactionUpdateRequest, original?: TransactionViewModel | null) => {
     try {
       isLoading.value = true
       error.value = null
 
       // Convert frontend request to backend format
-      const backendRequest = convertToBackendUpdateRequest(request)
-      
+      const backendRequest = original ? buildTransactionUpdatePayload(request, original) : convertToBackendUpdateRequest(request)
+
       const response = await putForm<TransactionViewModel>(`/api/core-finance/transaction/${request.id}`, backendRequest)
       
       if (response) {
@@ -314,7 +316,10 @@ export const useTransactions = () => {
       
       return true
     } catch (err) {
-      error.value = { messageKey: 'transactions.errors.deleteFailed', message: err instanceof Error ? err.message : 'Failed to delete transaction' }
+      // A refusal explains itself, for example how to unlock a transaction that is linked to a debt.
+      error.value = (err as Partial<ApiError> | null)?.statusCode === 409
+        ? toTransactionErrorState(err, 'transactions.errors.deleteFailed')
+        : { messageKey: 'transactions.errors.deleteFailed', message: err instanceof Error ? err.message : 'Failed to delete transaction' }
       throw err
     } finally {
       isLoading.value = false

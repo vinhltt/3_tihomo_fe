@@ -410,6 +410,14 @@ export interface ExpectedTransactionViewModel {
   daysUntilDue: number
   createAt?: string
   updateAt?: string
+  /**
+   * Set when the period is an installment of a debt, together with the name and the counterparty of the debt. (EN)
+   *
+   * Có giá trị khi kỳ là kỳ trả góp của khoản nợ, kèm tên khoản và đối tác của khoản. (VI)
+   */
+  debtId?: string | null
+  debtName?: string | null
+  debtCounterparty?: string | null
 }
 
 /**

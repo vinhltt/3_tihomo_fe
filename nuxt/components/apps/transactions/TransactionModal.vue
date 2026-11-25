@@ -35,6 +35,18 @@
 
         <!-- Form -->
         <form v-else @submit.prevent="handleSubmit" class="space-y-5">
+          <!-- Debt Lock Reason -->
+          <div v-if="debtLockKey" class="p-3 bg-info/10 border border-info/20 rounded-lg text-sm text-info">
+            <p>{{ t(debtLockKey) }}</p>
+            <NuxtLink
+              v-if="originalTransaction?.debtId"
+              :to="`/apps/debts/${encodeURIComponent(originalTransaction.debtId)}`"
+              class="underline"
+            >
+              {{ t('debts.detail.title') }}
+            </NuxtLink>
+          </div>
+
           <!-- Simple Mode Fields -->
           <div class="space-y-4">
             <!-- Transaction Direction -->
@@ -42,9 +54,9 @@
               <label class="text-sm font-medium text-white-dark">
                 {{ t('transactions.fields.direction') }} *
               </label>
-              <select 
-                v-model="form.transactionDirection" 
-                :disabled="mode === 'view'"
+              <select
+                v-model="form.transactionDirection"
+                :disabled="mode === 'view' || !!debtLockKey"
                 class="form-select"
                 required
               >
@@ -59,8 +71,8 @@
                 {{ t('transactions.fields.amount') }} *
               </label>
               <input 
-                v-model.number="form.amount" 
-                :disabled="mode === 'view'"
+                v-model.number="form.amount"
+                :disabled="mode === 'view' || !!debtLockKey"
                 type="number" 
                 step="0.01"
                 class="form-input"
@@ -75,8 +87,8 @@
                 {{ t('transactions.fields.transactionDate') }} *
               </label>
               <input 
-                v-model="form.transactionDate" 
-                :disabled="mode === 'view'"
+                v-model="form.transactionDate"
+                :disabled="mode === 'view' || !!debtLockKey"
                 type="date" 
                 class="form-input"
                 required
@@ -89,8 +101,8 @@
                 {{ t('transactions.fields.account') }} *
               </label>
               <select 
-                v-model="form.accountId" 
-                :disabled="mode === 'view'"
+                v-model="form.accountId"
+                :disabled="mode === 'view' || !!debtLockKey"
                 class="form-select"
                 required
               >
@@ -427,7 +439,7 @@ import Swal from 'sweetalert2'
 import type { TransactionViewModel, TransactionCreateRequest, TransactionUpdateRequest, TransactionDirectionType } from '~/types/transaction'
 import type { AccountSelectOption, AccountViewModel } from '~/types/account'
 import type { ApiError } from '~/types/api'
-import { CategoryTypeConst, TransactionDirectionConst } from '~/types/transaction'
+import { CategoryTypeConst, TransactionDirectionConst, getDebtLockKey } from '~/types/transaction'
 import { getCategoryTypeValue, toTransactionErrorState } from '~/composables/useTransactions'
 
 // Props
@@ -465,6 +477,9 @@ const isLoading = ref(false)
 // Holds a key or a backend message, never translated text, so it follows a locale switch.
 const error = ref<Pick<ApiError, 'messageKey' | 'messageParams' | 'message'> | null>(null)
 const showAdvanced = ref(false)
+// What the form was filled from, as the API sent it; null when creating.
+const originalTransaction = ref<TransactionViewModel | null>(null)
+const debtLockKey = computed(() => getDebtLockKey(originalTransaction.value))
 
 const errorText = computed(() =>
   error.value?.messageKey ? t(error.value.messageKey, error.value.messageParams ?? {}) : error.value?.message ?? ''
@@ -521,6 +536,7 @@ watch(() => props.transaction, () => {
 const initializeForm = () => {
   error.value = null
   showAdvanced.value = false
+  originalTransaction.value = props.mode === 'create' ? null : props.transaction
 
   if (props.mode === 'create') {
     // Create mode - use defaults
@@ -566,7 +582,7 @@ const handleSubmit = async () => {
       resetForm(form.value)
       emit('created')
     } else if (props.mode === 'edit') {
-      await updateTransaction(form.value as TransactionUpdateRequest)
+      await updateTransaction(form.value as TransactionUpdateRequest, originalTransaction.value)
       emit('updated')
     }
   } catch (err) {

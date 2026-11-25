@@ -74,6 +74,18 @@
                             </li>
 
                             <li class="nav-item">
+                                <NuxtLink to="/apps/debts" class="group" @click="toggleMobileMenu">
+                                    <div class="flex items-center">
+                                        <icon-cash-banknotes class="shrink-0 group-hover:!text-primary" />
+
+                                        <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">
+                                            {{ $t('debts.title') }}
+                                        </span>
+                                    </div>
+                                </NuxtLink>
+                            </li>
+
+                            <li class="nav-item">
                                 <NuxtLink to="/apps/api-keys" class="group" @click="toggleMobileMenu">
                                     <div class="flex items-center">
                                         <icon-key class="shrink-0 group-hover:!text-primary" />
