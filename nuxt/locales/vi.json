@@ -126,6 +126,128 @@
     "contact_us_boxed": "Liên hệ (Boxed)",
     "contact_us_cover": "Liên hệ (Cover)",
     "api_keys": "Khóa API",
+    "debts": {
+        "title": "Vay và cho vay",
+        "description": "Theo dõi các khoản đi vay và cho vay, dư nợ và tiến độ trả.",
+        "columns": {
+            "nameCounterparty": "Tên khoản / Đối tác",
+            "directionType": "Chiều / Loại khoản"
+        },
+        "fields": {
+            "direction": "Chiều",
+            "type": "Loại khoản",
+            "name": "Tên khoản",
+            "counterparty": "Đối tác",
+            "originalAmount": "Số gốc (VND)",
+            "initialBalance": "Dư nợ ban đầu (VND)",
+            "currentBalance": "Dư nợ (VND)",
+            "progress": "Tiến độ",
+            "startDate": "Ngày bắt đầu",
+            "interestRate": "Lãi suất năm (%)",
+            "description": "Mô tả",
+            "notes": "Ghi chú",
+            "account": "Tài khoản VND"
+        },
+        "direction": {
+            "borrow": "Đi vay",
+            "lend": "Cho vay"
+        },
+        "status": {
+            "provisioning": "Đang hoàn tất",
+            "active": "Đang hoạt động",
+            "settled": "Đã tất toán",
+            "closed": "Đã đóng"
+        },
+        "type": {
+            "personalLoan": "Vay cá nhân",
+            "mortgage": "Vay mua nhà",
+            "carLoan": "Vay mua xe",
+            "studentLoan": "Vay học phí",
+            "businessLoan": "Vay kinh doanh",
+            "creditCard": "Nợ thẻ tín dụng",
+            "personalLending": "Cho cá nhân vay",
+            "other": "Khác"
+        },
+        "operation": {
+            "deleting": "Chưa xóa xong khoản",
+            "closing": "Chưa đóng xong khoản",
+            "settling": "Chưa tất toán xong khoản",
+            "scheduling": "Chưa ghi xong lịch trả góp",
+            "cancelling": "Chưa hủy xong thanh toán",
+            "restoring": "Chưa khôi phục xong các kỳ"
+        },
+        "filters": {
+            "allDirections": "Tất cả chiều",
+            "allStatuses": "Tất cả trạng thái"
+        },
+        "totals": {
+            "borrowed": "Mình nợ (VND)",
+            "lent": "Được nợ (VND)",
+            "note": "Chỉ tính dư nợ gốc của các khoản đang hoạt động.",
+            "loadFailed": "Không thể tải tổng dư nợ: {error}"
+        },
+        "list": {
+            "heading": "Danh sách khoản",
+            "reload": "Tải lại danh sách",
+            "loading": "Đang tải danh sách khoản...",
+            "loadFailed": "Không thể tải danh sách khoản: {error}",
+            "signInRequired": "Vui lòng đăng nhập để xem các khoản vay và cho vay.",
+            "empty": "Không có khoản nào phù hợp với bộ lọc.",
+            "summary": "Hiển thị {from}–{to} trong {total} khoản"
+        },
+        "pendingSync": {
+            "payments": "Khoản có thanh toán chờ đồng bộ nên dư nợ chưa cập nhật. Hãy đồng bộ lại hoặc hủy thanh toán đó."
+        },
+        "form": {
+            "createTitle": "Tạo khoản mới",
+            "editTitle": "Sửa khoản",
+            "directionFixed": "Không đổi được chiều. Muốn đổi, hãy xóa khoản rồi tạo lại.",
+            "amountHint": "Nhập liền các chữ số, dùng dấu chấm cho phần lẻ. Ví dụ: 10000000 hoặc 10.50",
+            "initialBalanceHint": "Dư nợ lúc bắt đầu theo dõi. Để trống nếu bằng số gốc.",
+            "recordDisbursement": "Ghi nhận giải ngân bằng số gốc",
+            "disbursementIncome": "Tạo một giao dịch thu bằng số gốc, vào ngày bắt đầu của khoản, ở tài khoản chọn bên dưới.",
+            "disbursementExpense": "Tạo một giao dịch chi bằng số gốc, vào ngày bắt đầu của khoản, từ tài khoản chọn bên dưới.",
+            "noVndAccounts": "Chưa có tài khoản VND nào. Hãy tạo tài khoản VND, hoặc bỏ chọn ghi nhận giải ngân.",
+            "saveFailed": "Không thể lưu khoản: {error}",
+            "createUnknown": "Chưa rõ khoản đã được lưu hay chưa. Hãy đóng hộp thoại và kiểm tra danh sách trước khi tạo lại để tránh trùng.",
+            "editLocked": "Hiện chưa sửa được khoản này. Hãy đóng hộp thoại, tải lại danh sách rồi mở lại."
+        },
+        "validation": {
+            "originalAmount": "Số gốc phải từ 0.01, tối đa 2 chữ số sau dấu chấm, không có dấu phân cách hàng nghìn. Số quá lớn để lưu chính xác bị từ chối.",
+            "initialBalance": "Dư nợ ban đầu phải từ 0.01, tối đa 2 chữ số sau dấu chấm, không có dấu phân cách hàng nghìn. Số quá lớn để lưu chính xác bị từ chối.",
+            "initialBalanceTooLarge": "Dư nợ ban đầu không được lớn hơn số gốc.",
+            "interestRate": "Lãi suất năm phải từ 0 đến 100, tối đa 2 chữ số sau dấu chấm.",
+            "startDate": "Vui lòng chọn ngày bắt đầu.",
+            "account": "Vui lòng chọn một tài khoản VND để ghi nhận giải ngân."
+        },
+        "close": {
+            "title": "Đóng khoản \"{name}\"?",
+            "action": "Đóng khoản",
+            "confirm": "Khoản đã đóng không mở lại được và không ghi nhận thêm thanh toán. Các kỳ còn chờ sẽ bị hủy.",
+            "confirm_permanent_lock": "Khoản còn thanh toán có hiệu lực. Sau khi đóng, không hủy được các thanh toán đó nữa và giao dịch đã gắn bị khóa vĩnh viễn. Khoản đã đóng không mở lại được."
+        },
+        "delete": {
+            "title": "Xóa khoản \"{name}\"?",
+            "cancelTitle": "Hủy khoản đang hoàn tất \"{name}\"?",
+            "action": "Xóa khoản",
+            "cancelAction": "Hủy khoản",
+            "noTransaction": "Khoản không có giao dịch giải ngân. Không thể hoàn tác thao tác này.",
+            "transactionDeleted": "Giao dịch giải ngân ngày {date}, tài khoản {account}, số tiền {amount} VND sẽ bị xóa cùng khoản. Không thể hoàn tác thao tác này.",
+            "transactionKept": "Giao dịch giải ngân ngày {date}, tài khoản {account}, số tiền {amount} VND sẽ được giữ lại và mở khóa. Khoản sẽ bị xóa và không thể hoàn tác."
+        },
+        "notice": {
+            "created": "Đã tạo khoản.",
+            "provisioning": "Đã tạo khoản nhưng chưa rõ kết quả giải ngân. Khoản đang hoàn tất; hãy dùng Thử lại hoặc Hủy.",
+            "updated": "Đã lưu thay đổi của khoản.",
+            "closed": "Đã đóng khoản.",
+            "deleted": "Đã xóa khoản.",
+            "resynced": "Đã đồng bộ lại khoản."
+        },
+        "errors": {
+            "actionFailed": "Không thể hoàn tất thao tác: {error}",
+            "checkAndRetry": "Vui lòng kiểm tra thông tin và thử lại."
+        }
+    },
     "reminder_bell_label": "Nhắc hạn giao dịch dự kiến: {count}",
     "reminder_title": "Nhắc hạn thanh toán",
     "reminder_loading": "Đang tải nhắc hạn…",

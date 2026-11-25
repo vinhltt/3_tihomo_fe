@@ -126,6 +126,128 @@
     "contact_us_boxed": "Contact Us Boxed",
     "contact_us_cover": "Contact Us Cover",
     "api_keys": "API Keys",
+    "debts": {
+        "title": "Borrowing and lending",
+        "description": "Track the money you borrowed and lent, the balances and the repayment progress.",
+        "columns": {
+            "nameCounterparty": "Name / Counterparty",
+            "directionType": "Direction / Type"
+        },
+        "fields": {
+            "direction": "Direction",
+            "type": "Type",
+            "name": "Name",
+            "counterparty": "Counterparty",
+            "originalAmount": "Original amount (VND)",
+            "initialBalance": "Initial balance (VND)",
+            "currentBalance": "Balance (VND)",
+            "progress": "Progress",
+            "startDate": "Start date",
+            "interestRate": "Annual interest rate (%)",
+            "description": "Description",
+            "notes": "Notes",
+            "account": "VND account"
+        },
+        "direction": {
+            "borrow": "Borrowed",
+            "lend": "Lent"
+        },
+        "status": {
+            "provisioning": "Being completed",
+            "active": "Active",
+            "settled": "Settled",
+            "closed": "Closed"
+        },
+        "type": {
+            "personalLoan": "Personal loan",
+            "mortgage": "Mortgage",
+            "carLoan": "Car loan",
+            "studentLoan": "Student loan",
+            "businessLoan": "Business loan",
+            "creditCard": "Credit card debt",
+            "personalLending": "Lent to a person",
+            "other": "Other"
+        },
+        "operation": {
+            "deleting": "Deletion not finished",
+            "closing": "Closing not finished",
+            "settling": "Settlement not finished",
+            "scheduling": "Installment schedule not finished",
+            "cancelling": "Payment cancellation not finished",
+            "restoring": "Restoring the installments not finished"
+        },
+        "filters": {
+            "allDirections": "All directions",
+            "allStatuses": "All statuses"
+        },
+        "totals": {
+            "borrowed": "I owe (VND)",
+            "lent": "Owed to me (VND)",
+            "note": "Only the outstanding principal of active debts is counted.",
+            "loadFailed": "Unable to load the totals: {error}"
+        },
+        "list": {
+            "heading": "Debts",
+            "reload": "Reload list",
+            "loading": "Loading debts...",
+            "loadFailed": "Unable to load the debts: {error}",
+            "signInRequired": "Please sign in to see your debts.",
+            "empty": "No debts match the filters.",
+            "summary": "Showing {from}–{to} of {total} debts"
+        },
+        "pendingSync": {
+            "payments": "A payment of this debt is waiting to be synced, so the balance is not up to date. Sync that payment again or cancel it."
+        },
+        "form": {
+            "createTitle": "New debt",
+            "editTitle": "Edit debt",
+            "directionFixed": "The direction cannot change. To change it, delete the debt and create it again.",
+            "amountHint": "Digits only, with a dot for the decimals. For example: 10000000 or 10.50",
+            "initialBalanceHint": "Balance when tracking starts. Leave it empty when it equals the original amount.",
+            "recordDisbursement": "Record the disbursement of the original amount",
+            "disbursementIncome": "Creates an income transaction of the original amount, on the start date of the debt, in the account chosen below.",
+            "disbursementExpense": "Creates an expense transaction of the original amount, on the start date of the debt, from the account chosen below.",
+            "noVndAccounts": "You have no VND account. Create one, or clear the disbursement option.",
+            "saveFailed": "Unable to save the debt: {error}",
+            "createUnknown": "It is not clear whether the debt was saved. Close this dialog and check the list before creating it again, to avoid a duplicate.",
+            "editLocked": "This debt cannot be edited right now. Close this dialog, reload the list and open it again."
+        },
+        "validation": {
+            "originalAmount": "The original amount must be at least 0.01, with at most 2 digits after the dot and no thousands separator. Amounts too large to be stored exactly are refused.",
+            "initialBalance": "The initial balance must be at least 0.01, with at most 2 digits after the dot and no thousands separator. Amounts too large to be stored exactly are refused.",
+            "initialBalanceTooLarge": "The initial balance must not exceed the original amount.",
+            "interestRate": "The annual interest rate must be from 0 to 100, with at most 2 digits after the dot.",
+            "startDate": "Please choose the start date.",
+            "account": "Please choose a VND account to record the disbursement."
+        },
+        "close": {
+            "title": "Close the debt \"{name}\"?",
+            "action": "Close debt",
+            "confirm": "A closed debt cannot be reopened and takes no more payments. Its pending installments will be cancelled.",
+            "confirm_permanent_lock": "This debt still has active payments. Once it is closed, those payments can no longer be cancelled and their transactions are locked permanently. A closed debt cannot be reopened."
+        },
+        "delete": {
+            "title": "Delete the debt \"{name}\"?",
+            "cancelTitle": "Cancel the debt \"{name}\" that is being completed?",
+            "action": "Delete debt",
+            "cancelAction": "Cancel debt",
+            "noTransaction": "This debt has no disbursement transaction. This cannot be undone.",
+            "transactionDeleted": "The disbursement transaction of {date}, account {account}, amount {amount} VND will be deleted with the debt. This cannot be undone.",
+            "transactionKept": "The disbursement transaction of {date}, account {account}, amount {amount} VND will be kept and unlocked. The debt will be deleted and this cannot be undone."
+        },
+        "notice": {
+            "created": "The debt was created.",
+            "provisioning": "The debt was created, but the result of its disbursement is not clear. It is being completed; use Retry or Cancel.",
+            "updated": "The changes to the debt were saved.",
+            "closed": "The debt was closed.",
+            "deleted": "The debt was deleted.",
+            "resynced": "The debt was synced again."
+        },
+        "errors": {
+            "actionFailed": "Unable to complete the action: {error}",
+            "checkAndRetry": "Please check the information and try again."
+        }
+    },
     "reminder_bell_label": "Expected transaction reminders: {count}",
     "reminder_title": "Upcoming payments",
     "reminder_loading": "Loading reminders…",
