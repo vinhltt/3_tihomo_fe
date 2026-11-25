@@ -8,7 +8,7 @@ import type {
   TransactionDirectionType,
   CategoryType
 } from '~/types/transaction'
-import type { FilterBodyRequest, ApiResponse, ApiError } from '~/types/api'
+import type { FilterBodyRequest, FilterRequest, ApiResponse, ApiError } from '~/types/api'
 import type { IBasePaging } from '~/types/recurring-transaction'
 import { FilterLogicalOperator, FilterType, SortDirection } from '~/types/api'
 import { 
@@ -206,12 +206,13 @@ export const useTransactions = () => {
     searchValue: string,
     pageIndex: number,
     pageSize: number,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    filter?: FilterRequest
   ): Promise<IBasePaging<TransactionViewModel>> => {
     const body: FilterBodyRequest = {
       langId: '',
       searchValue,
-      filter: {},
+      filter: filter ?? {},
       orders: [
         { field: 'transactionDate', direction: SortDirection.Descending },
         { field: 'id', direction: SortDirection.Descending }

@@ -29,7 +29,9 @@
                 <tbody>
                     <tr v-for="debt in debts" :key="debt.id">
                         <td class="min-w-[200px] max-w-xs">
-                            <p class="break-words font-semibold">{{ debt.name }}</p>
+                            <p class="break-words font-semibold">
+                                <NuxtLink :to="`/apps/debts/${encodeURIComponent(debt.id)}`" class="text-primary hover:underline">{{ debt.name }}</NuxtLink>
+                            </p>
                             <p v-if="debt.counterparty" class="mt-1 break-words text-sm">{{ debt.counterparty }}</p>
                             <DebtPendingSyncAlert :debt="debt" />
                         </td>

@@ -1,4 +1,5 @@
 import type { ApiError } from './api'
+import type { TransactionViewModel } from './transaction'
 
 /**
  * Who owes whom: the owner borrowed or lent the money. (EN)
@@ -26,6 +27,20 @@ export type DebtPendingOperation = 'None' | 'Deleting' | 'Closing' | 'Settling' 
 export type DebtScheduleMethod = 'EqualPrincipal' | 'EqualPayment'
 
 export type DebtDisbursementOrigin = 'Created' | 'Linked'
+
+/**
+ * How money is recorded: with a new transaction, or with one that already exists. (EN)
+ *
+ * Cách ghi nhận tiền: bằng giao dịch mới, hoặc bằng giao dịch có sẵn. (VI)
+ */
+export type DebtTransactionMode = 'create' | 'link'
+
+/**
+ * Status of a payment; Pending means that it still waits to be synced and the balance does not count it. (EN)
+ *
+ * Trạng thái thanh toán; Pending nghĩa là còn chờ đồng bộ và dư nợ chưa tính. (VI)
+ */
+export type DebtPaymentStatus = 'Pending' | 'Applied' | 'CountedInInitialBalance' | 'Cancelled'
 
 /**
  * One debt, in lists and in detail. Amounts are VND; startDate is a calendar day (YYYY-MM-DD). (EN)
@@ -61,6 +76,27 @@ export type Debt = {
 }
 
 /**
+ * One payment of a debt. paymentDate is a calendar day, null until the day of a linked transaction is known;
+ * pendingOperation is set while its cancellation is unfinished. (EN)
+ *
+ * Một thanh toán của khoản nợ. paymentDate là ngày lịch, null cho tới khi biết ngày của giao dịch liên kết;
+ * pendingOperation có giá trị khi chưa hủy xong thanh toán. (VI)
+ */
+export type DebtPayment = {
+  id: string
+  principal: number
+  interest: number
+  paymentDate: string | null
+  status: DebtPaymentStatus
+  countedInInitialBalance: boolean
+  transactionId: string | null
+  installmentId: string | null
+  accountId: string | null
+  pendingOperation: DebtPendingOperation | null
+  createdAt: string | null
+}
+
+/**
  * Outstanding principal of the active debts, one total per direction. (EN)
  *
  * Dư nợ gốc của các khoản đang hoạt động, mỗi chiều một tổng. (VI)
@@ -91,10 +127,7 @@ export type DebtDeletePreview = {
  *
  * Giải ngân bằng số gốc, ghi nhận cùng khoản. (VI)
  */
-export type DebtDisbursementInput = {
-  mode: 'create'
-  accountId: string
-}
+export type DebtDisbursementInput = { mode: 'create'; accountId: string } | { mode: 'link'; transactionId: string | null }
 
 type DebtDescriptionRequest = {
   name: string
@@ -137,8 +170,35 @@ export type DebtForm = {
   description: string
   notes: string
   recordDisbursement: boolean
+  disbursementMode: DebtTransactionMode
   accountId: string
+  transaction: TransactionViewModel | null
 }
+
+/**
+ * What the payment dialog holds. Only the fields of the chosen mode are sent. (EN)
+ *
+ * Nội dung hộp thoại thanh toán. Chỉ gửi các field của cách đã chọn. (VI)
+ */
+export type DebtPaymentForm = {
+  mode: DebtTransactionMode
+  principal: string
+  interest: string
+  accountId: string
+  paymentDate: string
+  transaction: TransactionViewModel | null
+  countedInInitialBalance: boolean
+}
+
+/**
+ * Records a payment; the key of the attempt is added when it is sent. (EN)
+ *
+ * Ghi nhận thanh toán; khóa của lần ghi nhận được thêm khi gửi. (VI)
+ */
+export type DebtPaymentRequest = {
+  principal: number
+  interest: number
+} & ({ accountId: string; paymentDate: string } | { transactionId: string | null; countedInInitialBalance: boolean })
 
 export type DebtFilterForm = {
   direction: '' | DebtDirection

@@ -7,7 +7,6 @@
             :aria-label="title"
             tabindex="-1"
             class="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-white shadow-xl outline-none dark:bg-[#0e1726]"
-            @keydown="handleDialogKeydown"
         >
             <div class="flex items-center justify-between gap-4 border-b border-gray-200 p-5 dark:border-gray-700">
                 <h2 class="text-lg font-semibold">{{ title }}</h2>
@@ -70,30 +69,21 @@
                     </div>
                 </fieldset>
 
-                <fieldset v-if="!current" :disabled="saving || locked" class="space-y-3 rounded-lg border border-gray-200 p-4 dark:border-gray-700">
-                    <label class="flex items-center gap-2">
-                        <input id="debt-disbursement" v-model="form.recordDisbursement" type="checkbox" class="form-checkbox" />
-                        <span>{{ t('debts.form.recordDisbursement') }}</span>
-                    </label>
-                    <div v-if="form.recordDisbursement">
-                        <p class="mb-3 text-sm text-gray-500">{{ form.direction === 'Borrow' ? t('debts.form.disbursementIncome') : t('debts.form.disbursementExpense') }}</p>
-                        <label for="debt-account" class="mb-1 block text-sm font-medium">{{ t('debts.fields.account') }} *</label>
-                        <select id="debt-account" v-model="form.accountId" class="form-select" :disabled="vndAccounts.length === 0">
-                            <option value="">{{ t('expected.payment.selectAccount') }}</option>
-                            <option v-for="account in vndAccounts" :key="account.id" :value="account.id">{{ account.name || t('expected.account.unnamed') }}</option>
-                        </select>
-                        <p v-if="accountsLoading" role="status" class="mt-2 text-sm text-gray-500">{{ t('accounts.dropdown.loading') }}</p>
-                        <div v-else-if="accountError" role="alert" class="mt-2 text-sm text-danger">
-                            <p>{{ t('accounts.errors.loadFailedDetail', { error: displayText(accountError) }) }}</p>
-                            <button type="button" class="btn btn-sm btn-outline-primary mt-2" @click="getAccounts()">{{ t('common.retry') }}</button>
-                        </div>
-                        <p v-else-if="vndAccounts.length === 0" role="alert" class="mt-2 text-sm text-warning">{{ t('debts.form.noVndAccounts') }}</p>
-                    </div>
-                </fieldset>
+                <DebtDisbursementFields
+                    v-if="!current"
+                    :form="form"
+                    :accounts="vndAccounts"
+                    :accounts-loading="accountsLoading"
+                    :account-error="accountError"
+                    :disabled="saving || locked"
+                    @change="changeDisbursement"
+                    @blocked="blocked => (transactionsBlocked = blocked)"
+                    @retry="getAccounts()"
+                />
 
                 <div class="flex justify-end gap-3 border-t border-gray-200 pt-4 dark:border-gray-700">
                     <button type="button" class="btn btn-outline-secondary" @click="closeModal">{{ closeLabel }}</button>
-                    <button type="submit" class="btn btn-primary" :disabled="saving || locked">{{ saving ? t('common.saving') : t('common.save') }}</button>
+                    <button type="submit" class="btn btn-primary" :disabled="saving || locked || (linking && transactionsBlocked)">{{ saving ? t('common.saving') : t('common.save') }}</button>
                 </div>
             </form>
         </section>
@@ -101,13 +91,23 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue'
+import DebtDisbursementFields from '~/components/apps/debts/DebtDisbursementFields.vue'
 import { useAccountsSimple } from '~/composables/useAccountsSimple'
-import { useDebts } from '~/composables/useDebts'
-import { useAuthStore } from '~/stores/auth'
+import { useDebtDialog, useDebts } from '~/composables/useDebts'
 import type { ApiError } from '~/types/api'
 import type { Debt, DebtDisplayError, DebtForm } from '~/types/debt'
-import { DEBT_DIRECTION_KEYS, DEBT_TYPE_KEYS, canEditDebt, debtFormError, debtTypesFor, toDebtForm } from '~/utils/debt-formatters'
+import {
+    DEBT_DIRECTION_KEYS,
+    DEBT_TYPE_KEYS,
+    canEditDebt,
+    debtFormError,
+    debtTypesFor,
+    isUnknownOutcome,
+    isVndAccount,
+    toDebtForm,
+    transactionAmountText
+} from '~/utils/debt-formatters'
 import { errorMessage } from '~/utils/expected-transaction-formatters'
 
 // Creates a debt, or edits the given one. The page unmounts it when the session changes.
@@ -117,22 +117,22 @@ const emit = defineEmits<{
     saved: [debt: Debt]
 }>()
 
-const auth = useAuthStore()
 const { getDebt, createDebt, updateDebt } = useDebts()
 const { accounts, isLoading: accountsLoading, error: accountError, getAccounts } = useAccountsSimple()
 const { t } = useI18n()
-const dialog = ref<HTMLElement | null>(null)
+// Only the read is aborted: a pending command may still commit on the server.
+const closeModal = (): void => emit('close')
+const { dialog, isCurrent } = useDebtDialog(closeModal)
 const current = ref<Debt | null>(props.debt)
 const form = reactive<DebtForm>(toDebtForm(props.debt))
 const saving = ref(false)
 // A new debt whose outcome is unknown may already exist, and a refused edit needs the debt as it is now.
 const locked = ref(false)
+// Mirrors the loading or error state of the transaction picker.
+const transactionsBlocked = ref(false)
 const invalidKey = ref<string | null>(null)
 const saveError = ref<DebtDisplayError | null>(null)
 const readController = new AbortController()
-const openingToken = auth.token
-let disposed = false
-let previousFocus: HTMLElement | null = null
 
 // A frontend message carries messageKey; a backend message is shown verbatim.
 const displayText = (error: DebtDisplayError): string => (error.messageKey ? t(error.messageKey, error.messageParams ?? {}) : error.message)
@@ -143,12 +143,12 @@ const errorText = computed(() => {
 const title = computed(() => (current.value ? t('debts.form.editTitle') : t('debts.form.createTitle')))
 const closeLabel = computed(() => (saving.value ? t('expected.modal.closeWhileSaving') : t('common.close')))
 const closed = computed(() => current.value?.status === 'Closed')
-const vndAccounts = computed(() => accounts.value.filter(account => account.currency?.toUpperCase() === 'VND'))
-const isCurrent = (): boolean => !disposed && auth.isAuthenticated && auth.token === openingToken
+const vndAccounts = computed(() => accounts.value.filter(isVndAccount))
+const linking = computed(() => form.recordDisbursement && form.disbursementMode === 'link')
 
 const findInvalid = (): string | null => {
     const key = debtFormError(form, current.value)
-    if (key || !form.recordDisbursement) return key
+    if (key || !form.recordDisbursement || linking.value) return key
     return vndAccounts.value.some(account => account.id === form.accountId) ? null : 'debts.validation.account'
 }
 
@@ -179,52 +179,28 @@ const submit = async (): Promise<void> => {
     } catch (error) {
         if (!isCurrent()) return
         saveError.value = errorMessage(error, 'debts.errors.checkAndRetry')
-        const status = (error as Partial<ApiError> | null)?.statusCode ?? 0
-        locked.value = edited ? status === 409 : status === 0 || status >= 500
+        locked.value = edited ? (error as Partial<ApiError> | null)?.statusCode === 409 : isUnknownOutcome(error)
         if (edited && locked.value) await reloadDebt(edited.id)
     } finally {
         if (isCurrent()) saving.value = false
     }
 }
 
-// Only the read is aborted: a pending command may still commit on the server.
-const closeModal = (): void => emit('close')
-
-const handleDialogKeydown = (event: KeyboardEvent): void => {
-    if (event.key === 'Escape') {
-        event.preventDefault()
-        closeModal()
-        return
-    }
-    if (event.key !== 'Tab' || !dialog.value) return
-    const controls = Array.from(dialog.value.querySelectorAll<HTMLElement>('button, input, select, textarea')).filter(control => !control.matches(':disabled'))
-    const first = controls[0]
-    const last = controls[controls.length - 1]
-    if (event.shiftKey && (document.activeElement === first || document.activeElement === dialog.value)) {
-        event.preventDefault()
-        last?.focus()
-    } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault()
-        first?.focus()
-    }
+const changeDisbursement = (changes: Partial<DebtForm>): void => {
+    if (!isCurrent()) return
+    Object.assign(form, changes)
+    if (changes.transaction && !form.originalAmount) form.originalAmount = transactionAmountText(changes.transaction)
 }
 
 watch(() => form.direction, direction => {
-    if (!current.value) form.debtType = debtTypesFor(direction)[0]
+    if (current.value) return
+    form.debtType = debtTypesFor(direction)[0]
+    // The other direction disburses with the other side of the transactions.
+    form.transaction = null
 })
 watch(() => form.recordDisbursement, record => {
     if (record) void getAccounts()
 })
 
-onMounted(() => {
-    previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null
-    void nextTick(() => dialog.value?.focus())
-})
-onBeforeUnmount(() => {
-    // Focus goes back after an ordinary dismissal, never after a session change.
-    const restoreFocus = isCurrent()
-    disposed = true
-    readController.abort()
-    if (restoreFocus && previousFocus?.isConnected) previousFocus.focus()
-})
+onBeforeUnmount(() => readController.abort())
 </script>

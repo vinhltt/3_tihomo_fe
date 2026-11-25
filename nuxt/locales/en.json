@@ -131,7 +131,8 @@
         "description": "Track the money you borrowed and lent, the balances and the repayment progress.",
         "columns": {
             "nameCounterparty": "Name / Counterparty",
-            "directionType": "Direction / Type"
+            "directionType": "Direction / Type",
+            "transaction": "Transaction"
         },
         "fields": {
             "direction": "Direction",
@@ -146,7 +147,11 @@
             "interestRate": "Annual interest rate (%)",
             "description": "Description",
             "notes": "Notes",
-            "account": "VND account"
+            "account": "VND account",
+            "paymentDate": "Payment date",
+            "principal": "Principal (VND)",
+            "interest": "Interest (VND)",
+            "transactionAmount": "Amount (VND)"
         },
         "direction": {
             "borrow": "Borrowed",
@@ -176,6 +181,16 @@
             "cancelling": "Payment cancellation not finished",
             "restoring": "Restoring the installments not finished"
         },
+        "paymentStatus": {
+            "pending": "Waiting to be synced",
+            "applied": "Taken off the balance",
+            "countedInInitialBalance": "Counted in the initial balance",
+            "cancelled": "Cancelled"
+        },
+        "transactionMode": {
+            "create": "Create a new transaction",
+            "link": "Use an existing transaction"
+        },
         "filters": {
             "allDirections": "All directions",
             "allStatuses": "All statuses"
@@ -196,7 +211,41 @@
             "summary": "Showing {from}–{to} of {total} debts"
         },
         "pendingSync": {
-            "payments": "A payment of this debt is waiting to be synced, so the balance is not up to date. Sync that payment again or cancel it."
+            "payments": "A payment of this debt is waiting to be synced, so the balance is not up to date. Sync that payment again or cancel it.",
+            "busy": "This debt is busy: {operation}. The other actions are off until it is synced again.",
+            "labels": "The new name or counterparty has not reached the installments yet.",
+            "action": "Sync again"
+        },
+        "detail": {
+            "title": "Debt details",
+            "back": "Back to the debts",
+            "loading": "Loading the debt...",
+            "loadFailed": "Unable to load the debt: {error}",
+            "notFound": "This debt was not found. It may have been deleted."
+        },
+        "history": {
+            "heading": "Payment history",
+            "empty": "No payments yet."
+        },
+        "payment": {
+            "recordBorrow": "Record a repayment",
+            "recordLend": "Record a collection",
+            "interestHint": "All of it is principal by default. If there is interest, split it off the principal; empty means no interest.",
+            "countedHint": "Turn this on when this payment was already taken off the initial balance. The balance then does not change.",
+            "noVndAccounts": "You have no VND account. Create one before recording a payment.",
+            "saveFailed": "Unable to record the payment: {error}",
+            "unknown": "It is not clear whether the payment was saved. Check the payment history of the debt. Save sends this same attempt again and does not create another payment."
+        },
+        "picker": {
+            "outgoingHint": "Only expense transactions of your VND accounts are listed. Linking creates no transaction; the server checks that it belongs to no other debt or period.",
+            "incomingHint": "Only income transactions of your VND accounts are listed. Linking creates no transaction; the server checks that it belongs to no other debt or period.",
+            "noVndAccounts": "You have no VND account, so there is no transaction to choose."
+        },
+        "cancelPayment": {
+            "title": "Cancel the payment of {principal} VND principal and {interest} VND interest?",
+            "action": "Cancel payment",
+            "principalReturned": "The transaction is kept and unlocked. The principal of {principal} VND goes back to the balance.",
+            "balanceUnchanged": "The transaction (if any) is kept and unlocked. The balance does not change, because the principal of this payment was never taken off it."
         },
         "form": {
             "createTitle": "New debt",
@@ -207,6 +256,7 @@
             "recordDisbursement": "Record the disbursement of the original amount",
             "disbursementIncome": "Creates an income transaction of the original amount, on the start date of the debt, in the account chosen below.",
             "disbursementExpense": "Creates an expense transaction of the original amount, on the start date of the debt, from the account chosen below.",
+            "disbursementLink": "Choose a transaction whose amount equals the original amount.",
             "noVndAccounts": "You have no VND account. Create one, or clear the disbursement option.",
             "saveFailed": "Unable to save the debt: {error}",
             "createUnknown": "It is not clear whether the debt was saved. Close this dialog and check the list before creating it again, to avoid a duplicate.",
@@ -218,7 +268,15 @@
             "initialBalanceTooLarge": "The initial balance must not exceed the original amount.",
             "interestRate": "The annual interest rate must be from 0 to 100, with at most 2 digits after the dot.",
             "startDate": "Please choose the start date.",
-            "account": "Please choose a VND account to record the disbursement."
+            "account": "Please choose a VND account to record the disbursement.",
+            "transaction": "Please choose an existing transaction.",
+            "disbursementAmount": "The original amount must equal the amount of the chosen transaction.",
+            "principal": "The principal must be at least 0, with at most 2 digits after the dot and no thousands separator. Amounts too large to be stored exactly are refused.",
+            "interest": "The interest must be at least 0, with at most 2 digits after the dot and no thousands separator. Amounts too large to be stored exactly are refused.",
+            "paymentTotal": "The principal and the interest must add up to more than 0.",
+            "paymentAccount": "Please choose a VND account.",
+            "paymentDate": "Please choose the payment date.",
+            "transactionTotal": "The principal and the interest must add up to the amount of the chosen transaction."
         },
         "close": {
             "title": "Close the debt \"{name}\"?",
@@ -241,7 +299,11 @@
             "updated": "The changes to the debt were saved.",
             "closed": "The debt was closed.",
             "deleted": "The debt was deleted.",
-            "resynced": "The debt was synced again."
+            "resynced": "The debt was synced again.",
+            "paymentSaved": "The payment was recorded.",
+            "paymentPending": "The payment was saved but still waits to be synced, so the balance has not changed. Use Sync again in the payment history.",
+            "paymentCancelled": "The payment was cancelled.",
+            "paymentSynced": "The payment was synced again."
         },
         "errors": {
             "actionFailed": "Unable to complete the action: {error}",

@@ -35,13 +35,14 @@
         />
 
         <DebtFormModal v-if="formOpen" :debt="editing" @close="closeForm" @saved="handleSaved" />
+        <DebtConfirmDialog ref="confirmDialog" />
     </div>
 </template>
 
 <script setup lang="ts">
-import Swal from 'sweetalert2'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useHead } from '#imports'
+import DebtConfirmDialog from '~/components/apps/debts/DebtConfirmDialog.vue'
 import DebtFilters from '~/components/apps/debts/DebtFilters.vue'
 import DebtFormModal from '~/components/apps/debts/DebtFormModal.vue'
 import DebtTable from '~/components/apps/debts/DebtTable.vue'
@@ -50,7 +51,7 @@ import { useDebtActions, useDebts } from '~/composables/useDebts'
 import { useExpectedTransactions } from '~/composables/useExpectedTransactions'
 import { useAuthStore } from '~/stores/auth'
 import type { Pagination } from '~/types/api'
-import type { Debt, DebtDialog, DebtDisplayError, DebtFilterForm } from '~/types/debt'
+import type { Debt, DebtDisplayError, DebtFilterForm } from '~/types/debt'
 import { errorMessage } from '~/utils/expected-transaction-formatters'
 
 const auth = useAuthStore()
@@ -58,24 +59,10 @@ const { getDebts } = useDebts()
 const { revision } = useExpectedTransactions()
 const { t } = useI18n()
 
-let dialogOpen = false
-// User data only goes through titleText and text, which are not rendered as HTML.
-const confirmDialog = async (dialog: DebtDialog): Promise<boolean> => {
-    dialogOpen = true
-    const answer = await Swal.fire({
-        titleText: t(dialog.titleKey, dialog.titleParams),
-        text: t(dialog.textKey, dialog.textParams),
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: t(dialog.confirmKey),
-        cancelButtonText: t('common.back')
-    })
-    dialogOpen = false
-    return answer.isConfirmed
-}
-const { actionId, actionError, noticeKey, requestClose, requestDelete, retry } = useDebtActions(confirmDialog)
+const confirmDialog = ref<InstanceType<typeof DebtConfirmDialog> | null>(null)
+const { actionId, actionError, noticeKey, requestClose, requestDelete, retry } = useDebtActions(
+    dialog => confirmDialog.value?.confirm(dialog) ?? Promise.resolve(false)
+)
 
 const emptyPagination = (): Pagination => ({ pageIndex: 1, pageSize: 10, totalRow: 0, pageCount: 0 })
 const emptyFilters = (): DebtFilterForm => ({ direction: '', status: '' })
@@ -157,8 +144,6 @@ const handleSaved = (saved: Debt): void => {
 const clearSessionState = (): void => {
     resettingSession = true
     invalidateList()
-    // A dialog of the old session must not stay open; closing answers it as not confirmed.
-    if (dialogOpen) Swal.close()
     debts.value = []
     pagination.value = emptyPagination()
     listError.value = null
