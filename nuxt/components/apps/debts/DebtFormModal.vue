@@ -94,7 +94,8 @@
 import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue'
 import DebtDisbursementFields from '~/components/apps/debts/DebtDisbursementFields.vue'
 import { useAccountsSimple } from '~/composables/useAccountsSimple'
-import { useDebtDialog, useDebts } from '~/composables/useDebts'
+import { useDebtDialog } from '~/composables/useDebtDialog'
+import { useDebts } from '~/composables/useDebts'
 import type { ApiError } from '~/types/api'
 import type { Debt, DebtDisplayError, DebtForm } from '~/types/debt'
 import {

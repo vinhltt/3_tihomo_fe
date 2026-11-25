@@ -132,7 +132,14 @@
         "columns": {
             "nameCounterparty": "Tên khoản / Đối tác",
             "directionType": "Chiều / Loại khoản",
-            "transaction": "Giao dịch"
+            "transaction": "Giao dịch",
+            "installmentNo": "Kỳ",
+            "dueDate": "Ngày hạn",
+            "plannedPrincipal": "Gốc dự kiến (VND)",
+            "plannedInterest": "Lãi dự kiến (VND)",
+            "plannedTotal": "Tổng dự kiến (VND)",
+            "actualPrincipal": "Gốc thực tế (VND)",
+            "actualInterest": "Lãi thực tế (VND)"
         },
         "fields": {
             "direction": "Chiều",
@@ -151,7 +158,11 @@
             "paymentDate": "Ngày thanh toán",
             "principal": "Gốc (VND)",
             "interest": "Lãi (VND)",
-            "transactionAmount": "Số tiền (VND)"
+            "transactionAmount": "Số tiền (VND)",
+            "scheduleMethod": "Cách tính",
+            "firstDueDate": "Ngày kỳ đầu",
+            "nextDueDate": "Ngày hạn kỳ kế tiếp",
+            "installmentCount": "Số kỳ"
         },
         "direction": {
             "borrow": "Đi vay",
@@ -191,6 +202,10 @@
             "create": "Tạo giao dịch mới",
             "link": "Dùng giao dịch có sẵn"
         },
+        "scheduleMethod": {
+            "equalPrincipal": "Gốc đều, lãi trên dư nợ giảm dần",
+            "equalPayment": "Trả đều mỗi kỳ"
+        },
         "filters": {
             "allDirections": "Tất cả chiều",
             "allStatuses": "Tất cả trạng thái"
@@ -223,6 +238,30 @@
             "loadFailed": "Không thể tải chi tiết khoản: {error}",
             "notFound": "Không tìm thấy khoản này. Khoản có thể đã bị xóa."
         },
+        "schedule": {
+            "heading": "Lịch trả góp",
+            "none": "Khoản chưa có lịch trả góp.",
+            "empty": "Lịch không có kỳ nào.",
+            "loading": "Đang tải các kỳ...",
+            "loadFailed": "Không thể tải các kỳ: {error}",
+            "create": "Tạo lịch trả góp",
+            "recalculate": "Tính lại các kỳ còn lại",
+            "record": "Ghi nhận",
+            "adjust": "Chỉnh kỳ",
+            "installment": "Kỳ {no}, hạn {date}",
+            "original": "Trước khi chỉnh: {amount}",
+            "countHint": "Số nguyên từ 1 đến 2400. Mỗi tháng một kỳ.",
+            "periods_over_600_warning": "Hơn 600 kỳ là hơn 50 năm. Hãy kiểm tra lại số kỳ; bạn vẫn có thể tiếp tục.",
+            "balance": "Dư nợ chia vào các kỳ (VND)",
+            "pendingPrincipal": "Gốc chờ đồng bộ, đã trừ ra (VND)",
+            "replacedCount": "Số kỳ chờ sẽ bị thay",
+            "adjustedWarning": "Có {count} kỳ đã chỉnh tay sẽ bị thay. Các số đã chỉnh sẽ mất.",
+            "nothingLeft": "Không còn gì để trả. Các kỳ chờ sẽ bị bỏ và không tạo kỳ mới.",
+            "previewLoading": "Đang kiểm tra các kỳ sẽ bị thay...",
+            "previewFailed": "Không thể kiểm tra các kỳ sẽ bị thay: {error}",
+            "saveFailed": "Không thể lưu lịch trả góp: {error}",
+            "unknown": "Chưa rõ thay đổi đã được lưu hay chưa. Hãy đóng hộp thoại và kiểm tra lịch trước khi làm lại. Nếu khoản đang bận, hãy bấm Đồng bộ lại."
+        },
         "history": {
             "heading": "Lịch sử thanh toán",
             "empty": "Chưa có thanh toán nào."
@@ -234,7 +273,8 @@
             "countedHint": "Bật khi lần trả này đã được trừ sẵn trong dư nợ ban đầu. Khi bật, dư nợ không đổi.",
             "noVndAccounts": "Chưa có tài khoản VND nào. Hãy tạo tài khoản VND trước khi ghi nhận.",
             "saveFailed": "Không thể ghi nhận thanh toán: {error}",
-            "unknown": "Chưa rõ thanh toán đã được lưu hay chưa. Hãy kiểm tra lịch sử thanh toán của khoản. Bấm Lưu sẽ gửi lại đúng lần ghi nhận này và không tạo thêm thanh toán."
+            "unknown": "Chưa rõ thanh toán đã được lưu hay chưa. Hãy kiểm tra lịch sử thanh toán của khoản. Bấm Lưu sẽ gửi lại đúng lần ghi nhận này và không tạo thêm thanh toán.",
+            "installmentHint": "Gốc và lãi lấy theo số dự kiến của kỳ. Hãy sửa theo số thực tế."
         },
         "picker": {
             "outgoingHint": "Chỉ hiện giao dịch chi ở tài khoản VND của bạn. Liên kết không tạo thêm giao dịch; máy chủ kiểm tra giao dịch chưa gắn với khoản nợ hay kỳ nào khác.",
@@ -276,7 +316,9 @@
             "paymentTotal": "Tổng gốc và lãi phải lớn hơn 0.",
             "paymentAccount": "Vui lòng chọn một tài khoản VND.",
             "paymentDate": "Vui lòng chọn ngày thanh toán.",
-            "transactionTotal": "Tổng gốc và lãi phải bằng số tiền của giao dịch đã chọn."
+            "transactionTotal": "Tổng gốc và lãi phải bằng số tiền của giao dịch đã chọn.",
+            "installmentCount": "Số kỳ phải là số nguyên từ 1 đến 2400.",
+            "dueDate": "Vui lòng chọn ngày hạn."
         },
         "close": {
             "title": "Đóng khoản \"{name}\"?",
@@ -303,7 +345,10 @@
             "paymentSaved": "Đã ghi nhận thanh toán.",
             "paymentPending": "Thanh toán đã được lưu nhưng còn chờ đồng bộ nên dư nợ chưa đổi. Hãy bấm Đồng bộ lại ở lịch sử thanh toán.",
             "paymentCancelled": "Đã hủy thanh toán.",
-            "paymentSynced": "Đã đồng bộ lại thanh toán."
+            "paymentSynced": "Đã đồng bộ lại thanh toán.",
+            "scheduleCreated": "Đã tạo lịch trả góp.",
+            "scheduleRecalculated": "Đã tính lại các kỳ còn lại.",
+            "installmentAdjusted": "Đã chỉnh kỳ."
         },
         "errors": {
             "actionFailed": "Không thể hoàn tất thao tác: {error}",

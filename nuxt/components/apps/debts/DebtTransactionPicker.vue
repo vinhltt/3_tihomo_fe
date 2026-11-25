@@ -72,7 +72,8 @@ import type { Pagination } from '~/types/api'
 import type { DebtDisplayError } from '~/types/debt'
 import { getAmount } from '~/types/transaction'
 import type { TransactionViewModel } from '~/types/transaction'
-import { debtTransactionFilter, formatDebtAmount, isVndAccount } from '~/utils/debt-formatters'
+import { formatDebtAmount, isVndAccount } from '~/utils/debt-formatters'
+import { debtTransactionFilter } from '~/utils/debt-payment-rules'
 import { errorMessage, formatDate } from '~/utils/expected-transaction-formatters'
 
 // Owns the read of the VND accounts and of their one-sided transactions. The dialog owns the selection and submit, and its

@@ -19,6 +19,8 @@
                     <p v-if="locked" class="mt-2 text-sm">{{ t('debts.payment.unknown') }}</p>
                 </div>
 
+                <p v-if="installment">{{ t('debts.schedule.installment', { no: installment.installmentNo, date: formatDate(installment.dueDate) }) }}</p>
+
                 <fieldset :disabled="saving || locked" class="space-y-5">
                     <div role="tablist" class="flex flex-wrap gap-2">
                         <button
@@ -61,7 +63,8 @@
                             @selected="pickTransaction"
                             @blocked="blocked => (transactionsBlocked = blocked)"
                         />
-                        <div>
+                        <!-- A payment of an installment is never part of the initial balance. -->
+                        <div v-if="!installment">
                             <label class="flex items-center gap-2">
                                 <input id="debt-payment-counted" v-model="form.countedInInitialBalance" type="checkbox" class="form-checkbox" />
                                 <span>{{ t('debts.paymentStatus.countedInInitialBalance') }}</span>
@@ -79,7 +82,7 @@
                         <div>
                             <label for="debt-payment-interest" class="mb-1 block text-sm font-medium">{{ t('debts.fields.interest') }}</label>
                             <input id="debt-payment-interest" v-model.trim="form.interest" type="text" inputmode="decimal" class="form-input" />
-                            <p class="mt-1 text-sm text-gray-500">{{ t('debts.payment.interestHint') }}</p>
+                            <p class="mt-1 text-sm text-gray-500">{{ installment ? t('debts.payment.installmentHint') : t('debts.payment.interestHint') }}</p>
                         </div>
                     </div>
                 </fieldset>
@@ -97,22 +100,18 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import DebtTransactionPicker from '~/components/apps/debts/DebtTransactionPicker.vue'
 import { useAccountsSimple } from '~/composables/useAccountsSimple'
-import { useAttemptKey, useDebtDialog, useDebts } from '~/composables/useDebts'
-import type { Debt, DebtDisplayError, DebtPayment, DebtPaymentForm } from '~/types/debt'
+import { useAttemptKey, useDebtDialog } from '~/composables/useDebtDialog'
+import { useDebts } from '~/composables/useDebts'
+import type { Debt, DebtDisplayError, DebtInstallment, DebtPayment, DebtPaymentForm } from '~/types/debt'
 import type { TransactionViewModel } from '~/types/transaction'
-import {
-    DEBT_TRANSACTION_MODE_KEYS,
-    debtPaymentError,
-    isUnknownOutcome,
-    isVndAccount,
-    pickedTransactionFields,
-    toPaymentForm,
-    toPaymentRequest
-} from '~/utils/debt-formatters'
+import { DEBT_TRANSACTION_MODE_KEYS, isUnknownOutcome, isVndAccount } from '~/utils/debt-formatters'
+import { debtPaymentError, pickedInstallmentFields, pickedTransactionFields, toPaymentForm, toPaymentRequest } from '~/utils/debt-payment-rules'
+import { formatDate } from '~/utils/display-format'
 import { errorMessage } from '~/utils/expected-transaction-formatters'
 
-// Records one payment of the debt. The page unmounts it when the session changes.
-const props = defineProps<{ debt: Debt }>()
+// Records one payment of the debt, of the given installment or outside the schedule. The page unmounts it when the session
+// changes.
+const props = defineProps<{ debt: Debt; installment?: DebtInstallment | null }>()
 const emit = defineEmits<{
     close: []
     saved: [payment: DebtPayment]
@@ -124,7 +123,7 @@ const { t } = useI18n()
 // Closing is not a rollback: a pending command may still commit on the server.
 const closeModal = (): void => emit('close')
 const { dialog, isCurrent } = useDebtDialog(closeModal)
-const form = reactive<DebtPaymentForm>(toPaymentForm())
+const form = reactive<DebtPaymentForm>(toPaymentForm(props.installment))
 const attemptKey = useAttemptKey(() => toPaymentRequest(form))
 const saving = ref(false)
 // A payment whose outcome is unknown may already exist: only the same attempt can be sent again.
@@ -151,7 +150,9 @@ const findInvalid = (): string | null => {
 }
 
 const pickTransaction = (transaction: TransactionViewModel | null): void => {
-    if (isCurrent()) Object.assign(form, transaction ? pickedTransactionFields(props.debt, transaction) : { transaction })
+    if (!isCurrent()) return
+    if (!transaction) form.transaction = null
+    else Object.assign(form, props.installment ? pickedInstallmentFields(props.installment, transaction) : pickedTransactionFields(props.debt, transaction))
 }
 
 const submit = async (): Promise<void> => {

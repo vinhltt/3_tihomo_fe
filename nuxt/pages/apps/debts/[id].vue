@@ -23,34 +23,18 @@
         </section>
         <p v-else-if="!auth.isAuthenticated" class="panel py-12 text-center text-gray-500">{{ t('debts.list.signInRequired') }}</p>
         <template v-else-if="debt">
-            <div class="flex flex-wrap items-start justify-between gap-4">
-                <div class="min-w-0">
-                    <h1 class="break-words text-2xl font-semibold dark:text-white-light">{{ debt.name }}</h1>
-                    <span class="badge mt-2 inline-block" :class="debtStatusClass(debt.status)">{{ labelText(DEBT_STATUS_KEYS, debt.status) }}</span>
-                </div>
-                <div class="flex flex-wrap gap-2">
-                    <button v-if="provisioning && !isDebtBusy(debt)" type="button" class="btn btn-sm btn-outline-primary" :disabled="!!actionId" @click="retry(debt)">{{ t('common.retry') }}</button>
-                    <template v-if="!provisioning">
-                        <button v-if="hasPaymentActions(debt)" type="button" class="btn btn-sm btn-primary" :disabled="!!actionId || !canRecordPayment(debt)" @click="paying = true">
-                            {{ debt.direction === 'Borrow' ? t('debts.payment.recordBorrow') : t('debts.payment.recordLend') }}
-                        </button>
-                        <button type="button" class="btn btn-sm btn-outline-primary" :disabled="!!actionId || !canEditDebt(debt)" @click="editing = true">{{ t('common.edit') }}</button>
-                        <button type="button" class="btn btn-sm btn-outline-warning" :disabled="!!actionId || !canCloseDebt(debt)" @click="requestClose(debt)">{{ t('debts.close.action') }}</button>
-                    </template>
-                    <button type="button" class="btn btn-sm btn-outline-danger" :disabled="!!actionId || !canDeleteDebt(debt)" @click="requestDelete(debt)">
-                        {{ provisioning ? t('common.cancel') : t('common.delete') }}
-                    </button>
-                </div>
-            </div>
+            <DebtDetailHeader
+                :debt="debt"
+                :loading="loading"
+                :disabled="!!actionId"
+                @retry="retry(debt)"
+                @pay="openDialog('pay')"
+                @edit="openDialog('edit')"
+                @close="requestClose(debt)"
+                @delete="requestDelete(debt)"
+            />
 
-            <DebtPendingSyncAlert :debt="debt" detailed :disabled="!!actionId" @resync="retry(debt)" />
-
-            <dl class="panel grid gap-4 sm:grid-cols-2 lg:grid-cols-3" :aria-busy="loading">
-                <div v-for="[key, value] in facts" :key="key">
-                    <dt class="text-sm text-gray-500">{{ t(key) }}</dt>
-                    <dd class="mt-1 whitespace-pre-line break-words font-semibold">{{ value }}</dd>
-                </div>
-            </dl>
+            <DebtSchedulePanel :debt="debt" :disabled="!!actionId" @open="openDialog" />
 
             <DebtPaymentHistory
                 :debt="debt"
@@ -62,40 +46,41 @@
         </template>
 
         <!-- Outside the states above: a reload that fails must not take an open dialog and its attempt away. -->
-        <DebtFormModal v-if="editing && debt" :debt="debt" @close="editing = false" @saved="handleSaved" />
-        <DebtRecordPaymentModal v-if="paying && debt" :debt="debt" @close="paying = false" @saved="handlePaid" />
+        <template v-if="debt">
+            <DebtFormModal v-if="dialog === 'edit'" :debt="debt" @close="dialog = null" @saved="finish('debts.notice.updated')" />
+            <DebtRecordPaymentModal v-if="dialog === 'pay'" :debt="debt" :installment="installment" @close="dialog = null" @saved="handlePaid" />
+            <DebtScheduleSetupModal v-if="dialog === 'createSchedule'" :debt="debt" @close="dialog = null" @saved="finish('debts.notice.scheduleCreated')" />
+            <DebtRecalculateModal v-if="dialog === 'recalculate'" :debt="debt" @close="dialog = null" @saved="finish('debts.notice.scheduleRecalculated')" />
+            <DebtInstallmentAdjustModal
+                v-if="dialog === 'adjust' && installment"
+                :debt="debt"
+                :installment="installment"
+                @close="dialog = null"
+                @saved="finish('debts.notice.installmentAdjusted')"
+            />
+        </template>
         <DebtConfirmDialog ref="confirmDialog" />
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import { navigateTo, useHead, useRoute } from '#imports'
 import DebtConfirmDialog from '~/components/apps/debts/DebtConfirmDialog.vue'
+import DebtDetailHeader from '~/components/apps/debts/DebtDetailHeader.vue'
 import DebtFormModal from '~/components/apps/debts/DebtFormModal.vue'
+import DebtInstallmentAdjustModal from '~/components/apps/debts/DebtInstallmentAdjustModal.vue'
 import DebtPaymentHistory from '~/components/apps/debts/DebtPaymentHistory.vue'
-import DebtPendingSyncAlert from '~/components/apps/debts/DebtPendingSyncAlert.vue'
+import DebtRecalculateModal from '~/components/apps/debts/DebtRecalculateModal.vue'
 import DebtRecordPaymentModal from '~/components/apps/debts/DebtRecordPaymentModal.vue'
-import { useDebtActions, useDebts } from '~/composables/useDebts'
+import DebtSchedulePanel from '~/components/apps/debts/DebtSchedulePanel.vue'
+import DebtScheduleSetupModal from '~/components/apps/debts/DebtScheduleSetupModal.vue'
+import { useDebtActions } from '~/composables/useDebtActions'
+import { useDebts } from '~/composables/useDebts'
 import { useExpectedTransactions } from '~/composables/useExpectedTransactions'
 import { useAuthStore } from '~/stores/auth'
 import type { ApiError } from '~/types/api'
-import type { Debt, DebtDisplayError, DebtPayment } from '~/types/debt'
-import {
-    DEBT_DIRECTION_KEYS,
-    DEBT_STATUS_KEYS,
-    DEBT_TYPE_KEYS,
-    canCloseDebt,
-    canDeleteDebt,
-    canEditDebt,
-    canRecordPayment,
-    debtLabel,
-    debtStatusClass,
-    formatDebtAmount,
-    hasPaymentActions,
-    isDebtBusy
-} from '~/utils/debt-formatters'
-import { formatDate, formatNumber } from '~/utils/display-format'
+import type { Debt, DebtDetailDialog, DebtDisplayError, DebtInstallment, DebtPayment } from '~/types/debt'
 import { errorMessage } from '~/utils/expected-transaction-formatters'
 
 const auth = useAuthStore()
@@ -105,7 +90,7 @@ const { t } = useI18n()
 
 const confirmDialog = ref<InstanceType<typeof DebtConfirmDialog> | null>(null)
 const { actionId, actionError, noticeKey, requestClose, requestDelete, retry, requestCancelPayment, retryPayment } = useDebtActions(
-    dialog => confirmDialog.value?.confirm(dialog) ?? Promise.resolve(false)
+    request => confirmDialog.value?.confirm(request) ?? Promise.resolve(false)
 )
 
 // The page is mounted again for another id.
@@ -116,38 +101,17 @@ const payments = ref<DebtPayment[]>([])
 const loading = ref(true)
 const loadError = ref<DebtDisplayError | null>(null)
 const notFound = ref(false)
-const editing = ref(false)
-const paying = ref(false)
+const dialog = ref<DebtDetailDialog | null>(null)
+// The installment the dialog was opened for, or null for a dialog of the whole debt.
+const installment = shallowRef<DebtInstallment | null>(null)
 let mounted = false
 let sequence = 0
 let controller: AbortController | null = null
 
 // A frontend message carries messageKey; a backend message is shown verbatim. Resolved at render, so it follows a locale switch.
 const errorText = (error: DebtDisplayError): string => (error.messageKey ? t(error.messageKey, error.messageParams ?? {}) : error.message)
-const labelText = (keys: Record<string, string>, value: string): string => {
-    const label = debtLabel(keys, value)
-    return 'raw' in label ? label.raw : t(label.key)
-}
-const provisioning = computed(() => debt.value?.status === 'Provisioning')
 // A payment that waits to be synced is not a success yet.
 const waiting = computed(() => noticeKey.value === 'debts.notice.paymentPending')
-const facts = computed((): Array<[string, string]> => {
-    const value = debt.value
-    if (!value) return []
-    return [
-        ['debts.fields.direction', labelText(DEBT_DIRECTION_KEYS, value.direction)],
-        ['debts.fields.type', labelText(DEBT_TYPE_KEYS, value.debtType)],
-        ['debts.fields.counterparty', value.counterparty || '-'],
-        ['debts.fields.originalAmount', formatDebtAmount(value.originalAmount)],
-        ['debts.fields.initialBalance', formatDebtAmount(value.initialBalance)],
-        ['debts.fields.currentBalance', formatDebtAmount(value.currentBalance)],
-        ['debts.fields.progress', `${formatNumber(value.progress)}%`],
-        ['debts.fields.interestRate', formatNumber(value.interestRate)],
-        ['debts.fields.startDate', formatDate(value.startDate)],
-        ['debts.fields.description', value.description || '-'],
-        ['debts.fields.notes', value.notes || '-']
-    ]
-})
 
 useHead({ title: computed(() => t('debts.detail.title')) })
 
@@ -186,24 +150,23 @@ const loadDebt = async (): Promise<void> => {
     }
 }
 
-const handleSaved = (): void => {
-    editing.value = false
-    actionError.value = null
-    noticeKey.value = 'debts.notice.updated'
+const openDialog = (name: DebtDetailDialog, target: DebtInstallment | null = null): void => {
+    installment.value = target
+    dialog.value = name
 }
-const handlePaid = (payment: DebtPayment): void => {
-    paying.value = false
+const finish = (key: string): void => {
+    dialog.value = null
     actionError.value = null
-    noticeKey.value = payment.status === 'Pending' ? 'debts.notice.paymentPending' : 'debts.notice.paymentSaved'
+    noticeKey.value = key
 }
+const handlePaid = (payment: DebtPayment): void => finish(payment.status === 'Pending' ? 'debts.notice.paymentPending' : 'debts.notice.paymentSaved')
 
 const clearSessionState = (): void => {
     invalidate()
     debt.value = null
     payments.value = []
     loadError.value = null
-    editing.value = false
-    paying.value = false
+    dialog.value = null
 }
 
 watch(noticeKey, key => {

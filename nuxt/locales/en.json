@@ -132,7 +132,14 @@
         "columns": {
             "nameCounterparty": "Name / Counterparty",
             "directionType": "Direction / Type",
-            "transaction": "Transaction"
+            "transaction": "Transaction",
+            "installmentNo": "No.",
+            "dueDate": "Due date",
+            "plannedPrincipal": "Expected principal (VND)",
+            "plannedInterest": "Expected interest (VND)",
+            "plannedTotal": "Expected total (VND)",
+            "actualPrincipal": "Actual principal (VND)",
+            "actualInterest": "Actual interest (VND)"
         },
         "fields": {
             "direction": "Direction",
@@ -151,7 +158,11 @@
             "paymentDate": "Payment date",
             "principal": "Principal (VND)",
             "interest": "Interest (VND)",
-            "transactionAmount": "Amount (VND)"
+            "transactionAmount": "Amount (VND)",
+            "scheduleMethod": "Calculation method",
+            "firstDueDate": "First due date",
+            "nextDueDate": "Next due date",
+            "installmentCount": "Number of installments"
         },
         "direction": {
             "borrow": "Borrowed",
@@ -191,6 +202,10 @@
             "create": "Create a new transaction",
             "link": "Use an existing transaction"
         },
+        "scheduleMethod": {
+            "equalPrincipal": "Equal principal, interest on the declining balance",
+            "equalPayment": "Equal payments"
+        },
         "filters": {
             "allDirections": "All directions",
             "allStatuses": "All statuses"
@@ -223,6 +238,30 @@
             "loadFailed": "Unable to load the debt: {error}",
             "notFound": "This debt was not found. It may have been deleted."
         },
+        "schedule": {
+            "heading": "Installment schedule",
+            "none": "This debt has no installment schedule yet.",
+            "empty": "The schedule has no installments.",
+            "loading": "Loading the installments...",
+            "loadFailed": "Unable to load the installments: {error}",
+            "create": "Create a schedule",
+            "recalculate": "Recalculate the remaining installments",
+            "record": "Record",
+            "adjust": "Adjust installment",
+            "installment": "Installment {no}, due {date}",
+            "original": "Before the change: {amount}",
+            "countHint": "A whole number from 1 to 2400. There is one installment a month.",
+            "periods_over_600_warning": "More than 600 installments is more than 50 years. Please check the number; you can still continue.",
+            "balance": "Balance to spread over the installments (VND)",
+            "pendingPrincipal": "Principal waiting to be synced, already left out (VND)",
+            "replacedCount": "Pending installments that will be replaced",
+            "adjustedWarning": "Installments adjusted by hand that will be replaced: {count}. Their adjusted amounts will be lost.",
+            "nothingLeft": "Nothing is left to pay. The pending installments will be removed and no new ones created.",
+            "previewLoading": "Checking which installments will be replaced...",
+            "previewFailed": "Unable to check which installments will be replaced: {error}",
+            "saveFailed": "Unable to save the schedule: {error}",
+            "unknown": "It is not clear whether the change was saved. Close this dialog and check the schedule before trying again. If the debt is busy, sync it again."
+        },
         "history": {
             "heading": "Payment history",
             "empty": "No payments yet."
@@ -234,7 +273,8 @@
             "countedHint": "Turn this on when this payment was already taken off the initial balance. The balance then does not change.",
             "noVndAccounts": "You have no VND account. Create one before recording a payment.",
             "saveFailed": "Unable to record the payment: {error}",
-            "unknown": "It is not clear whether the payment was saved. Check the payment history of the debt. Save sends this same attempt again and does not create another payment."
+            "unknown": "It is not clear whether the payment was saved. Check the payment history of the debt. Save sends this same attempt again and does not create another payment.",
+            "installmentHint": "The principal and the interest are the expected amounts of the installment. Change them to what was really paid."
         },
         "picker": {
             "outgoingHint": "Only expense transactions of your VND accounts are listed. Linking creates no transaction; the server checks that it belongs to no other debt or period.",
@@ -276,7 +316,9 @@
             "paymentTotal": "The principal and the interest must add up to more than 0.",
             "paymentAccount": "Please choose a VND account.",
             "paymentDate": "Please choose the payment date.",
-            "transactionTotal": "The principal and the interest must add up to the amount of the chosen transaction."
+            "transactionTotal": "The principal and the interest must add up to the amount of the chosen transaction.",
+            "installmentCount": "The number of installments must be a whole number from 1 to 2400.",
+            "dueDate": "Please choose the due date."
         },
         "close": {
             "title": "Close the debt \"{name}\"?",
@@ -303,7 +345,10 @@
             "paymentSaved": "The payment was recorded.",
             "paymentPending": "The payment was saved but still waits to be synced, so the balance has not changed. Use Sync again in the payment history.",
             "paymentCancelled": "The payment was cancelled.",
-            "paymentSynced": "The payment was synced again."
+            "paymentSynced": "The payment was synced again.",
+            "scheduleCreated": "The installment schedule was created.",
+            "scheduleRecalculated": "The remaining installments were recalculated.",
+            "installmentAdjusted": "The installment was adjusted."
         },
         "errors": {
             "actionFailed": "Unable to complete the action: {error}",

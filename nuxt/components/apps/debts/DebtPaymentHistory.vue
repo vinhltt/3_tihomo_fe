@@ -52,16 +52,8 @@
 
 <script setup lang="ts">
 import type { Debt, DebtPayment } from '~/types/debt'
-import {
-    DEBT_OPERATION_KEYS,
-    DEBT_PAYMENT_STATUS_KEYS,
-    canCancelPayment,
-    canResyncPayment,
-    debtLabel,
-    debtPaymentStatusClass,
-    formatDebtAmount,
-    hasPaymentActions
-} from '~/utils/debt-formatters'
+import { DEBT_OPERATION_KEYS, debtLabel, formatDebtAmount } from '~/utils/debt-formatters'
+import { DEBT_PAYMENT_STATUS_KEYS, canCancelPayment, canResyncPayment, debtPaymentStatusClass, hasPaymentActions } from '~/utils/debt-payment-rules'
 import { formatDate } from '~/utils/display-format'
 import type { DisplayLabel } from '~/utils/expected-transaction-formatters'
 
