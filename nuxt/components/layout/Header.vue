@@ -261,15 +261,16 @@
                                         </li>
                                         <li v-for="item in reminders" :key="item.id" class="dark:text-white-light/90">
                                             <NuxtLink
-                                                :to="{ path: '/apps/expected-transactions', query: { id: item.id } }"
+                                                :to="isDebtLinked(item) ? `/apps/debts/${encodeURIComponent(item.debtId)}` : { path: '/apps/expected-transactions', query: { id: item.id } }"
                                                 class="!block px-4 py-3 hover:bg-white-light/40 dark:hover:bg-dark/60"
                                                 @click="close()"
                                             >
-                                                <h6 class="break-words font-semibold">{{ item.templateName?.trim() || $t('reminder_unnamed_template') }}</h6>
-                                                <p v-if="item.description" class="mt-1 break-words text-sm">{{ item.description }}</p>
+                                                <h6 class="break-words font-semibold">{{ isDebtLinked(item) ? item.debtName || $t('debts.detail.title') : item.templateName?.trim() || $t('reminder_unnamed_template') }}</h6>
+                                                <p v-if="isDebtLinked(item) && item.debtCounterparty" class="mt-1 break-words text-sm">{{ $t('reminder_debt_counterparty', { counterparty: item.debtCounterparty }) }}</p>
+                                                <p v-else-if="item.description" class="mt-1 break-words text-sm">{{ item.description }}</p>
                                                 <div class="mt-2 flex flex-wrap items-center justify-between gap-2 text-sm">
-                                                    <span class="font-semibold">{{ formatMoney(item.expectedAmount) }}</span>
-                                                    <span>{{ reminderTypeLabel(item.transactionType) }}</span>
+                                                    <span class="font-semibold">{{ isDebtLinked(item) ? formatDebtAmount(item.expectedAmount) : formatMoney(item.expectedAmount) }}</span>
+                                                    <span>{{ isDebtLinked(item) ? reminderDebtLabel(item.transactionType) : reminderTypeLabel(item.transactionType) }}</span>
                                                 </div>
                                                 <p class="mt-1 text-xs">{{ $t('reminder_due_date', { date: formatReminderDate(item.expectedDate) }) }}</p>
                                                 <div class="mt-2 flex flex-wrap items-center gap-2 text-xs">
@@ -884,7 +885,9 @@
     import { ExpectedTransactionDisplayStatus, RecurringTransactionType } from '~/types/recurring-transaction';
     import { useExpectedTransactionReminders } from '~/composables/useExpectedTransactionReminders';
     import { useExpectedTransactions } from '~/composables/useExpectedTransactions';
+    import { formatDebtAmount } from '~/utils/debt-formatters';
     import { formatDate, formatMoney } from '~/utils/display-format';
+    import { isDebtLinked } from '~/utils/expected-transaction-formatters';
     import { useAuthStore } from '@/stores/auth';    const store = useAppStore();
     const authStore = useAuthStore();
     const route = useRoute();
@@ -936,6 +939,13 @@
             case RecurringTransactionType.Expense: return t('reminder_type_expense');
             case RecurringTransactionType.Transfer: return t('reminder_type_transfer');
             default: return String(type ?? '');
+        }
+    };
+    const reminderDebtLabel = (type: RecurringTransactionType): string => {
+        switch (type) {
+            case RecurringTransactionType.Income: return t('reminder_debt_receivable');
+            case RecurringTransactionType.Expense: return t('reminder_debt_payable');
+            default: return reminderTypeLabel(type);
         }
     };
     const reminderStatusLabel = (status: ExpectedTransactionDisplayStatus): string => {

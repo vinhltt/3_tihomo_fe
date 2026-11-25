@@ -125,3 +125,11 @@ export const isIncomeExpense = (transaction: ExpectedTransactionViewModel): bool
 export const isPending = (transaction: ExpectedTransactionViewModel): boolean =>
   transaction.status === ExpectedTransactionStatus.Pending &&
   (transaction.displayStatus === ExpectedTransactionDisplayStatus.Pending || transaction.displayStatus === ExpectedTransactionDisplayStatus.Overdue)
+
+/**
+ * Whether the period is an installment of a debt; it is read-only here, only the debt changes it. (EN)
+ *
+ * Kỳ có phải kỳ trả góp của khoản nợ hay không; ở đây chỉ xem, chỉ thay đổi được ở khoản nợ. (VI)
+ */
+export const isDebtLinked = (transaction: ExpectedTransactionViewModel): transaction is ExpectedTransactionViewModel & { debtId: string } =>
+  !!transaction.debtId

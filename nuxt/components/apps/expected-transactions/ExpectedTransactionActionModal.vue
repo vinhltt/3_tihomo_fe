@@ -106,7 +106,7 @@ import type { ApiError } from '~/types/api'
 import { ExpectedTransactionDisplayStatus, ExpectedTransactionStatus, RecurringTransactionType } from '~/types/recurring-transaction'
 import type { ActionMode, CommittedPayload, ExpectedTransactionViewModel, RecordPaymentResult } from '~/types/recurring-transaction'
 import type { TransactionViewModel } from '~/types/transaction'
-import { errorMessage } from '~/utils/expected-transaction-formatters'
+import { errorMessage, isDebtLinked } from '~/utils/expected-transaction-formatters'
 
 const props = defineProps<{ transaction: ExpectedTransactionViewModel; mode: ActionMode }>()
 const emit = defineEmits<{
@@ -173,7 +173,7 @@ const paymentAccountId = computed(() => currentTransaction.value?.accountId || s
 const paymentAccountAvailable = computed(() => !!paymentAccountId.value && accounts.value.some(account => account.id === paymentAccountId.value))
 const actionAllowed = computed(() => {
     const transaction = currentTransaction.value
-    if (!transaction || transaction.status !== ExpectedTransactionStatus.Pending ||
+    if (!transaction || isDebtLinked(transaction) || transaction.status !== ExpectedTransactionStatus.Pending ||
         (transaction.displayStatus !== ExpectedTransactionDisplayStatus.Pending && transaction.displayStatus !== ExpectedTransactionDisplayStatus.Overdue)) return false
     const incomeExpense = transaction.transactionType === RecurringTransactionType.Income || transaction.transactionType === RecurringTransactionType.Expense
     if (props.mode === 'payment' || props.mode === 'adjust') return incomeExpense

@@ -70,7 +70,8 @@ import { computed, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vu
 import { useDebts } from '~/composables/useDebts'
 import { useExpectedTransactions } from '~/composables/useExpectedTransactions'
 import { useAuthStore } from '~/stores/auth'
-import type { Debt, DebtDetailDialog, DebtDisplayError, DebtInstallment } from '~/types/debt'
+import type { Debt, DebtDetailDialog, DebtDisplayError } from '~/types/debt'
+import type { DebtInstallment } from '~/types/debt-schedule'
 import { debtLabel, formatDebtAmount, todayInVietnam } from '~/utils/debt-formatters'
 import {
     DEBT_INSTALLMENT_STATUS_KEYS,

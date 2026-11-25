@@ -80,7 +80,8 @@ import { useDebts } from '~/composables/useDebts'
 import { useExpectedTransactions } from '~/composables/useExpectedTransactions'
 import { useAuthStore } from '~/stores/auth'
 import type { ApiError } from '~/types/api'
-import type { Debt, DebtDetailDialog, DebtDisplayError, DebtInstallment, DebtPayment } from '~/types/debt'
+import type { Debt, DebtDetailDialog, DebtDisplayError, DebtPayment } from '~/types/debt'
+import type { DebtInstallment } from '~/types/debt-schedule'
 import { errorMessage } from '~/utils/expected-transaction-formatters'
 
 const auth = useAuthStore()

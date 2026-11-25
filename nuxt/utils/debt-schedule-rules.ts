@@ -1,5 +1,5 @@
+import type { Debt, DebtScheduleMethod } from '~/types/debt'
 import type {
-  Debt,
   DebtInstallment,
   DebtInstallmentForm,
   DebtInstallmentRequest,
@@ -8,9 +8,8 @@ import type {
   DebtRecalculationPreview,
   DebtRecalculationRequest,
   DebtScheduleForm,
-  DebtScheduleMethod,
   DebtScheduleRequest
-} from '~/types/debt'
+} from '~/types/debt-schedule'
 import { isDebtBusy, toDebtCents } from '~/utils/debt-formatters'
 
 const COUNT_PATTERN = /^\d+$/

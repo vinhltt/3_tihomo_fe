@@ -32,6 +32,18 @@
 
     <!-- Form -->
     <form v-else ref="formRef" novalidate @submit.prevent="handleSubmit" class="space-y-5">
+      <!-- Debt Lock Reason -->
+      <div v-if="debtLockKey" class="p-3 bg-info/10 border border-info/20 rounded-lg text-sm text-info">
+        <p>{{ t(debtLockKey) }}</p>
+        <NuxtLink
+          v-if="originalTransaction?.debtId"
+          :to="`/apps/debts/${encodeURIComponent(originalTransaction.debtId)}`"
+          class="underline"
+        >
+          {{ t('debts.detail.title') }}
+        </NuxtLink>
+      </div>
+
       <!-- Simple Mode Fields -->
       <div class="space-y-4">
         <!-- Transaction Direction -->
@@ -39,9 +51,9 @@
           <label class="text-sm font-medium text-white-dark">
             {{ t('transactions.fields.direction') }} *
           </label>
-          <select 
-            v-model="form.transactionDirection" 
-            :disabled="mode === 'view'"
+          <select
+            v-model="form.transactionDirection"
+            :disabled="mode === 'view' || !!debtLockKey"
             class="form-select"
             required
           >
@@ -56,8 +68,8 @@
             {{ t('transactions.fields.amount') }} *
           </label>
           <input 
-            v-model.number="form.amount" 
-            :disabled="mode === 'view'"
+            v-model.number="form.amount"
+            :disabled="mode === 'view' || !!debtLockKey"
             type="number" 
             class="form-input"
             :placeholder="t('transactions.placeholders.amount')"
@@ -71,8 +83,8 @@
             {{ t('transactions.fields.transactionDateTime') }} *
           </label>
           <input 
-            v-model="form.transactionDate" 
-            :disabled="mode === 'view'"
+            v-model="form.transactionDate"
+            :disabled="mode === 'view' || !!debtLockKey"
             type="datetime-local" 
             class="form-input"
             required
@@ -85,8 +97,8 @@
             {{ t('transactions.fields.account') }} *
           </label>
           <select 
-            v-model="form.accountId" 
-            :disabled="mode === 'view'"
+            v-model="form.accountId"
+            :disabled="mode === 'view' || !!debtLockKey"
             class="form-select"
             required
           >
@@ -406,7 +418,7 @@ import Swal from 'sweetalert2'
 import type { TransactionViewModel, TransactionCreateRequest, TransactionUpdateRequest, TransactionDirectionType } from '~/types/transaction'
 import type { AccountSelection } from '~/types/account'
 import type { ApiError } from '~/types/api'
-import { CategoryTypeConst, TransactionDirectionConst } from '~/types/transaction'
+import { CategoryTypeConst, TransactionDirectionConst, getDebtLockKey } from '~/types/transaction'
 import { getCategoryTypeValue, toTransactionErrorState } from '~/composables/useTransactions'
 
 // Props
@@ -444,6 +456,9 @@ const isLoading = ref(false)
 const error = ref<Pick<ApiError, 'messageKey' | 'messageParams' | 'message'> | null>(null)
 const showAdvanced = ref(false)
 const formRef = ref<HTMLFormElement | null>(null)
+// What the form was filled from, as the API sent it; null when creating.
+const originalTransaction = ref<TransactionViewModel | null>(null)
+const debtLockKey = computed(() => getDebtLockKey(originalTransaction.value))
 
 const errorText = computed(() =>
   error.value?.messageKey ? t(error.value.messageKey, error.value.messageParams ?? {}) : error.value?.message ?? ''
@@ -490,6 +505,7 @@ const handleClose = () => {
 const initializeForm = () => {
   error.value = null
   showAdvanced.value = false
+  originalTransaction.value = props.mode === 'create' ? null : props.transaction
 
   if (props.mode === 'create') {
     // Create mode - use defaults
@@ -517,9 +533,11 @@ const initializeForm = () => {
       ? CategoryTypeConst.Income 
       : CategoryTypeConst.Expense
   } else if (props.transaction) {
-    // Edit or View mode - populate from transaction
-    const transactionDate = new Date(props.transaction.transactionDate).toISOString().slice(0, 16)
-    
+    // Edit or View mode - populate from transaction. A locked date shows the stored wall clock, the same day as at the debt.
+    const transactionDate = props.transaction.debtLinkId
+      ? props.transaction.transactionDate.slice(0, 16)
+      : new Date(props.transaction.transactionDate).toISOString().slice(0, 16)
+
     form.value = {
       id: props.transaction.id,
       accountId: props.transaction.accountId,
@@ -577,7 +595,7 @@ const handleSubmit = async () => {
       resetForm(form.value)
       emit('created')
     } else if (props.mode === 'edit') {
-      await updateTransaction(form.value as TransactionUpdateRequest)
+      await updateTransaction(form.value as TransactionUpdateRequest, originalTransaction.value)
       emit('updated')
     }
   } catch (err) {

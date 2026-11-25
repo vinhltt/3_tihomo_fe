@@ -376,6 +376,9 @@
     "reminder_days_overdue": "Quá hạn {days} ngày",
     "reminder_due_today": "Đến hạn hôm nay",
     "reminder_days_remaining": "Còn {days} ngày",
+    "reminder_debt_payable": "Phải trả",
+    "reminder_debt_receivable": "Phải thu",
+    "reminder_debt_counterparty": "Đối tác: {counterparty}",
     "expected_transactions": "Giao dịch dự kiến",
     "common": {
         "actions": "Thao tác",
@@ -1077,6 +1080,12 @@
             "classificationNotes": "Phân loại & ghi chú",
             "syncMetadata": "Đồng bộ & metadata"
         },
+        "debtLock": {
+            "permanent": "Giao dịch này thuộc một khoản nợ đã đóng nên loại, số tiền, ngày và tài khoản bị khóa vĩnh viễn.",
+            "disbursement": "Giao dịch này là giải ngân của một khoản nợ nên loại, số tiền, ngày và tài khoản bị khóa. Muốn mở khóa, hãy xóa khoản nợ.",
+            "payment": "Giao dịch này là thanh toán của một khoản nợ nên loại, số tiền, ngày và tài khoản bị khóa. Muốn mở khóa, hãy hủy thanh toán ở khoản nợ.",
+            "linked": "Giao dịch này gắn với một khoản nợ."
+        },
         "actions": {
             "addIncome": "Thêm giao dịch Thu",
             "addExpense": "Thêm giao dịch Chi",
@@ -1168,7 +1177,8 @@
             "loading": "Đang tải kỳ được chọn từ nhắc hạn...",
             "loadFailed": "Không thể chọn kỳ: {error}",
             "retry": "Thử tải lại kỳ được chọn",
-            "processed": "Kỳ được chọn đã xử lý, không thể thay đổi."
+            "processed": "Kỳ được chọn đã xử lý, không thể thay đổi.",
+            "handledAtDebt": "Kỳ được chọn là kỳ của một khoản nợ và được xử lý ở khoản nợ."
         },
         "filters": {
             "allStatuses": "Tất cả trạng thái",
@@ -1191,7 +1201,8 @@
             "signInRequired": "Vui lòng đăng nhập để xem giao dịch dự kiến.",
             "invalidDateRange": "Khoảng ngày không hợp lệ. Hãy sửa bộ lọc ngày để xem danh sách.",
             "empty": "Không có giao dịch dự kiến phù hợp với bộ lọc.",
-            "processed": "Kỳ đã xử lý, không thể thay đổi."
+            "processed": "Kỳ đã xử lý, không thể thay đổi.",
+            "handledAtDebt": "Xử lý ở khoản nợ."
         },
         "columns": {
             "periodTemplate": "Kỳ / Mẫu định kỳ",

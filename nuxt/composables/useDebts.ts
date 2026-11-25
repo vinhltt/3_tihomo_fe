@@ -8,17 +8,19 @@ import type {
   DebtDisbursementInput,
   DebtFilterForm,
   DebtForm,
-  DebtInstallment,
-  DebtInstallmentForm,
   DebtPayment,
   DebtPaymentForm,
-  DebtRecalculationForm,
-  DebtRecalculationPreview,
-  DebtSchedule,
-  DebtScheduleForm,
   DebtTotals,
   DebtUpdateRequest
 } from '~/types/debt'
+import type {
+  DebtInstallment,
+  DebtInstallmentForm,
+  DebtRecalculationForm,
+  DebtRecalculationPreview,
+  DebtSchedule,
+  DebtScheduleForm
+} from '~/types/debt-schedule'
 import { toPaymentRequest } from '~/utils/debt-payment-rules'
 import { toInstallmentRequest, toRecalculationRequest, toScheduleRequest } from '~/utils/debt-schedule-rules'
 

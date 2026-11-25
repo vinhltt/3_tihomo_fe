@@ -31,7 +31,13 @@
                 <tbody>
                     <tr v-for="transaction in transactions" :key="transaction.id" :class="{ 'bg-primary/10': highlightedId === transaction.id }">
                         <td class="min-w-[180px] max-w-xs">
-                            <p class="font-semibold">{{ labelText(templateLabel(transaction)) }}</p>
+                            <div v-if="isDebtLinked(transaction)" class="break-words">
+                                <p class="font-semibold">
+                                    <NuxtLink :to="`/apps/debts/${encodeURIComponent(transaction.debtId)}`" class="text-primary hover:underline">{{ transaction.debtName || t('debts.detail.title') }}</NuxtLink>
+                                </p>
+                                <p v-if="transaction.debtCounterparty" class="mt-1 text-sm">{{ t('debts.fields.counterparty') }}: {{ transaction.debtCounterparty }}</p>
+                            </div>
+                            <p v-else class="font-semibold">{{ labelText(templateLabel(transaction)) }}</p>
                             <p v-if="transaction.description" class="mt-1 whitespace-pre-wrap text-sm">{{ transaction.description }}</p>
                             <p v-if="transaction.category" class="mt-1 text-xs text-gray-500">{{ t('transactions.fields.category') }}: {{ transaction.category }}</p>
                             <p class="mt-1 break-all text-xs text-gray-500">{{ t('expected.fields.periodId') }}: {{ transaction.id }}</p>
@@ -47,9 +53,9 @@
                             <p class="mt-1 text-sm text-gray-500">{{ labelText(typeLabel(transaction.transactionType)) }}</p>
                         </td>
                         <td class="whitespace-nowrap">
-                            <p class="font-semibold">{{ formatCurrency(transaction.expectedAmount) }}</p>
+                            <p class="font-semibold">{{ amountText(transaction, transaction.expectedAmount) }}</p>
                             <p v-if="transaction.isAdjusted" class="mt-1 text-xs text-warning">{{ t('expected.fields.adjusted') }}</p>
-                            <p v-if="transaction.originalAmount != null" class="mt-1 text-xs text-gray-500">{{ t('expected.fields.originalAmount') }}: {{ formatCurrency(transaction.originalAmount) }}</p>
+                            <p v-if="transaction.originalAmount != null" class="mt-1 text-xs text-gray-500">{{ t('expected.fields.originalAmount') }}: {{ amountText(transaction, transaction.originalAmount) }}</p>
                         </td>
                         <td>
                             <span class="badge whitespace-nowrap" :class="statusClass(transaction.displayStatus)">{{ labelText(statusLabel(transaction.displayStatus)) }}</span>
@@ -62,7 +68,8 @@
                             <p v-if="transaction.notes" class="mt-1 whitespace-pre-wrap text-gray-500">{{ t('transactions.fields.note') }}: {{ transaction.notes }}</p>
                         </td>
                         <td class="min-w-[220px]">
-                            <div v-if="isPending(transaction)" class="flex flex-wrap gap-2">
+                            <p v-if="isPending(transaction) && isDebtLinked(transaction)" class="text-sm text-gray-500">{{ t('expected.list.handledAtDebt') }}</p>
+                            <div v-else-if="isPending(transaction)" class="flex flex-wrap gap-2">
                                 <button v-if="isIncomeExpense(transaction)" type="button" class="btn btn-sm btn-outline-success" @click="emit('open', transaction, 'payment')">{{ t('expected.actions.payment') }}</button>
                                 <button type="button" class="btn btn-sm btn-outline-primary" @click="emit('open', transaction, 'link')">{{ t('expected.actions.link') }}</button>
                                 <button v-if="isIncomeExpense(transaction)" type="button" class="btn btn-sm btn-outline-warning" @click="emit('open', transaction, 'adjust')">{{ t('expected.actions.adjust') }}</button>
@@ -90,11 +97,13 @@
 import { computed } from 'vue'
 import type { Pagination } from '~/types/api'
 import type { ActionMode, ExpectedTransactionViewModel } from '~/types/recurring-transaction'
+import { formatDebtAmount } from '~/utils/debt-formatters'
 import {
     dueMessage,
     formatCurrency,
     formatDate,
     formatTimestamp,
+    isDebtLinked,
     isIncomeExpense,
     isPending,
     statusClass,
@@ -129,6 +138,9 @@ const labelText = (label: DisplayLabel): string => {
     if ('raw' in label) return label.raw
     return label.plural === undefined ? t(label.key, label.params ?? {}) : t(label.key, label.params ?? {}, label.plural)
 }
+// The amount of a debt shows both digits of its fraction.
+const amountText = (transaction: ExpectedTransactionViewModel, amount: number): string =>
+    isDebtLinked(transaction) ? formatDebtAmount(amount) : formatCurrency(amount)
 const firstRow = computed(() => (props.pagination.pageIndex - 1) * props.pagination.pageSize + 1)
 const lastRow = computed(() => Math.min(props.pagination.pageIndex * props.pagination.pageSize, props.pagination.totalRow))
 </script>

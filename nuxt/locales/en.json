@@ -376,6 +376,9 @@
     "reminder_days_overdue": "{days} day overdue | {days} days overdue",
     "reminder_due_today": "Due today",
     "reminder_days_remaining": "Due in {days} day | Due in {days} days",
+    "reminder_debt_payable": "Payable",
+    "reminder_debt_receivable": "Receivable",
+    "reminder_debt_counterparty": "Counterparty: {counterparty}",
     "expected_transactions": "Expected transactions",
     "common": {
         "actions": "Actions",
@@ -1077,6 +1080,12 @@
             "classificationNotes": "Classification & notes",
             "syncMetadata": "Sync & metadata"
         },
+        "debtLock": {
+            "permanent": "This transaction belongs to a closed debt, so its type, amount, date and account stay locked for good.",
+            "disbursement": "This transaction is the disbursement of a debt, so its type, amount, date and account are locked. Delete the debt to unlock them.",
+            "payment": "This transaction is a payment of a debt, so its type, amount, date and account are locked. Cancel the payment at the debt to unlock them.",
+            "linked": "This transaction is linked to a debt."
+        },
         "actions": {
             "addIncome": "Add income transaction",
             "addExpense": "Add expense transaction",
@@ -1168,7 +1177,8 @@
             "loading": "Loading the period selected from the reminder...",
             "loadFailed": "Unable to select the period: {error}",
             "retry": "Reload the selected period",
-            "processed": "The selected period has been processed and cannot be changed."
+            "processed": "The selected period has been processed and cannot be changed.",
+            "handledAtDebt": "The selected period is an installment of a debt and is handled at the debt."
         },
         "filters": {
             "allStatuses": "All statuses",
@@ -1191,7 +1201,8 @@
             "signInRequired": "Please sign in to view expected transactions.",
             "invalidDateRange": "Invalid date range. Fix the date filter to see the list.",
             "empty": "No expected transactions match the filters.",
-            "processed": "This period has been processed and cannot be changed."
+            "processed": "This period has been processed and cannot be changed.",
+            "handledAtDebt": "Handled at the debt."
         },
         "columns": {
             "periodTemplate": "Period / Recurring template",

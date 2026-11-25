@@ -1,6 +1,7 @@
 import type { FilterRequest } from '~/types/api'
 import { FilterLogicalOperator, FilterType } from '~/types/api'
-import type { Debt, DebtDialog, DebtInstallment, DebtPayment, DebtPaymentForm, DebtPaymentRequest, DebtPaymentStatus } from '~/types/debt'
+import type { Debt, DebtDialog, DebtPayment, DebtPaymentForm, DebtPaymentRequest, DebtPaymentStatus } from '~/types/debt'
+import type { DebtInstallment } from '~/types/debt-schedule'
 import type { TransactionViewModel } from '~/types/transaction'
 import { formatDebtAmount, isDebtBusy, toDebtCents, todayInVietnam, transactionAmountText } from '~/utils/debt-formatters'
 import { formatTimestamp } from '~/utils/expected-transaction-formatters'
